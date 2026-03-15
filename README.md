@@ -221,11 +221,6 @@ Field meanings:
    ```
 2. For Codex, also clean prompts: `rm -rf ~/.codex/prompts/openspec.md ~/.codex/prompts/opsx-*.md`
 
-### Workspace rule file not created
-**Symptom**: `CLAUDE.md` or `AGENTS.md` doesn't exist in workspace.
-**Explanation**: OpenSpec does not create workspace constraint files.
-**Solution**: Create the required rule file manually in your project root.
-
 ## 📄 License
 
 MIT (inherits upstream OpenSpec licensing model)

@@ -229,14 +229,6 @@ ruleFile: "CLAUDE.md"
    ```
 2. Codex 还需清理 prompts：`rm -rf ~/.codex/prompts/openspec.md ~/.codex/prompts/opsx-*.md`
 
-### 工作区规则文件未创建
-
-**症状**：工作区目录下没有 `CLAUDE.md` 或 `AGENTS.md`。
-**解决方案**：重新安装并指定 `--workspace`：
-```bash
-./install.sh --platform claude --workspace /path/to/your/project
-```
-
 ## 📄 许可证
 
 MIT（继承上游 OpenSpec 许可模型）
