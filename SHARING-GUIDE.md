@@ -1,4 +1,4 @@
-# OpenSpec Sharing Guide (v2.0.0)
+# OpenSpec Sharing Guide (v1.0.0)
 
 This package is now multi-platform and uses a unified command surface.
 
@@ -6,44 +6,36 @@ This package is now multi-platform and uses a unified command surface.
 
 - Claude
 - Codex
-- OpenCode
 - Gemini
-- OpenClaw
 
 ## Core Changes
 
-- Added: `/opsx:rules <type> [profile] [--file <name>]`
 - Removed: `/openspec --update` (falls back to help)
 - Shared config moved to `~/.openspec/.opsx-config.yaml`
+- Codex command surface uses custom prompts:
+  - `/prompts:openspec ...`
+  - `/prompts:opsx-<action>`
 
 ## Install
 
 ```bash
-./install.sh --platform <claude|codex|opencode|gemini|openclaw> [--workspace <path>]
+./install.sh --platform <claude|codex|gemini> [--workspace <path>]
 ```
 
 ## Uninstall
 
 ```bash
-./uninstall.sh --platform <claude|codex|opencode|gemini|openclaw>
+./uninstall.sh --platform <claude|codex|gemini>
 ```
-
-## Rule Type Matrix
-
-- `tech`: `web | api | fullstack | android | ios | harmony | desktop | general`
-- `ux`: `product | design-system | research | general`
-- `writing`: `docs | blog | spec | proposal | general`
-- `other`: `general`
 
 ## Platform Output Mapping
 
 - Claude -> `CLAUDE.md`
-- Codex/OpenCode/OpenClaw -> `AGENTS.md`
+- Codex -> `AGENTS.md`
 - Gemini -> `GEMINI.md`
 
 ## Share Checklist
 
-1. Ensure `commands/opsx/rules.md` exists and legacy rule command files are removed.
-2. Ensure no doc mentions `/openspec --update` as an active feature.
-3. Ensure installer requires `--platform`.
-4. Ensure config template has only `version/platform/language/ruleFile`.
+1. Ensure no doc mentions `/openspec --update` as an active feature.
+2. Ensure installer requires `--platform`.
+3. Ensure config template has only `version/platform/language/ruleFile`.

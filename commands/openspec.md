@@ -1,8 +1,8 @@
 ---
-description: OpenSpec workflow - AI-native spec-driven development (explore, propose, new, continue, ff, apply, rules, batch-apply, verify, sync, archive, bulk-archive, resume, status, onboard)
+description: OpenSpec workflow - AI-native spec-driven development (explore, propose, new, continue, ff, apply, batch-apply, verify, sync, archive, bulk-archive, resume, status, onboard)
 ---
 
-# OpenSpec Workflow (v2.0.0)
+# OpenSpec Workflow (v1.0.0)
 
 You are the **OpenSpec** entry point — an AI-native spec-driven development system.
 
@@ -15,7 +15,7 @@ Parse the argument after `/openspec` and route accordingly:
 Display the command reference card:
 
 ```
-## OpenSpec v2.0.0 — Command Reference
+## OpenSpec v1.0.0 — Command Reference
 
 **Core workflow:**
 
@@ -38,7 +38,6 @@ Display the command reference card:
 
 | Command | What it does |
 |---------|--------------|
-| `/opsx:rules <type> [profile] [--file <name>]` | Generate project constraint document |
 | `/opsx:verify <name>` | Verify implementation matches artifacts |
 | `/opsx:sync <name>` | Sync delta specs to main specs |
 | `/opsx:bulk-archive` | Archive multiple changes at once |
@@ -76,6 +75,49 @@ OpenSpec Local Skill v<version>
 Language: <language>
 Platform: <platform>
 RuleFile: <ruleFile>
+```
+
+### `--check`
+
+Validate the current OpenSpec installation and workspace configuration:
+
+1. **Check shared config** — verify `~/.openspec/.opsx-config.yaml` exists and is readable
+2. **Check platform files** — verify commands/prompts and skill files exist for the configured platform
+3. **Check workspace** — verify the workspace has the required rule file (`CLAUDE.md`, `AGENTS.md`, or `GEMINI.md`)
+4. **Check openspec directory** — if workspace has an `openspec/` directory, verify its structure
+
+Output format:
+
+```
+## OpenSpec Installation Check
+
+**Config**: ✓ Found (~/.openspec/.opsx-config.yaml)
+  - version: 1.0.0
+  - platform: claude
+  - language: en
+
+**Platform Files**:
+  ✓ ~/.claude/commands/openspec.md
+  ✓ ~/.claude/commands/opsx/
+  ✓ ~/.claude/skills/openspec-workflow/
+
+**Workspace**: /path/to/project
+  ✓ CLAUDE.md (rule file)
+  ✓ openspec/ directory found
+  ✓ openspec/changes/ exists
+
+**Summary**: All checks passed ✓
+```
+
+If any check fails, show `✗` with the issue and suggest fixes:
+
+```
+**Config**: ✗ Not found
+  → Run: ./install.sh --platform <claude|codex|gemini>
+
+**Workspace**: /path/to/project
+  ✗ CLAUDE.md (rule file missing)
+  → Re-run install with --workspace /path/to/project
 ```
 
 ### `--language <en|zh>` or `--lang <en|zh>`

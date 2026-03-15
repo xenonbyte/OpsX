@@ -1,7 +1,7 @@
 # OpenSpec Local Skill Configuration
 # Managed by /openspec meta-commands
 
-version: "2.0.0"
-platform: "claude"  # claude | codex | opencode | gemini | openclaw
+version: "1.0.0"
+platform: "claude"  # claude | codex | gemini
 language: "zh"      # en | zh
 ruleFile: "CLAUDE.md"

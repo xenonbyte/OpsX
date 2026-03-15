@@ -275,7 +275,6 @@ You just completed a full OpenSpec cycle:
 | `/opsx:new` | Start a new change, step through artifacts one at a time |
 | `/opsx:continue` | Continue working on an existing change |
 | `/opsx:ff` | Fast-forward: create all artifacts at once |
-| `/opsx:rules` | Generate project constraint document |
 | `/opsx:verify` | Verify implementation matches artifacts |
 | `/opsx:sync` | Sync delta specs to main specs |
 | `/opsx:bulk-archive` | Archive multiple changes at once |

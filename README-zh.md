@@ -1,13 +1,15 @@
-# OpenSpec Skill（多平台版）
+# OpenSpec
 
 OpenSpec 是一套规范驱动（spec-driven）工作流技能，统一支持以下平台：
 - Claude
 - Codex
-- OpenCode
 - Gemini
-- OpenClaw
 
 入口使用 `/openspec`，工作流命令使用 `/opsx:*`。
+
+不同平台的调用入口：
+- Claude/Gemini：`/openspec ...` 与 `/opsx:*`
+- Codex：`/prompts:openspec ...` 与 `/prompts:opsx-*`
 
 ## 快速开始
 
@@ -18,7 +20,7 @@ chmod +x install.sh uninstall.sh
 ./install.sh --platform claude
 ```
 
-安装后建议先执行：
+安装后建议先执行（Claude/Gemini）：
 
 ```bash
 /openspec --help
@@ -26,33 +28,38 @@ chmod +x install.sh uninstall.sh
 /openspec --doc
 ```
 
-## 平台约束文件映射
+安装后建议先执行（Codex）：
 
-- Claude -> `CLAUDE.md`
-- Codex -> `AGENTS.md`
-- OpenCode -> `AGENTS.md`
-- OpenClaw -> `AGENTS.md`
-- Gemini -> `GEMINI.md`
-
-使用 `/opsx:rules` 时可通过 `--file <name>` 覆盖默认文件名。
+```bash
+/prompts:openspec --help
+/prompts:openspec --version
+/prompts:openspec --doc
+```
 
 ## 命令说明
 
 ### 元命令
 
+Codex 说明：
+- 把 `/openspec ...` 替换为 `/prompts:openspec ...`
+
 | 命令 | 说明 | 实战例子 |
 |---|---|---|
 | `/openspec --help` | 查看完整命令参考卡片。 | 新成员第一次接触工作流时先看命令总览。 |
-| `/openspec --version` | 查看本地技能版本和配置摘要。 | 验证平台安装是否已经切换到 v2.0.0。 |
+| `/openspec --version` | 查看本地技能版本和配置摘要。 | 验证平台安装是否已经切换到 v1.0.0。 |
 | `/openspec --language zh` | 切换中文输出。 | 团队中文协作时统一输出语言。 |
 | `/openspec --language en` | 切换英文输出。 | 面向海外团队写 specs 时切换英文。 |
 | `/openspec --doc` | 打开内置实战指南。 | 在终端里直接查看完整使用文档。 |
 | `/openspec <描述>` | 用自然语言快速路由到 propose。 | `/openspec 增加仪表盘离线缓存` |
 
 兼容说明：
-- v2.0.0 已移除 `/openspec --update`，调用时会静默回落到 help 输出。
+- v1.0.0 已移除 `/openspec --update`，调用时会静默回落到 help 输出。
 
 ### 工作流命令
+
+Codex 映射规则：
+- `/opsx:<action>` -> `/prompts:opsx-<action>`
+- 例：`/opsx:new add-invoice-export` -> `/prompts:opsx-new add-invoice-export`
 
 | 命令 | 说明 | 实战例子 |
 |---|---|---|
@@ -71,58 +78,31 @@ chmod +x install.sh uninstall.sh
 | `/opsx:bulk-archive` | 批量归档多个完成变更。 | 迭代结束后集中清理 changes。 |
 | `/opsx:onboard` | 引导式教学，走完整个 OpenSpec 周期。 | 用于新同学上手项目流程。 |
 
-### 约束文档命令
-
-| 命令 | 说明 | 实战例子 |
-|---|---|---|
-| `/opsx:rules <type> [profile] [--file <name>]` | 按 Base + Type Pack + Project Signals 生成项目约束文档。 | `/opsx:rules tech android` |
-
-#### Type 体系
-
-顶层 `type`：
-- `tech`
-- `ux`
-- `writing`
-- `other`
-
-`profile`：
-- `tech`: `web | api | fullstack | android | ios | harmony | desktop | general`
-- `ux`: `product | design-system | research | general`
-- `writing`: `docs | blog | spec | proposal | general`
-- `other`: `general`
-
-别名行为：
-- `/opsx:rules android` 等价于 `/opsx:rules tech android`。
-
-兼容行为：
-- `mobile` 已移除，请改用 `android | ios | harmony`。
-
 ## 实战示例（端到端）
 
-### 示例 1：技术需求（Android）
+在 Codex 中，把示例里的 `/opsx:<action>` 替换为 `/prompts:opsx-<action>`。
+
+### 示例 1：技术需求
 
 ```bash
-/opsx:rules tech android
 /opsx:propose add-biometric-login
 /opsx:apply add-biometric-login
 /opsx:verify add-biometric-login
 /opsx:archive add-biometric-login
 ```
 
-### 示例 2：UX 需求（设计系统）
+### 示例 2：UX 需求
 
 ```bash
-/opsx:rules ux design-system
 /opsx:propose redesign-button-states
 /opsx:ff redesign-button-states
 /opsx:apply redesign-button-states
 /opsx:verify redesign-button-states
 ```
 
-### 示例 3：写作需求（文档）
+### 示例 3：写作需求
 
 ```bash
-/opsx:rules writing docs --file AGENTS.md
 /opsx:propose improve-api-error-guide
 /opsx:continue improve-api-error-guide
 /opsx:apply improve-api-error-guide
@@ -137,7 +117,7 @@ chmod +x install.sh uninstall.sh
 示例：
 
 ```yaml
-version: "2.0.0"
+version: "1.0.0"
 platform: "claude"
 language: "zh"
 ruleFile: "CLAUDE.md"
@@ -154,14 +134,86 @@ ruleFile: "CLAUDE.md"
 安装：
 
 ```bash
-./install.sh --platform <claude|codex|opencode|gemini|openclaw> [--workspace <path>] [--dry-run]
+./install.sh --platform <claude|codex|gemini> [--workspace <path>] [--dry-run]
 ```
 
 卸载：
 
 ```bash
-./uninstall.sh --platform <claude|codex|opencode|gemini|openclaw> [--dry-run]
+./uninstall.sh --platform <claude|codex|gemini> [--dry-run]
 ```
+
+## 环境要求
+
+- Bash 3.2+（macOS/Linux 默认已安装）
+- Git 2.0+
+- Perl 5.x（用于 Codex 命令转换）
+
+## 故障排除
+
+### 安装后命令找不到
+
+**症状**：`/openspec` 或 `/opsx:*` 命令无响应。
+
+**解决方案**：
+1. 检查平台目录是否存在：
+   ```bash
+   ls -la ~/.claude/commands/        # Claude
+   ls -la ~/.codex/prompts/          # Codex
+   ls -la ~/.gemini/commands/        # Gemini
+   ```
+2. 检查安装清单：
+   ```bash
+   cat ~/.openspec/manifests/claude.manifest
+   ```
+3. 先用 `--dry-run` 测试安装路径是否正确。
+
+### 配置文件权限错误
+
+**症状**：AI 报告读取 `~/.openspec/.opsx-config.yaml` 时"权限被拒绝"。
+
+**解决方案**：
+```bash
+chmod 644 ~/.openspec/.opsx-config.yaml
+```
+
+### 语言切换不生效
+
+**症状**：执行 `/openspec --language zh` 后输出语言未变化。
+
+**解决方案**：
+1. 确认配置已更新：
+   ```bash
+   cat ~/.openspec/.opsx-config.yaml
+   ```
+2. 开启新的对话会话 — 语言偏好在每个会话开始时读取。
+
+### 卸载后文件未清理干净
+
+**症状**：运行 `uninstall.sh` 后仍有残留文件。
+
+**解决方案**：
+1. 手动清理：
+   ```bash
+   rm -rf ~/.openspec
+   rm -rf ~/.claude/commands/openspec.md ~/.claude/commands/opsx
+   rm -rf ~/.claude/skills/openspec-workflow
+   ```
+2. Codex 还需清理 prompts：
+   ```bash
+   rm -rf ~/.codex/prompts/openspec.md ~/.codex/prompts/opsx-*.md
+   ```
+
+### 工作区规则文件未创建
+
+**症状**：工作区目录下没有 `CLAUDE.md` 或 `AGENTS.md`。
+
+**解决方案**：
+1. 重新安装并指定 `--workspace`：
+   ```bash
+   ./install.sh --platform claude --workspace /path/to/your/project
+   ```
+2. 或手动创建，内容参考安装脚本中的模板。
 
 ## 许可证
 

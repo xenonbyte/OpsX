@@ -5,11 +5,11 @@ license: MIT
 compatibility: Works standalone (no CLI required)
 metadata:
   author: OpenSpec (packaged for local use)
-  version: "2.0.0"
+  version: "1.0.0"
   generatedBy: "OpenSpec-Local-Skill"
 ---
 
-# OpenSpec Workflow Skill (v2.0.0)
+# OpenSpec Workflow Skill (v1.0.0)
 
 You are an expert in **OpenSpec** — an AI-native spec-driven development system that adds a lightweight spec layer between ideas and code generation.
 
@@ -33,6 +33,17 @@ Before responding, read `~/.openspec/.opsx-config.yaml`.
 ## OpenSpec Overview
 
 **OpenSpec** helps you and your AI assistant agree on what to build before any code is written, then provides a structured workflow for implementation and tracking.
+
+## Platform Invocation Notes
+
+- Canonical workflow names are `openspec` and `opsx`.
+- Claude/Gemini invocation:
+  - `/openspec ...`
+  - `/opsx:*`
+- Codex invocation:
+  - `/prompts:openspec ...`
+  - `/prompts:opsx-*`
+- When showing command examples to Codex users, adapt command text to the `/prompts:` form.
 
 ### Key Benefits
 
@@ -73,7 +84,6 @@ OPSX is the standard workflow for OpenSpec — **fluid, iterative, no rigid phas
 | **continue** | `/opsx:continue` | Create the next artifact | Building artifacts incrementally |
 | **ff** | `/opsx:ff` | Create all planning artifacts at once | When you have clear picture |
 | **apply** | `/opsx:apply` | Implement tasks | When ready to code |
-| **rules** | `/opsx:rules <type> [profile] [--file <name>]` | Generate platform-aware project constraint file | Initialize or refresh project constraints |
 | **verify** | `/opsx:verify` | Validate implementation against specs | Before archiving |
 | **sync** | `/opsx:sync` | Sync delta specs to main specs | When specs need updating |
 | **archive** | `/opsx:archive` | Archive completed changes | When work is done |
@@ -361,7 +371,7 @@ When user says "ff" or wants to create all planning artifacts:
 2. Show what was created
 3. Indicate readiness for implementation
 
-### Propose Workflow (v2.0.0)
+### Propose Workflow (v1.0.0)
 
 When user says "propose" or wants to quickly create everything:
 
@@ -380,7 +390,7 @@ When user says "apply" or starts implementation:
 4. **Mark tasks complete** using `- [x]` format
 5. **Pause if blockers** — ask for clarification when needed
 
-### Verify Workflow (v2.0.0)
+### Verify Workflow (v1.0.0)
 
 When user says "verify" or wants to validate implementation:
 
@@ -390,7 +400,7 @@ When user says "verify" or wants to validate implementation:
 4. **Coherence**: Does implementation follow design decisions?
 5. **Generate report** with CRITICAL/WARNING/SUGGESTION issues
 
-### Sync Workflow (v2.0.0)
+### Sync Workflow (v1.0.0)
 
 When user says "sync" or wants to update main specs:
 
@@ -410,7 +420,7 @@ When work is done:
 4. **Update main specs** if delta specs were used
 5. **Show completion** — what was archived
 
-### Bulk Archive (v2.0.0)
+### Bulk Archive (v1.0.0)
 
 When user wants to archive multiple changes:
 
@@ -466,7 +476,6 @@ rules:
 | "Let me think step by step" | Use `/opsx:new` then `/opsx:continue` |
 | "Fast forward" or "ff" | Create all planning artifacts at once |
 | "Implement this" | Read all context, work through tasks with `/opsx:apply` |
-| "Generate constraints" | Use `/opsx:rules` |
 | "Is this correct?" | Validate with `/opsx:verify` |
 | "Update main specs" | Use `/opsx:sync` |
 | "Done" or "Finish" | Verify completeness, archive with `/opsx:archive` |
