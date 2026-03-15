@@ -16,37 +16,46 @@ You are executing the **OPSX Archive** command to archive a completed change.
 
 ## Your Task
 
-1. **Verify completion**:
+1. **Identify target change**:
+   - If user specified a change name, use it
+   - If omitted:
+     - List active changes in `openspec/changes/` (excluding `archive/`)
+     - If exactly one active change, use it
+     - If multiple active changes, ask user to choose
+   - Verify `openspec/changes/<change-name>/` exists
+
+2. **Verify completion**:
    - Check if all tasks are marked complete (`- [x]`)
    - If not, ask user: "Some tasks are incomplete. Archive anyway?"
    - Get confirmation before proceeding
 
-2. **Check for delta specs**:
-   - Look in `specs/` for MODIFIED or REMOVED requirements
-   - If found, ask user: "Should specs be synced to main? (You can also use `/opsx:sync` separately)"
+3. **Check for delta specs**:
+   - Look in `openspec/changes/<change-name>/specs/` for delta sections (`ADDED`, `MODIFIED`, `REMOVED`, `RENAMED`)
+   - If any delta exists, ask user: "Should specs be synced to main? (You can also use `/opsx:sync` separately)"
 
-3. **Handle spec sync** (if user says yes):
+4. **Handle spec sync** (if user says yes):
    - Read delta specs from change directory
    - Read main specs from `openspec/specs/`
    - Apply changes:
      - **ADDED**: Add new requirement blocks
      - **MODIFIED**: Replace existing requirement blocks
      - **REMOVED**: Remove requirement blocks
+     - **RENAMED**: Rename requirement blocks from old title to new title
    - Update main spec files
 
-4. **Create archive directory**:
+5. **Create archive directory**:
    ```bash
    mkdir -p "openspec/changes/archive"
    ```
 
-5. **Move change to archive**:
+6. **Move change to archive**:
    ```bash
    mv "openspec/changes/<change-name>" "openspec/changes/archive/<date>-<change-name>"
    ```
    - Use format: `YYYY-MM-DD-<name>`
    - Example: `2026-01-23-add-dark-mode`
 
-6. **Show completion summary**:
+7. **Show completion summary**:
    ```
    ✓ Archived to: openspec/changes/archive/2026-01-23-add-dark-mode/
 
@@ -79,8 +88,10 @@ openspec/changes/archive/
 ### When Sync is Needed
 
 Sync specs to main when:
+- Change has **ADDED** requirements
 - Change has **MODIFIED** requirements
 - Change has **REMOVED** requirements
+- Change has **RENAMED** requirements
 - User wants to update the canonical specs
 
 ### Sync Process

@@ -30,8 +30,8 @@ You are executing the **OPSX Continue** command to create the next artifact in t
    ```
    proposal: requires []
    specs: requires [proposal]
-   design: requires [proposal]
-   tasks: requires [specs, design]
+   design: requires [proposal] (optional)
+   tasks: requires [specs] (design recommended when complexity warrants it)
    ```
 
 4. **Show status**:
@@ -41,8 +41,8 @@ You are executing the **OPSX Continue** command to create the next artifact in t
    Status:
    ✓ proposal (done)
    ✓ specs (done)
-   ○ design (ready)
-   ○ tasks (blocked - waiting for design)
+   ○ design (optional-ready)
+   ○ tasks (ready)
    ```
 
 5. **Create the next ready artifact**:
@@ -103,8 +103,8 @@ Current change: add-dark-mode
 Status:
 ✓ proposal (done)
 ○ specs (ready)
-○ design (ready)
-○ tasks (blocked - waiting for specs, design)
+○ design (optional-ready)
+○ tasks (blocked - waiting for specs)
 
 Creating specs...
 
@@ -114,7 +114,7 @@ Creating specs...
 ✓ Created specs/dark-mode-toggle/spec.md
 ✓ Created specs/theme-persistence/spec.md
 
-Now ready: design, tasks
+Now ready: tasks (and optional design)
 
 Run /opsx:continue to create the next artifact.
 ```
@@ -131,11 +131,11 @@ Run /opsx:continue to create the next artifact.
 **User wants to skip design**:
 - Allowed if design isn't needed
 - Create tasks directly after specs
-- Note in change that design was skipped
+- Note in change that design was intentionally skipped
 
 ## Notes
 
 - Always read completed artifacts before creating new ones
-- Respect dependencies — don't skip ahead
+- Respect required dependencies — don't skip ahead
 - Be helpful and guide the user
 - Show clear progress indicators

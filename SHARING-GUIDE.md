@@ -10,7 +10,6 @@ This package is now multi-platform and uses a unified command surface.
 
 ## Core Changes
 
-- Removed: `/openspec --update` (falls back to help)
 - Shared config moved to `~/.openspec/.opsx-config.yaml`
 - Codex command surface uses custom prompts:
   - `/prompts:openspec ...`
@@ -36,6 +35,5 @@ This package is now multi-platform and uses a unified command surface.
 
 ## Share Checklist
 
-1. Ensure no doc mentions `/openspec --update` as an active feature.
-2. Ensure installer requires `--platform`.
-3. Ensure config template has only `version/platform/language/ruleFile`.
+1. Ensure installer requires `--platform`.
+2. Ensure config template has only `version/platform/language/ruleFile`.

@@ -30,8 +30,8 @@ You are executing the **OPSX Status** command to check the current state of a ch
    ```
    ✓ proposal (done) — file exists
    ○ specs (ready) — dependencies met, doesn't exist
-   ○ design (ready) — dependencies met, doesn't exist
-   ○ tasks (blocked) — waiting for specs, design
+   ○ design (optional-ready) — create when complexity warrants it
+   ○ tasks (blocked) — waiting for specs
    ```
 
 4. **Check task progress** (if tasks.md exists):
@@ -49,7 +49,7 @@ You are executing the **OPSX Status** command to check the current state of a ch
    ✓ proposal (done)
    ✓ specs (done) — 2 capabilities
    ✓ design (done)
-   ○ tasks (done) — 8/12 tasks complete (67%)
+   ✓ tasks (in progress) — 9/12 tasks complete (75%)
 
    Ready to: /opsx:apply (implementation in progress)
 
@@ -67,7 +67,7 @@ You are executing the **OPSX Status** command to check the current state of a ch
 
 ### Task Progress
 ```
-tasks.md: 8/12 complete (67%)
+tasks.md: 9/12 complete (75%)
 
 Completed:
   ✓ 1.1 Create theme context

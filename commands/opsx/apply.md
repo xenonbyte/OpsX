@@ -17,8 +17,12 @@ You are executing the **OPSX Apply** command to implement the planned change.
 ## Your Task
 
 1. **Identify the current change**:
-   - Use specified change name or find most recent
-   - Verify change directory exists and has tasks.md
+   - If user specified a change name, use it
+   - If omitted:
+     - List active changes in `openspec/changes/` (excluding `archive/`)
+     - If exactly one active change, use it
+     - If multiple active changes, ask user to choose (do not guess)
+   - Verify change directory exists and has `tasks.md`
 
 2. **Read all context**:
    - Read `proposal.md` — understand WHY

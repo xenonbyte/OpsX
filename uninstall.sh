@@ -20,7 +20,9 @@ run() {
     if [ "$DRY_RUN" = true ]; then
         echo "[dry-run] $*"
     else
-        "$@"
+        # Commands are passed as a single quoted string at call sites.
+        # Evaluate that string so normal mode matches dry-run behavior.
+        eval "$*"
     fi
 }
 

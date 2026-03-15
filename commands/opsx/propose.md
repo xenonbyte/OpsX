@@ -16,6 +16,7 @@ Propose a new change - create the change and generate all artifacts in one step.
 
 I'll create a change with artifacts:
 - proposal.md (what & why)
+- specs/<capability>/spec.md (requirements and scenarios)
 - design.md (how)
 - tasks.md (implementation steps)
 
@@ -56,8 +57,8 @@ When ready to implement, run `/opsx:apply`
    The standard dependency order for the `spec-driven` schema is:
    - `proposal` (no dependencies)
    - `specs` (requires: proposal)
-   - `design` (requires: proposal)
-   - `tasks` (requires: specs, design)
+   - `design` (requires: proposal, optional)
+   - `tasks` (requires: specs; design recommended when needed)
 
    Check which artifacts already exist by looking for the files:
    - `openspec/changes/<name>/proposal.md`

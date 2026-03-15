@@ -1,6 +1,6 @@
 # OpenSpec
 
-OpenSpec 是一套规范驱动（spec-driven）工作流技能，统一支持以下平台：
+OpenSpec 是一套 AI 原生的规范驱动（spec-driven）工作流技能，统一支持以下平台：
 - Claude
 - Codex
 - Gemini
@@ -11,32 +11,71 @@ OpenSpec 是一套规范驱动（spec-driven）工作流技能，统一支持以
 - Claude/Gemini：`/openspec ...` 与 `/opsx:*`
 - Codex：`/prompts:openspec ...` 与 `/prompts:opsx-*`
 
-## 快速开始
+## 🚀 快速开始
 
-一次只安装到一个平台：
-
-```bash
-chmod +x install.sh uninstall.sh
-./install.sh --platform claude
-```
-
-安装后建议先执行（Claude/Gemini）：
+推荐使用 `npx` 进行安装：
 
 ```bash
-/openspec --help
-/openspec --version
-/openspec --doc
+# 为 Claude 安装
+npx @xenonbyte/openspec install --platform claude
+
+# 为 Gemini 安装
+npx @xenonbyte/openspec install --platform gemini
+
+# 为 Codex 安装
+npx @xenonbyte/openspec install --platform codex
 ```
 
-安装后建议先执行（Codex）：
+安装完成后，可以通过以下方式验证：
 
 ```bash
-/prompts:openspec --help
-/prompts:openspec --version
-/prompts:openspec --doc
+# 验证安装
+openspec --check
+
+# 查看实战指南
+openspec --doc
 ```
 
-## 命令说明
+### 命令入口
+
+OpenSpec 命令可以在你的终端（CLI）或 AI 助手（AI 命令）中直接运行。
+
+**AI 命令 (Claude/Gemini):**
+- `/openspec --help`
+- `/opsx:onboard`
+
+**AI 命令 (Codex):**
+- `/prompts:openspec --help`
+- `/prompts:opsx-onboard`
+
+## 🏗️ 架构与项目结构
+
+本仓库包含了 CLI 工具和 AI 技能配置的源代码。如果您希望阅读源码或参与贡献，以下是项目的目录结构：
+
+- **`bin/openspec.js`**: Node.js CLI 的入口文件。它处理所有元命令（例如 `--check`, `--doc`, `--language`）并调用 Shell 脚本进行安装卸载操作。
+- **`install.sh` & `uninstall.sh`**: 核心安装脚本。负责将工作流 Prompt 和技能配置复制到指定的 AI 平台目录中（如 `~/.claude/`, `~/.codex/`, `~/.gemini/`），并初始化配置文件 `~/.openspec/.opsx-config.yaml`。
+- **`skills/openspec-workflow/`**: AI 技能定义的核心内容。
+  - `SKILL.md`: 定义了技能的主系统提示词（System Prompt），指导 AI 如何理解和执行 OpenSpec 工作流。
+  - `GUIDE-*.md`: 当用户运行 `openspec --doc` 时展示的实战指南文件。
+  - `references/`: 存放按需加载的参考模板与操作剧本（Action Playbooks）。
+- **`commands/opsx/`**: 存放了各工作流命令（如 `apply.md`, `propose.md`）的具体 Markdown 提示词。当触发 `/opsx:*` 时，AI 将读取对应的指令细节。
+
+## 🛠️ 本地开发与贡献
+
+如何本地测试并修改 OpenSpec：
+
+```bash
+# 1. 建立本地链接，使得执行 openspec 时使用当前代码
+npm link
+
+# 2. 安全地测试安装脚本（干跑模式）
+./install.sh --platform claude --dry-run
+
+# 3. 将本地修改应用到 AI 工作区
+openspec install --platform claude
+```
+
+## 💻 命令说明
 
 ### 元命令
 
@@ -51,9 +90,6 @@ Codex 说明：
 | `/openspec --language en` | 切换英文输出。 | 面向海外团队写 specs 时切换英文。 |
 | `/openspec --doc` | 打开内置实战指南。 | 在终端里直接查看完整使用文档。 |
 | `/openspec <描述>` | 用自然语言快速路由到 propose。 | `/openspec 增加仪表盘离线缓存` |
-
-兼容说明：
-- v1.0.0 已移除 `/openspec --update`，调用时会静默回落到 help 输出。
 
 ### 工作流命令
 
@@ -78,7 +114,7 @@ Codex 映射规则：
 | `/opsx:bulk-archive` | 批量归档多个完成变更。 | 迭代结束后集中清理 changes。 |
 | `/opsx:onboard` | 引导式教学，走完整个 OpenSpec 周期。 | 用于新同学上手项目流程。 |
 
-## 实战示例（端到端）
+## 📋 实战示例（端到端）
 
 在 Codex 中，把示例里的 `/opsx:<action>` 替换为 `/prompts:opsx-<action>`。
 
@@ -109,7 +145,7 @@ Codex 映射规则：
 /opsx:archive improve-api-error-guide
 ```
 
-## 配置文件
+## ⚙️ 配置文件
 
 共享配置路径：
 - `~/.openspec/.opsx-config.yaml`
@@ -129,32 +165,38 @@ ruleFile: "CLAUDE.md"
 - `language`：默认输出语言
 - `ruleFile`：该平台默认约束文件名
 
-## 安装与卸载
+### 语言路由（Skill References）
 
-安装：
+`language` 不仅影响回复语言，也会决定 skill 默认加载哪组 reference 文件：
+- `language: zh` 会加载 `artifact-templates-zh.md` 与 `action-playbooks-zh.md`
+- `language: en`（或缺省）会加载 `artifact-templates.md` 与 `action-playbooks.md`
 
+*说明：语言偏好在会话启动时读取。执行 `/openspec --language` 后，请开启新会话再验证。*
+
+## 📦 安装与卸载
+
+**本地 / 手动安装：**
 ```bash
 ./install.sh --platform <claude|codex|gemini> [--workspace <path>] [--dry-run]
 ```
 
-卸载：
-
+**卸载：**
 ```bash
 ./uninstall.sh --platform <claude|codex|gemini> [--dry-run]
 ```
 
-## 环境要求
+## ✅ 环境要求
 
 - Bash 3.2+（macOS/Linux 默认已安装）
 - Git 2.0+
 - Perl 5.x（用于 Codex 命令转换）
+- Node.js >=14.0.0
 
-## 故障排除
+## 🔌 故障排除
 
 ### 安装后命令找不到
 
 **症状**：`/openspec` 或 `/opsx:*` 命令无响应。
-
 **解决方案**：
 1. 检查平台目录是否存在：
    ```bash
@@ -162,59 +204,39 @@ ruleFile: "CLAUDE.md"
    ls -la ~/.codex/prompts/          # Codex
    ls -la ~/.gemini/commands/        # Gemini
    ```
-2. 检查安装清单：
-   ```bash
-   cat ~/.openspec/manifests/claude.manifest
-   ```
+2. 检查安装清单：`cat ~/.openspec/manifests/claude.manifest`
 3. 先用 `--dry-run` 测试安装路径是否正确。
 
 ### 配置文件权限错误
 
 **症状**：AI 报告读取 `~/.openspec/.opsx-config.yaml` 时"权限被拒绝"。
-
-**解决方案**：
-```bash
-chmod 644 ~/.openspec/.opsx-config.yaml
-```
+**解决方案**：`chmod 644 ~/.openspec/.opsx-config.yaml`
 
 ### 语言切换不生效
 
 **症状**：执行 `/openspec --language zh` 后输出语言未变化。
-
 **解决方案**：
-1. 确认配置已更新：
-   ```bash
-   cat ~/.openspec/.opsx-config.yaml
-   ```
-2. 开启新的对话会话 — 语言偏好在每个会话开始时读取。
+1. 确认配置已更新：`cat ~/.openspec/.opsx-config.yaml`
+2. **开启新的对话会话** — 语言偏好在每个会话开始时读取。
 
 ### 卸载后文件未清理干净
 
 **症状**：运行 `uninstall.sh` 后仍有残留文件。
-
 **解决方案**：
 1. 手动清理：
    ```bash
-   rm -rf ~/.openspec
-   rm -rf ~/.claude/commands/openspec.md ~/.claude/commands/opsx
-   rm -rf ~/.claude/skills/openspec-workflow
+   rm -rf ~/.openspec ~/.claude/commands/openspec.md ~/.claude/commands/opsx ~/.claude/skills/openspec-workflow
    ```
-2. Codex 还需清理 prompts：
-   ```bash
-   rm -rf ~/.codex/prompts/openspec.md ~/.codex/prompts/opsx-*.md
-   ```
+2. Codex 还需清理 prompts：`rm -rf ~/.codex/prompts/openspec.md ~/.codex/prompts/opsx-*.md`
 
 ### 工作区规则文件未创建
 
 **症状**：工作区目录下没有 `CLAUDE.md` 或 `AGENTS.md`。
+**解决方案**：重新安装并指定 `--workspace`：
+```bash
+./install.sh --platform claude --workspace /path/to/your/project
+```
 
-**解决方案**：
-1. 重新安装并指定 `--workspace`：
-   ```bash
-   ./install.sh --platform claude --workspace /path/to/your/project
-   ```
-2. 或手动创建，内容参考安装脚本中的模板。
-
-## 许可证
+## 📄 许可证
 
 MIT（继承上游 OpenSpec 许可模型）

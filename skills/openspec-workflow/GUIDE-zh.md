@@ -27,8 +27,6 @@ Codex 对应写法：
 - `/prompts:openspec --doc`
 - `/prompts:openspec --check`
 
-说明：`/openspec --update` 已删除，输入时会静默回落到 help。
-
 ## 3. 安装与配置
 
 安装：

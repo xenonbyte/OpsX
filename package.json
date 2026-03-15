@@ -2,9 +2,8 @@
   "name": "@xenonbyte/openspec",
   "version": "1.0.0",
   "description": "AI-native spec-driven development system for Claude, Codex, and Gemini",
-  "main": "index.js",
   "bin": {
-    "openspec": "./bin/openspec.js"
+    "openspec": "bin/openspec.js"
   },
   "scripts": {
     "postinstall": "node scripts/postinstall.js"
@@ -33,7 +32,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/xenonbyte/openspec.git"
+    "url": "git+https://github.com/xenonbyte/openspec.git"
   },
   "bugs": {
     "url": "https://github.com/xenonbyte/openspec/issues"

@@ -120,7 +120,7 @@ If any check fails, show `✗` with the issue and suggest fixes:
   → Re-run install with --workspace /path/to/project
 ```
 
-### `--language <en|zh>` or `--lang <en|zh>`
+### `--language <en|zh>`
 
 1. Read `~/.openspec/.opsx-config.yaml`
 2. Update the `language` field to the specified value (`en` or `zh`)
@@ -145,11 +145,18 @@ If the file does not exist, display:
 Guide not found. Please verify ~/.openspec/skills/openspec-workflow/GUIDE-<lang>.md exists.
 ```
 
-### `--update`
+### Unknown flags
 
-This option is removed. Silently display the same output as `/openspec --help`.
+If the argument starts with `--` and is not one of:
+- `--help`
+- `--version`
+- `--check`
+- `--doc`
+- `--language`
 
-### Any other argument
+Then report it as unsupported and show `/openspec --help`.
+
+### Any other non-flag argument
 
 Treat the argument as a change description and route to `/opsx:propose`. For example:
 

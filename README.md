@@ -1,6 +1,6 @@
 # OpenSpec
 
-OpenSpec is a spec-driven workflow skill with unified command semantics across:
+OpenSpec is an AI-native spec-driven workflow skill with unified command semantics across:
 - Claude
 - Codex
 - Gemini
@@ -11,32 +11,71 @@ Command surface by platform:
 - Claude/Gemini: `/openspec ...` and `/opsx:*`
 - Codex: `/prompts:openspec ...` and `/prompts:opsx-*`
 
-## Quick Start
+## 🚀 Quick Start
 
-Install for one platform at a time:
-
-```bash
-chmod +x install.sh uninstall.sh
-./install.sh --platform claude
-```
-
-First checks (Claude/Gemini):
+The easiest way to install is using `npx`:
 
 ```bash
-/openspec --help
-/openspec --version
-/openspec --doc
+# Install for Claude
+npx @xenonbyte/openspec install --platform claude
+
+# Install for Gemini
+npx @xenonbyte/openspec install --platform gemini
+
+# Install for Codex
+npx @xenonbyte/openspec install --platform codex
 ```
 
-First checks (Codex):
+After installation, verify with:
 
 ```bash
-/prompts:openspec --help
-/prompts:openspec --version
-/prompts:openspec --doc
+# Verify installation
+openspec --check
+
+# View practical guide
+openspec --doc
 ```
 
-## Command Reference
+### Entry Point
+
+OpenSpec commands can be used in your shell (CLI) or directly within your AI agent (AI Commands).
+
+**AI Commands (Claude/Gemini):**
+- `/openspec --help`
+- `/opsx:onboard`
+
+**AI Commands (Codex):**
+- `/prompts:openspec --help`
+- `/prompts:opsx-onboard`
+
+## 🏗️ Architecture & Project Structure
+
+This repository contains the source code for both the CLI tool and the AI Skill files. If you are exploring the source code or wish to contribute, here is how the project is organized:
+
+- **`bin/openspec.js`**: The Node.js CLI entry point. It handles meta-commands (like `--check`, `--doc`, `--language`) and delegates to the shell scripts for installation.
+- **`install.sh` & `uninstall.sh`**: Core bash scripts that manage the deployment of the skill. They copy the necessary prompt and skill files into the specific platform directories (`~/.claude/`, `~/.codex/`, `~/.gemini/`) and configure the shared `~/.openspec/.opsx-config.yaml`.
+- **`skills/openspec-workflow/`**: The core AI agent skill definition.
+  - `SKILL.md`: The main system prompt instructing the AI on the OpenSpec methodology and state machine.
+  - `GUIDE-*.md`: The practical guide texts shown when users run `openspec --doc`.
+  - `references/`: Contains the artifact templates and action playbooks loaded dynamically by the AI.
+- **`commands/opsx/`**: Detailed Markdown files for each workflow command (e.g., `apply.md`, `propose.md`). These act as highly-focused context injections when a specific `/opsx:*` command is invoked.
+
+## 🛠️ Development & Contribution
+
+To modify the OpenSpec skill or test changes locally:
+
+```bash
+# 1. Link the package locally so `openspec` uses your local source
+npm link
+
+# 2. Test installation changes safely using dry-run
+./install.sh --platform claude --dry-run
+
+# 3. Apply your local changes to your AI agent
+openspec install --platform claude
+```
+
+## 💻 Command Reference
 
 ### Meta Commands
 
@@ -51,9 +90,6 @@ Codex note:
 | `/openspec --language en` | Switch output language to English. | Use when writing specs in English for global teams. |
 | `/openspec --doc` | Print the embedded practical guide. | Open docs in-session without leaving the terminal. |
 | `/openspec <description>` | Shortcut route to propose a change from natural language. | `/openspec add offline cache for dashboard` |
-
-Compatibility note:
-- `/openspec --update` was removed in v1.0.0 and now silently falls back to help output.
 
 ### Workflow Commands
 
@@ -78,12 +114,11 @@ Codex mapping rule:
 | `/opsx:bulk-archive` | Archive multiple completed changes together. | Clean up all done changes at sprint end. |
 | `/opsx:onboard` | Guided tutorial through a full OpenSpec cycle. | Train a new engineer on your project workflow. |
 
-## Practical End-to-End Examples
+## 📋 Practical End-to-End Examples
 
 For Codex, replace each `/opsx:<action>` with `/prompts:opsx-<action>`.
 
 ### Example 1: Tech Feature
-
 ```bash
 /opsx:propose add-biometric-login
 /opsx:apply add-biometric-login
@@ -92,7 +127,6 @@ For Codex, replace each `/opsx:<action>` with `/prompts:opsx-<action>`.
 ```
 
 ### Example 2: UX Work
-
 ```bash
 /opsx:propose redesign-button-states
 /opsx:ff redesign-button-states
@@ -101,7 +135,6 @@ For Codex, replace each `/opsx:<action>` with `/prompts:opsx-<action>`.
 ```
 
 ### Example 3: Writing Work
-
 ```bash
 /opsx:propose improve-api-error-guide
 /opsx:continue improve-api-error-guide
@@ -109,13 +142,12 @@ For Codex, replace each `/opsx:<action>` with `/prompts:opsx-<action>`.
 /opsx:archive improve-api-error-guide
 ```
 
-## Config
+## ⚙️ Config
 
 Shared config path:
 - `~/.openspec/.opsx-config.yaml`
 
 Example:
-
 ```yaml
 version: "1.0.0"
 platform: "claude"
@@ -129,32 +161,37 @@ Field meanings:
 - `language`: output language preference
 - `ruleFile`: default rule filename for the platform
 
-## Install / Uninstall
+### Language Routing (Skill References)
 
-Install:
+`language` controls both response language and which reference files the skill loads by default:
+- `language: zh` loads `artifact-templates-zh.md` and `action-playbooks-zh.md`
+- `language: en` loads `artifact-templates.md` and `action-playbooks.md`
 
+*Note: Language preference is read at session start. Start a new chat/session after changing `/openspec --language`.*
+
+## 📦 Install / Uninstall
+
+**Install Locally/Manually:**
 ```bash
-./install.sh --platform <claude|codex|gemini> [--workspace <path>] [--dry-run]
+./install.sh --platform <claude|codex|gemini> [--dry-run]
 ```
 
-Uninstall:
-
+**Uninstall:**
 ```bash
 ./uninstall.sh --platform <claude|codex|gemini> [--dry-run]
 ```
 
-## Requirements
+## ✅ Requirements
 
 - Bash 3.2+ (default on macOS/Linux)
 - Git 2.0+
 - Perl 5.x (for Codex command transformation)
+- Node.js >=14.0.0
 
-## Troubleshooting
+## 🔌 Troubleshooting
 
 ### Command not found after installation
-
 **Symptom**: `/openspec` or `/opsx:*` commands don't work.
-
 **Solutions**:
 1. Verify the platform directory exists:
    ```bash
@@ -162,59 +199,33 @@ Uninstall:
    ls -la ~/.codex/prompts/          # for Codex
    ls -la ~/.gemini/commands/        # for Gemini
    ```
-2. Check if files were installed:
-   ```bash
-   cat ~/.openspec/manifests/claude.manifest
-   ```
+2. Check if files were installed: `cat ~/.openspec/manifests/claude.manifest`
 3. Re-run installation with `--dry-run` first to verify paths.
 
 ### Config file permission denied
-
 **Symptom**: AI reports "permission denied" when reading `~/.openspec/.opsx-config.yaml`.
-
-**Solution**:
-```bash
-chmod 644 ~/.openspec/.opsx-config.yaml
-```
+**Solution**: `chmod 644 ~/.openspec/.opsx-config.yaml`
 
 ### Language not switching
-
 **Symptom**: `/openspec --language zh` doesn't change output language.
-
 **Solution**:
-1. Verify the config was updated:
-   ```bash
-   cat ~/.openspec/.opsx-config.yaml
-   ```
-2. Start a new chat session — language preference is read at the start of each session.
+1. Verify the config was updated: `cat ~/.openspec/.opsx-config.yaml`
+2. **Start a new chat session** — language preference is read at the start of each session.
 
 ### Uninstall didn't remove all files
-
 **Symptom**: Some files remain after running `uninstall.sh`.
-
 **Solution**:
 1. Manual cleanup:
    ```bash
-   rm -rf ~/.openspec
-   rm -rf ~/.claude/commands/openspec.md ~/.claude/commands/opsx
-   rm -rf ~/.claude/skills/openspec-workflow
+   rm -rf ~/.openspec ~/.claude/commands/openspec.md ~/.claude/commands/opsx ~/.claude/skills/openspec-workflow
    ```
-2. For Codex, also clean prompts:
-   ```bash
-   rm -rf ~/.codex/prompts/openspec.md ~/.codex/prompts/opsx-*.md
-   ```
+2. For Codex, also clean prompts: `rm -rf ~/.codex/prompts/openspec.md ~/.codex/prompts/opsx-*.md`
 
 ### Workspace rule file not created
-
 **Symptom**: `CLAUDE.md` or `AGENTS.md` doesn't exist in workspace.
+**Explanation**: OpenSpec does not create workspace constraint files.
+**Solution**: Create the required rule file manually in your project root.
 
-**Solution**:
-1. Re-run install with `--workspace` pointing to your project:
-   ```bash
-   ./install.sh --platform claude --workspace /path/to/your/project
-   ```
-2. Or create it manually with the template from the installation script.
-
-## License
+## 📄 License
 
 MIT (inherits upstream OpenSpec licensing model)

@@ -10,12 +10,11 @@ SHARED_CONFIG="$SHARED_HOME/.opsx-config.yaml"
 MANIFEST_DIR="$SHARED_HOME/manifests"
 
 PLATFORM=""
-WORKSPACE=""
 DRY_RUN=false
 
 usage() {
     cat <<USAGE
-Usage: ./install.sh --platform <claude|codex|gemini> [--workspace <path>] [--dry-run]
+Usage: ./install.sh --platform <claude|codex|gemini> [--dry-run]
 USAGE
 }
 
@@ -23,7 +22,9 @@ run() {
     if [ "$DRY_RUN" = true ]; then
         echo "[dry-run] $*"
     else
-        "$@"
+        # Commands are passed as a single quoted string at call sites.
+        # Evaluate that string so normal mode matches dry-run behavior.
+        eval "$*"
     fi
 }
 
@@ -31,10 +32,6 @@ while [ $# -gt 0 ]; do
     case "$1" in
         --platform)
             PLATFORM="${2:-}"
-            shift 2
-            ;;
-        --workspace)
-            WORKSPACE="${2:-}"
             shift 2
             ;;
         --dry-run)
@@ -83,17 +80,12 @@ if [ "$PLATFORM" = "codex" ]; then
     IS_CODEX=true
 fi
 
-if [ -z "$WORKSPACE" ]; then
-    WORKSPACE="$PWD"
-fi
-
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 BACKUP_DIR="$SHARED_HOME/backups/install-$PLATFORM-$TIMESTAMP"
 MANIFEST_FILE="$MANIFEST_DIR/$PLATFORM.manifest"
 
 echo "🚀 OpenSpec v1.0.0 installer"
 echo "Platform: $PLATFORM"
-echo "Workspace: $WORKSPACE"
 echo "Rule file: $RULE_FILE"
 [ "$DRY_RUN" = true ] && echo "Mode: dry-run"
 echo
@@ -238,25 +230,6 @@ language: \"$CURRENT_LANGUAGE\"      # en | zh
 ruleFile: \"$RULE_FILE\"
 CFG"
 
-# Optional: seed workspace rule file if missing
-TARGET_RULE_FILE="$WORKSPACE/$RULE_FILE"
-if [ "$DRY_RUN" = false ] && [ ! -f "$TARGET_RULE_FILE" ]; then
-    cat > "$TARGET_RULE_FILE" <<RULE
-# Project Constraints
-
-This project uses OpenSpec for spec-driven development.
-
-## Quick Reference
-- Entry point: /openspec (Claude/Gemini) or /prompts:openspec (Codex)
-- Workflow commands: /opsx:* (Claude/Gemini) or /prompts:opsx-* (Codex)
-
-## Getting Started
-1. Run /opsx:onboard (or /prompts:opsx-onboard for Codex) for a guided tutorial
-2. Use /openspec --help to see all available commands
-3. Start your first change with /opsx:propose <change-name>
-RULE
-fi
-
 echo
 echo "✅ Installation complete"
 echo "- Shared config: $SHARED_CONFIG"
@@ -268,7 +241,6 @@ else
     echo "- Commands: $PLATFORM_COMMANDS_DIR"
 fi
 echo "- Skill: $PLATFORM_SKILL_DIR"
-echo "- Workspace rule file: $TARGET_RULE_FILE"
 echo
 echo "📌 Next step: Run the guided tutorial to get started!"
 if [ "$IS_CODEX" = true ]; then

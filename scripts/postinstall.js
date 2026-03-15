@@ -12,19 +12,19 @@ console.log(`
 Next steps:
 
 1. Install for your platform:
-   npx openspec install --platform claude
+   npx @xenonbyte/openspec install --platform claude
 
    Or for Codex:
-   npx openspec install --platform codex
+   npx @xenonbyte/openspec install --platform codex
 
    Or for Gemini:
-   npx openspec install --platform gemini
+   npx @xenonbyte/openspec install --platform gemini
 
 2. After installation, run the guided tutorial:
    /opsx:onboard
 
 3. View documentation:
-   npx openspec help
+   npx @xenonbyte/openspec help
 
 GitHub: https://github.com/xenonbyte/openspec
 `);

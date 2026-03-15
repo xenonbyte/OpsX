@@ -27,8 +27,6 @@ Codex equivalents:
 - `/prompts:openspec --doc`
 - `/prompts:openspec --check`
 
-Note: `/openspec --update` is removed. When called, it silently falls back to help.
-
 ## 3. Install and Config
 
 Install:
