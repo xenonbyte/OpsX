@@ -1,0 +1,52 @@
+{
+  "name": "@xenonbyte/openspec",
+  "version": "1.0.0",
+  "description": "AI-native spec-driven development system for Claude, Codex, and Gemini",
+  "main": "index.js",
+  "bin": {
+    "openspec": "./bin/openspec.js"
+  },
+  "scripts": {
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "files": [
+    "bin/",
+    "scripts/",
+    "commands/",
+    "skills/",
+    "config/",
+    "install.sh",
+    "uninstall.sh",
+    "README.md"
+  ],
+  "keywords": [
+    "ai",
+    "claude",
+    "codex",
+    "gemini",
+    "spec-driven",
+    "workflow",
+    "development",
+    "agent"
+  ],
+  "author": "xenonbyte",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xenonbyte/openspec.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xenonbyte/openspec/issues"
+  },
+  "homepage": "https://github.com/xenonbyte/openspec#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

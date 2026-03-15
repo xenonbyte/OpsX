@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# macOS
+.DS_Store
+*.swp
+*.swo
+
+# Editor
+.idea/
+.vscode/
+*.sublime-*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+
+# Test
+coverage/
+
+# Temp
+*.tmp
+*.temp
