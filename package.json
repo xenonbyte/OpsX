@@ -1,6 +1,6 @@
 {
   "name": "@xenonbyte/openspec",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "AI-native spec-driven development system for Claude, Codex, and Gemini",
   "bin": {
     "openspec": "bin/openspec.js"

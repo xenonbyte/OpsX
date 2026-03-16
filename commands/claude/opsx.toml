@@ -1,3 +1,4 @@
+subdir = "opsx"
 description = "OpenSpec workflow - AI-native spec-driven development (explore, propose, new, continue, ff, apply, batch-apply, verify, sync, archive, bulk-archive, resume, status, onboard)"
 prompt = """
 # OpenSpec Workflow
