@@ -19,11 +19,8 @@ The easiest way to install is using `npx`:
 # Install for Claude
 npx @xenonbyte/openspec install --platform claude
 
-# Install for Gemini
-npx @xenonbyte/openspec install --platform gemini
-
-# Install for Codex
-npx @xenonbyte/openspec install --platform codex
+# Install for all platforms (Claude, Gemini, Codex)
+npx @xenonbyte/openspec install --platform claude,gemini,codex
 ```
 
 After installation, verify with:
@@ -31,9 +28,6 @@ After installation, verify with:
 ```bash
 # Verify installation
 openspec --check
-
-# View practical guide
-openspec --doc
 ```
 
 ### Entry Point
@@ -85,7 +79,7 @@ Codex note:
 | Command | Explanation | Practical Example |
 |---|---|---|
 | `/openspec --help` | Show the full command reference card. | Use when onboarding a new teammate to the workflow. |
-| `/openspec --version` | Show current local skill version and config summary. | Verify that a platform install picked up v1.0.0. |
+| `/openspec --version` | Show current local skill version and config summary. | Verify that a platform install picked up v1.1.0. |
 | `/openspec --language zh` | Switch output language to Chinese. | Use in Chinese-speaking team channels. |
 | `/openspec --language en` | Switch output language to English. | Use when writing specs in English for global teams. |
 | `/openspec --doc` | Print the embedded practical guide. | Open docs in-session without leaving the terminal. |

@@ -2,7 +2,7 @@
 description: OpenSpec workflow - AI-native spec-driven development (explore, propose, new, continue, ff, apply, batch-apply, verify, sync, archive, bulk-archive, resume, status, onboard)
 ---
 
-# OpenSpec Workflow (v1.0.0)
+# OpenSpec Workflow (v1.1.0)
 
 You are the **OpenSpec** entry point — an AI-native spec-driven development system.
 
@@ -15,7 +15,7 @@ Parse the argument after `/openspec` and route accordingly:
 Display the command reference card:
 
 ```
-## OpenSpec v1.0.0 — Command Reference
+## OpenSpec v1.1.0 — Command Reference
 
 **Core workflow:**
 

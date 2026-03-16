@@ -1,4 +1,4 @@
-# OpenSpec Sharing Guide (v1.0.0)
+# OpenSpec Sharing Guide (v1.1.0)
 
 This package is now multi-platform and uses a unified command surface.
 

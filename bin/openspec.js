@@ -10,11 +10,11 @@ const UNINSTALL_SH = path.join(SCRIPT_DIR, 'uninstall.sh');
 
 function showHelp() {
   console.log(`
-OpenSpec v1.0.0 - AI-native spec-driven development system
+OpenSpec v1.1.0 - AI-native spec-driven development system
 
 Usage:
-  openspec install --platform <claude|codex|gemini>
-  openspec uninstall --platform <claude|codex|gemini>
+  openspec install --platform <claude|codex|gemini[,...]>
+  openspec uninstall --platform <claude|codex|gemini[,...]>
   openspec --check
   openspec --doc
   openspec --language <en|zh>
@@ -22,8 +22,8 @@ Usage:
   openspec --help
 
 Commands:
-  install      Install OpenSpec for a specific platform
-  uninstall    Uninstall OpenSpec from a specific platform
+  install      Install OpenSpec for one or more platforms
+  uninstall    Uninstall OpenSpec from one or more platforms
   --check      Validate the current installation and workspace config
   --doc        Show the practical guide (uses current language)
   --language   Switch the output language (en | zh)
@@ -37,6 +37,7 @@ Platforms:
 
 Examples:
   openspec install --platform claude
+  openspec install --platform claude,gemini,codex
   openspec --check
   openspec --language zh
 
