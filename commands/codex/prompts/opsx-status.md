@@ -1,5 +1,6 @@
-description = "Show the current status of a change - what's done, what's ready, what's blocked"
-prompt = """
+---
+description: Show the current status of a change - what's done, what's ready, what's blocked
+---
 # OPSX: Status
 
 You are executing the **OPSX Status** command to check the current state of a change.
@@ -46,4 +47,3 @@ Before responding, read `~/.openspec/.opsx-config.yaml`.
 - ✓ done — artifact exists and complete
 - ○ ready — all dependencies met, ready to create
 - ○ blocked — waiting for dependencies
-"""

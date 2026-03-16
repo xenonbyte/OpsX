@@ -1,5 +1,6 @@
-description = "Fast-forward - create all planning artifacts (proposal, specs, design, tasks) at once"
-prompt = """
+---
+description: Fast-forward - create all planning artifacts (proposal, specs, design, tasks) at once
+---
 # OPSX: Fast-Forward
 
 You are executing the **OPSX Fast-Forward** command to create all planning artifacts at once.
@@ -33,25 +34,12 @@ Before responding, read `~/.openspec/.opsx-config.yaml`.
    ✓ Created tasks.md — implementation tasks
 
    Ready for implementation!
-   Run /prompts:opsx-apply to start implementing tasks.
+   Run /opsx:apply to start implementing tasks.
    ```
 
 ## When to Use Fast-Forward
 
-Use `/prompts:opsx-ff` when:
+Use `/opsx:ff` when:
 - User has a clear picture of what they're building
 - Requirements are well-understood
 - User wants to move quickly to implementation
-
-
-## Phase Boundary Guard (MANDATORY)
-
-⚠️ You are in PLANNING phase. You MUST:
-1. Only create/modify artifact files under `openspec/changes/<name>/`
-2. NOT modify code files outside of artifact directories
-3. Ask clarification questions if boundaries are unclear
-
-Allowed: `openspec/changes/**/*.md`, `openspec/changes/**/*.yaml`
-Forbidden: `src/**/*`, `lib/**/*`, `**/*.ts`, `**/*.js` (except in openspec/)
-
-"""

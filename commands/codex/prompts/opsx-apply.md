@@ -1,5 +1,6 @@
-description = "Implement the tasks - work through the checklist, marking items complete as you go"
-prompt = """
+---
+description: Implement the tasks - work through the checklist, marking items complete as you go
+---
 # OPSX: Apply
 
 You are executing the **OPSX Apply** command to implement the planned change.
@@ -79,4 +80,3 @@ Maintain this block at the end of `tasks.md`:
 - Proceed with implementation
 - Update tasks.md checkboxes as you complete each task
 - Create checkpoints after completing 1-3 tasks (use git commit and update .openspec.yaml)
-"""

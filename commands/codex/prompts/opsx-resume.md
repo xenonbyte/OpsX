@@ -1,5 +1,6 @@
-description = "Resume a previous change - list active changes and pick up where you left off"
-prompt = """
+---
+description: Resume a previous change - list active changes and pick up where you left off
+---
 # OPSX: Resume
 
 Resume work on a previous change by listing active changes, helping user select one, loading context, and suggesting the next action.
@@ -41,4 +42,3 @@ Before responding, read `~/.openspec/.opsx-config.yaml`.
 
 6. **Wait for explicit user instruction**
    - Do not auto-execute the next command
-"""

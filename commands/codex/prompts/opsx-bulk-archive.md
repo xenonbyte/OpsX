@@ -1,5 +1,6 @@
-description = "Archive multiple completed changes at once"
-prompt = """
+---
+description: Archive multiple completed changes at once
+---
 # OPSX: Bulk Archive
 
 Archive multiple completed changes in a single operation.
@@ -50,4 +51,3 @@ Before responding, read `~/.openspec/.opsx-config.yaml`.
    - Archived N changes
    - Skipped N changes
    - Spec sync summary
-"""

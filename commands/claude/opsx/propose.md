@@ -1,5 +1,6 @@
-description = "Propose a new change - create it and generate all artifacts in one step"
-prompt = """
+---
+description: Propose a new change - create it and generate all artifacts in one step
+---
 # OPSX: Propose
 
 Propose a new change - create the change and generate all artifacts in one step.
@@ -11,7 +12,7 @@ Before responding, read `~/.openspec/.opsx-config.yaml`.
 
 ## Input
 
-The argument after `/prompts:opsx-propose` is the change name (kebab-case), OR a description of what the user wants to build.
+The argument after `/opsx:propose` is the change name (kebab-case), OR a description of what the user wants to build.
 
 ## Steps
 
@@ -48,7 +49,7 @@ The argument after `/prompts:opsx-propose` is the change name (kebab-case), OR a
 6. **Show final status**:
    - Change name and location
    - List of artifacts created
-   - Prompt: "Run `/prompts:opsx-apply` to start implementing."
+   - Prompt: "Run `/opsx:apply` to start implementing."
 
 ## Artifact Creation Guidelines
 
@@ -67,5 +68,3 @@ The argument after `/prompts:opsx-propose` is the change name (kebab-case), OR a
 
 Allowed: `openspec/changes/**/*.md`, `openspec/changes/**/*.yaml`
 Forbidden: `src/**/*`, `lib/**/*`, `**/*.ts`, `**/*.js` (except in openspec/)
-
-"""

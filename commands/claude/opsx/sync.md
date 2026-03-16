@@ -1,5 +1,6 @@
-description = "Sync delta specs from a change to main specs"
-prompt = """
+---
+description: Sync delta specs from a change to main specs
+---
 # OPSX: Sync
 
 Sync delta specs from a change to main specs.
@@ -11,7 +12,7 @@ Before responding, read `~/.openspec/.opsx-config.yaml`.
 
 ## Input
 
-Optionally specify a change name after `/prompts:opsx-sync`. If omitted, prompt for selection.
+Optionally specify a change name after `/opsx:sync`. If omitted, prompt for selection.
 
 ## Steps
 
@@ -51,4 +52,3 @@ The system SHALL do something new.
 - FROM: `### Requirement: Old Name`
 - TO: `### Requirement: New Name`
 ```
-"""

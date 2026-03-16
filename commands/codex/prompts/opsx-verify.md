@@ -1,5 +1,6 @@
-description = "Verify implementation matches change artifacts before archiving"
-prompt = """
+---
+description: Verify implementation matches change artifacts before archiving
+---
 # OPSX: Verify
 
 Verify that an implementation matches the change artifacts (specs, tasks, design).
@@ -54,4 +55,3 @@ Optionally specify a change name after `/prompts:opsx-verify`. If omitted, promp
    **Issues by Priority**: CRITICAL / WARNING / SUGGESTION
    **Final Assessment**: Ready for archive / Fix before archiving
    ```
-"""

@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# OpenSpec Uninstaller v1.1.0
+# OpenSpec Uninstaller v1.1.2
 
 set -euo pipefail
 
 SHARED_HOME="$HOME/.openspec"
 MANIFEST_DIR="$SHARED_HOME/manifests"
 
-PLATFORM=""
+PLATFORMS=""
 DRY_RUN=false
 
 usage() {
@@ -104,7 +104,7 @@ for PLATFORM in "${ADDR[@]}"; do
         done
     }
 
-    echo "🗑️  OpenSpec v1.1.0 uninstaller"
+    echo "🗑️  OpenSpec v1.1.2 uninstaller"
     echo "Platform: $PLATFORM"
     [ "$DRY_RUN" = true ] && echo "Mode: dry-run"
     echo

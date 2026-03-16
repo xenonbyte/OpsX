@@ -1,5 +1,6 @@
-description = "Guided onboarding - walk through a complete OpenSpec workflow cycle with narration"
-prompt = """
+---
+description: Guided onboarding - walk through a complete OpenSpec workflow cycle with narration
+---
 # OPSX: Onboard
 
 Guide the user through their first complete OpenSpec workflow cycle.
@@ -60,4 +61,3 @@ Show command reference and suggest next steps.
 - Don't skip phases
 - Handle exits gracefully
 - Use real codebase tasks
-"""

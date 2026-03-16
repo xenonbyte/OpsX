@@ -1,5 +1,6 @@
-description = "Think through ideas, investigate problems, and clarify requirements before committing to a change"
-prompt = """
+---
+description: Think through ideas, investigate problems, and clarify requirements before committing to a change
+---
 # OPSX: Explore
 
 You are executing the **OPSX Explore** command to think through ideas and investigate problems.
@@ -67,5 +68,3 @@ When the user is ready to move forward:
 
 Allowed: `openspec/changes/**/*.md`, `openspec/changes/**/*.yaml`
 Forbidden: `src/**/*`, `lib/**/*`, `**/*.ts`, `**/*.js` (except in openspec/)
-
-"""

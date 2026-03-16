@@ -1,5 +1,6 @@
-description = "Archive a completed change - move to archive directory and update main specs if needed"
-prompt = """
+---
+description: Archive a completed change - move to archive directory and update main specs if needed
+---
 # OPSX: Archive
 
 You are executing the **OPSX Archive** command to archive a completed change.
@@ -46,4 +47,3 @@ Before responding, read `~/.openspec/.opsx-config.yaml`.
 
    Ready for the next change! Use /opsx:new or /opsx:propose to start.
    ```
-"""

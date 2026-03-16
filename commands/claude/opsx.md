@@ -1,6 +1,7 @@
-subdir = "opsx"
-description = "OpenSpec workflow - AI-native spec-driven development (explore, propose, new, continue, ff, apply, batch-apply, verify, sync, archive, bulk-archive, resume, status, onboard)"
-prompt = """
+---
+description: OpenSpec workflow - AI-native spec-driven development (explore, propose, new, continue, ff, apply, batch-apply, verify, sync, archive, bulk-archive, resume, status, onboard)
+subdir: opsx
+---
 # OpenSpec Workflow
 
 OpenSpec is an AI-native spec-driven development system.
@@ -27,4 +28,3 @@ OpenSpec is an AI-native spec-driven development system.
 ## Getting Started
 
 Run `/opsx:onboard` for a guided tutorial, or `/opsx:propose` to start a new change.
-"""

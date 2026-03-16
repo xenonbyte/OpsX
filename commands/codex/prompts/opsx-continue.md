@@ -1,5 +1,6 @@
-description = "Create the next artifact in the OpenSpec workflow based on what's ready"
-prompt = """
+---
+description: Create the next artifact in the OpenSpec workflow based on what's ready
+---
 # OPSX: Continue
 
 You are executing the **OPSX Continue** command to create the next artifact in the OpenSpec workflow.
@@ -60,4 +61,3 @@ Before responding, read `~/.openspec/.opsx-config.yaml`.
 
 Allowed: `openspec/changes/**/*.md`, `openspec/changes/**/*.yaml`
 Forbidden: `src/**/*`, `lib/**/*`, `**/*.ts`, `**/*.js` (except in openspec/)
-"""

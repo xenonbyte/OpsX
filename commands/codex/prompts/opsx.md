@@ -1,21 +1,6 @@
-description = "OpenSpec workflow - AI-native spec-driven development (explore, propose, new, continue, ff, apply, batch-apply, verify, sync, archive, bulk-archive, resume, status, onboard)"
-prompts = [
-    "opsx-apply",
-    "opsx-archive",
-    "opsx-batch-apply",
-    "opsx-bulk-archive",
-    "opsx-continue",
-    "opsx-explore",
-    "opsx-ff",
-    "opsx-new",
-    "opsx-onboard",
-    "opsx-propose",
-    "opsx-resume",
-    "opsx-status",
-    "opsx-sync",
-    "opsx-verify"
-]
-prompt = """
+---
+description: OpenSpec workflow - AI-native spec-driven development (explore, propose, new, continue, ff, apply, batch-apply, verify, sync, archive, bulk-archive, resume, status, onboard)
+---
 # OpenSpec Workflow
 
 OpenSpec is an AI-native spec-driven development system.
@@ -42,4 +27,3 @@ OpenSpec is an AI-native spec-driven development system.
 ## Getting Started
 
 Run `/prompts:opsx-onboard` for a guided tutorial, or `/prompts:opsx-propose` to start a new change.
-"""

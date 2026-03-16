@@ -1,5 +1,6 @@
-description = "Select and execute multiple changes - choose serial or parallel execution mode"
-prompt = """
+---
+description: Select and execute multiple changes - choose serial or parallel execution mode
+---
 # OPSX: Batch Apply
 
 Select multiple active changes and execute their tasks, with the option to run serially or in parallel.
@@ -50,4 +51,3 @@ If user says "pause" / "stop":
 - Stop execution safely
 - Show current progress
 - Progress is persisted in each `tasks.md`
-"""
