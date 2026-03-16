@@ -1,0 +1,63 @@
+description = "Guided onboarding - walk through a complete OpenSpec workflow cycle with narration"
+prompt = """
+# OPSX: Onboard
+
+Guide the user through their first complete OpenSpec workflow cycle.
+
+## Language Preference
+Before responding, read `~/.openspec/.opsx-config.yaml`.
+- If `language: zh` → respond in Chinese (简体中文)
+- If `language: en` or missing → respond in English
+
+## Phases
+
+### Phase 1: Welcome
+Display welcome message and explain what we'll do:
+1. Pick a small, real task in the codebase
+2. Explore the problem briefly
+3. Create a change
+4. Build the artifacts: proposal → specs → design → tasks
+5. Implement the tasks
+6. Archive the completed change
+
+### Phase 2: Task Selection
+Scan the codebase for small improvement opportunities:
+- TODO/FIXME comments
+- Missing error handling
+- Functions without tests
+- Debug artifacts
+
+Present 3-4 specific suggestions.
+
+### Phase 3: Explore Demo
+Briefly demonstrate explore mode (1-2 minutes).
+
+### Phase 4-8: Create Artifacts
+Follow EXPLAIN → DO → SHOW → PAUSE pattern:
+- Create the change directory
+- Create proposal.md
+- Create specs/
+- Create design.md
+- Create tasks.md
+
+### Phase 9: Apply (Implementation)
+For each task:
+1. Announce: "Working on task N"
+2. Implement the change
+3. Mark complete in tasks.md
+4. Brief status: "✓ Task N complete"
+
+### Phase 10: Archive
+Move to `openspec/changes/archive/YYYY-MM-DD-<name>/`
+
+### Phase 11: Recap
+Show command reference and suggest next steps.
+
+## Guardrails
+
+- Follow the EXPLAIN → DO → SHOW → PAUSE pattern
+- Keep narration light
+- Don't skip phases
+- Handle exits gracefully
+- Use real codebase tasks
+"""

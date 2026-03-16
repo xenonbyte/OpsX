@@ -1,5 +1,5 @@
 ---
-name: openspec-workflow
+name: openspec
 description: Run OpenSpec spec-driven development without the OpenSpec CLI by creating and maintaining `openspec/changes/*` artifacts (proposal, specs, design, tasks), implementing tasks, verifying against requirements, syncing deltas, and archiving changes. Use when users ask for `/openspec`, `/opsx:*`, or Codex `/prompts:opsx-*` workflows, or when they need help authoring or operating OpenSpec change lifecycle files.
 ---
 

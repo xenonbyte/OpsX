@@ -54,11 +54,11 @@ This repository contains the source code for both the CLI tool and the AI Skill 
 
 - **`bin/openspec.js`**: The Node.js CLI entry point. It handles meta-commands (like `--check`, `--doc`, `--language`) and delegates to the shell scripts for installation.
 - **`install.sh` & `uninstall.sh`**: Core bash scripts that manage the deployment of the skill. They copy the necessary prompt and skill files into the specific platform directories (`~/.claude/`, `~/.codex/`, `~/.gemini/`) and configure the shared `~/.openspec/.opsx-config.yaml`.
-- **`skills/openspec-workflow/`**: The core AI agent skill definition.
-  - `SKILL.md`: The main system prompt instructing the AI on the OpenSpec methodology and state machine.
-  - `GUIDE-*.md`: The practical guide texts shown when users run `openspec --doc`.
-  - `references/`: Contains the artifact templates and action playbooks loaded dynamically by the AI.
-- **`commands/opsx/`**: Detailed Markdown files for each workflow command (e.g., `apply.md`, `propose.md`). These act as highly-focused context injections when a specific `/opsx:*` command is invoked.
+- **`commands/`**: Contains platform-specific TOML command definitions.
+  - `gemini/opsx/*.toml`: Commands for Gemini CLI.
+  - `claude/opsx/*.toml`: Commands for Claude Code.
+  - `codex/prompts/opsx-*.toml`: Prompts for Codex.
+- **`skills/openspec/`**: The core AI agent skill definition.
 
 ## 🛠️ Development & Contribution
 
@@ -149,7 +149,7 @@ Shared config path:
 
 Example:
 ```yaml
-version: "1.0.0"
+version: "1.1.0"
 platform: "claude"
 language: "zh"
 ruleFile: "CLAUDE.md"
@@ -188,6 +188,46 @@ Field meanings:
 - Perl 5.x (for Codex command transformation)
 - Node.js >=14.0.0
 
+## 🧠 Context Management Best Practices
+
+OpenSpec v1.1.0 引入简化上下文管理策略：
+
+### 1. Source of Truth 原则
+- **tasks.md 是唯一真相来源**：任务完成状态以 `[x]` 标记为准
+- **YAML 只存 cursor 信息**：stage、targetTask、tasksHash（校验用）
+- **不要重复记录 completedTasks**：避免同步问题
+
+### 2. Phase Gate 执行规则
+
+| 阶段边界 | 类型 | 行为 |
+|---------|------|------|
+| proposal → specs | 硬门禁 | 必须等待用户确认 |
+| design → tasks | 硬门禁 | 必须等待用户确认 |
+| tasks → apply | 硬门禁 | 必须等待用户确认 |
+| apply 内部 | 软门禁 | 自主执行，实时勾选进度 |
+
+### 3. Checkpoint 策略（降级兼容）
+```yaml
+checkpoint:
+  lastActive: "2026-03-16T14:20:00Z"
+  targetTask: "2.2"
+  integrity:
+    tasksHash: "m7a8xyz"  # 检测 tasks.md 手动修改
+  environment:
+    gitRef: "abc1234"     # 可选，git 可用时记录
+    isDirty: true
+```
+
+- **有 git**：使用 gitRef 作为锚点
+- **无 git**：使用 tasksHash + timestamp 降级
+- **脏工作区**：isDirty=true，建议用户先 git stash
+
+### 4. 三条金律
+
+1. **文档即记忆**：重要决定立即写入 artifact，不指望 LLM 记住
+2. **适时切分**：大 change 拆成小 change，减少上下文压力
+3. **善用 status**：修改代码后运行 `/opsx:status` 让 LLM 重新同步理解
+
 ## 🔌 Troubleshooting
 
 ### Command not found after installation
@@ -217,7 +257,7 @@ Field meanings:
 **Solution**:
 1. Manual cleanup:
    ```bash
-   rm -rf ~/.openspec ~/.claude/commands/openspec.md ~/.claude/commands/opsx ~/.claude/skills/openspec-workflow
+   rm -rf ~/.openspec ~/.claude/commands/openspec.md ~/.claude/commands/opsx ~/.claude/skills/openspec
    ```
 2. For Codex, also clean prompts: `rm -rf ~/.codex/prompts/openspec.md ~/.codex/prompts/opsx-*.md`
 

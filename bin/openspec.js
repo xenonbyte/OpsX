@@ -142,13 +142,13 @@ function showDoc() {
     if (langMatch) lang = langMatch[1];
   }
   
-  const docPath = path.join(home, '.openspec', 'skills', 'openspec-workflow', `GUIDE-${lang}.md`);
+  const docPath = path.join(home, '.openspec', 'skills', 'openspec', `GUIDE-${lang}.md`);
   
   if (fs.existsSync(docPath)) {
     console.log(fs.readFileSync(docPath, 'utf8'));
   } else {
     // Fallback to local file if not installed
-    const localDocPath = path.join(__dirname, '..', 'skills', 'openspec-workflow', `GUIDE-${lang}.md`);
+    const localDocPath = path.join(__dirname, '..', 'skills', 'openspec', `GUIDE-${lang}.md`);
     if (fs.existsSync(localDocPath)) {
       console.log(fs.readFileSync(localDocPath, 'utf8'));
     } else {

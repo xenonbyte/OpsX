@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# OpenSpec Installer v1.0.0
+# OpenSpec Installer v1.1.0
+# Supports TOML format for all platforms (Gemini, Claude, Codex)
 
 set -euo pipefail
 
@@ -22,8 +23,6 @@ run() {
     if [ "$DRY_RUN" = true ]; then
         echo "[dry-run] $*"
     else
-        # Commands are passed as a single quoted string at call sites.
-        # Evaluate that string so normal mode matches dry-run behavior.
         eval "$*"
     fi
 }
@@ -71,20 +70,29 @@ PLATFORM_HOME="$HOME/.${PLATFORM}"
 PLATFORM_COMMANDS_DIR="$PLATFORM_HOME/commands"
 PLATFORM_OPSX_DIR="$PLATFORM_COMMANDS_DIR/opsx"
 PLATFORM_PROMPTS_DIR="$PLATFORM_HOME/prompts"
-PLATFORM_SKILL_DIR="$PLATFORM_HOME/skills/openspec-workflow"
-SHARED_SKILL_DIR="$SHARED_HOME/skills/openspec-workflow"
+PLATFORM_SKILL_DIR="$PLATFORM_HOME/skills/openspec"
+SHARED_SKILL_DIR="$SHARED_HOME/skills/openspec"
 SHARED_COMMANDS_DIR="$SHARED_HOME/commands"
 SHARED_OPSX_DIR="$SHARED_COMMANDS_DIR/opsx"
+
 IS_CODEX=false
+IS_GEMINI=false
+IS_CLAUDE=false
 if [ "$PLATFORM" = "codex" ]; then
     IS_CODEX=true
+fi
+if [ "$PLATFORM" = "gemini" ]; then
+    IS_GEMINI=true
+fi
+if [ "$PLATFORM" = "claude" ]; then
+    IS_CLAUDE=true
 fi
 
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 BACKUP_DIR="$SHARED_HOME/backups/install-$PLATFORM-$TIMESTAMP"
 MANIFEST_FILE="$MANIFEST_DIR/$PLATFORM.manifest"
 
-echo "🚀 OpenSpec v1.0.0 installer"
+echo "🚀 OpenSpec v1.1.0 installer"
 echo "Platform: $PLATFORM"
 echo "Rule file: $RULE_FILE"
 [ "$DRY_RUN" = true ] && echo "Mode: dry-run"
@@ -116,26 +124,30 @@ copy_md_dir() {
     done < <(find "$src_dir" -type f -name '*.md' | sort)
 }
 
-copy_codex_prompt_file() {
-    local src="$1"
-    local dst="$2"
-    run "mkdir -p \"$(dirname "$dst")\""
-    run "perl -pe 's{(?<![A-Za-z0-9._-])/opsx:\\*}{/prompts:opsx-*}g; s{(?<![A-Za-z0-9._-])/opsx:([A-Za-z0-9-]+)}{/prompts:opsx-\$1}g; s{(?<![A-Za-z0-9._-])/openspec(?![A-Za-z0-9_-])}{/prompts:openspec}g' \"$src\" > \"$dst\""
-    record_manifest "$dst"
+# Copy TOML files to platform-specific locations
+copy_toml_commands() {
+    local src_dir="$1"
+    local dst_dir="$2"
+    local f
+    while IFS= read -r f; do
+        local rel="${f#${src_dir}/}"
+        copy_file "$f" "$dst_dir/$rel"
+    done < <(find "$src_dir" -type f -name '*.toml' | sort)
 }
 
-copy_opsx_as_codex_prompts() {
+# Copy TOML files for Codex (source files already have opsx- prefix)
+copy_toml_as_codex_prompts() {
     local src_dir="$1"
     local dst_dir="$2"
     local f
     local base
     while IFS= read -r f; do
-        base="$(basename "$f" .md)"
-        copy_codex_prompt_file "$f" "$dst_dir/opsx-${base}.md"
-    done < <(find "$src_dir" -type f -name '*.md' | sort)
+        base="$(basename "$f")"  # Keep full filename including .toml
+        copy_file "$f" "$dst_dir/$base"
+    done < <(find "$src_dir" -type f -name '*.toml' | sort)
 }
 
-# Backup existing platform files only.
+# Backup existing platform files
 if [ "$DRY_RUN" = false ]; then
     mkdir -p "$BACKUP_DIR"
     if [ "$IS_CODEX" = true ]; then
@@ -147,21 +159,19 @@ if [ "$DRY_RUN" = false ]; then
     [ -d "$PLATFORM_SKILL_DIR" ] && cp -r "$PLATFORM_SKILL_DIR" "$BACKUP_DIR/" || true
 fi
 
-# Install shared bundle used by /openspec --doc and shared config.
-run "mkdir -p \"$SHARED_SKILL_DIR\" \"$SHARED_OPSX_DIR\""
-copy_md_dir "$SCRIPT_DIR/skills/openspec-workflow" "$SHARED_SKILL_DIR"
-copy_md_dir "$SCRIPT_DIR/commands/opsx" "$SHARED_OPSX_DIR"
+# Install shared bundle
+run "mkdir -p \"$SHARED_SKILL_DIR\" \"$SHARED_COMMANDS_DIR\""
+copy_md_dir "$SCRIPT_DIR/skills/openspec" "$SHARED_SKILL_DIR"
 copy_file "$SCRIPT_DIR/commands/openspec.md" "$SHARED_COMMANDS_DIR/openspec.md"
 
-# Install platform bundle.
+# Install platform bundle
 if [ "$IS_CODEX" = true ]; then
     run "mkdir -p \"$PLATFORM_PROMPTS_DIR\" \"$PLATFORM_SKILL_DIR\""
 else
     run "mkdir -p \"$PLATFORM_OPSX_DIR\" \"$PLATFORM_SKILL_DIR\""
 fi
 
-# Clean up old files before installing new ones.
-# Read old manifest and remove files that won't be in the new install.
+# Cleanup old files
 cleanup_old_files() {
     local old_manifest="$1"
     if [ -f "$old_manifest" ]; then
@@ -169,9 +179,12 @@ cleanup_old_files() {
         while IFS= read -r old_path; do
             [ -z "$old_path" ] && continue
             if [ -f "$old_path" ]; then
-                # Only remove if it's an OpenSpec-managed path
                 case "$old_path" in
-                    */commands/openspec.md|*/commands/opsx/*|*/prompts/openspec.md|*/prompts/opsx-*.md|*/skills/openspec-workflow/*)
+                    */commands/openspec.md|*/commands/openspec.toml|\
+                    */commands/opsx/*.md|*/commands/opsx/*.toml|\
+                    */prompts/openspec.md|*/prompts/openspec.toml|\
+                    */prompts/opsx-*.md|*/prompts/opsx-*.toml|\
+                    */skills/openspec/*)
                         run "rm -f \"$old_path\""
                         echo "  Removed: $old_path"
                         ;;
@@ -181,33 +194,56 @@ cleanup_old_files() {
     fi
 }
 
-# Store old manifest before reset for cleanup.
 OLD_MANIFEST_FILE="$MANIFEST_FILE.old"
 if [ "$DRY_RUN" = false ] && [ -f "$MANIFEST_FILE" ]; then
     cp "$MANIFEST_FILE" "$OLD_MANIFEST_FILE"
 fi
 
-# Reset manifest for this platform on each install.
 if [ "$DRY_RUN" = false ]; then
     : > "$MANIFEST_FILE"
 fi
 
-# Clean up old files from previous installation.
 if [ "$DRY_RUN" = false ] && [ -f "$OLD_MANIFEST_FILE" ]; then
     cleanup_old_files "$OLD_MANIFEST_FILE"
     rm -f "$OLD_MANIFEST_FILE"
 fi
 
+# Install TOML commands based on platform
 if [ "$IS_CODEX" = true ]; then
-    copy_opsx_as_codex_prompts "$SCRIPT_DIR/commands/opsx" "$PLATFORM_PROMPTS_DIR"
-    copy_codex_prompt_file "$SCRIPT_DIR/commands/openspec.md" "$PLATFORM_PROMPTS_DIR/openspec.md"
-else
-    copy_md_dir "$SCRIPT_DIR/commands/opsx" "$PLATFORM_OPSX_DIR"
-    copy_file "$SCRIPT_DIR/commands/openspec.md" "$PLATFORM_COMMANDS_DIR/openspec.md"
+    # Codex: Install with opsx- prefix
+    if [ -d "$SCRIPT_DIR/commands/codex/prompts" ]; then
+        copy_toml_as_codex_prompts "$SCRIPT_DIR/commands/codex/prompts" "$PLATFORM_PROMPTS_DIR"
+    else
+        # Fallback: Convert from opsx/*.toml with prefix
+        copy_toml_as_codex_prompts "$SCRIPT_DIR/commands/opsx" "$PLATFORM_PROMPTS_DIR"
+        # Also copy entry file
+        if [ -f "$SCRIPT_DIR/commands/gemini/opsx.toml" ]; then
+            copy_file "$SCRIPT_DIR/commands/gemini/opsx.toml" "$PLATFORM_PROMPTS_DIR/opsx.toml"
+        fi
+    fi
+elif [ "$IS_GEMINI" = true ]; then
+    # Gemini: Subdirectory namespace
+    if [ -d "$SCRIPT_DIR/commands/gemini/opsx" ]; then
+        copy_toml_commands "$SCRIPT_DIR/commands/gemini/opsx" "$PLATFORM_OPSX_DIR"
+        copy_file "$SCRIPT_DIR/commands/gemini/opsx.toml" "$PLATFORM_COMMANDS_DIR/opsx.toml"
+    else
+        # Fallback: Use generic opsx/*.toml
+        copy_toml_commands "$SCRIPT_DIR/commands/opsx" "$PLATFORM_OPSX_DIR"
+    fi
+elif [ "$IS_CLAUDE" = true ]; then
+    # Claude: Subdirectory namespace
+    if [ -d "$SCRIPT_DIR/commands/claude/opsx" ]; then
+        copy_toml_commands "$SCRIPT_DIR/commands/claude/opsx" "$PLATFORM_OPSX_DIR"
+        copy_file "$SCRIPT_DIR/commands/claude/opsx.toml" "$PLATFORM_COMMANDS_DIR/opsx.toml"
+    else
+        # Fallback: Use generic opsx/*.toml
+        copy_toml_commands "$SCRIPT_DIR/commands/opsx" "$PLATFORM_OPSX_DIR"
+    fi
 fi
-copy_md_dir "$SCRIPT_DIR/skills/openspec-workflow" "$PLATFORM_SKILL_DIR"
 
-# Migrate legacy Claude-only config if needed.
+copy_md_dir "$SCRIPT_DIR/skills/openspec" "$PLATFORM_SKILL_DIR"
+
+# Migrate legacy config
 if [ "$DRY_RUN" = false ] && [ ! -f "$SHARED_CONFIG" ] && [ -f "$HOME/.claude/.opsx-config.yaml" ]; then
     cp "$HOME/.claude/.opsx-config.yaml" "$BACKUP_DIR/legacy-claude-config.yaml"
 fi
@@ -224,7 +260,7 @@ run "cat > \"$SHARED_CONFIG\" <<CFG
 # OpenSpec Local Skill Configuration
 # Managed by /openspec meta-commands
 
-version: \"1.0.0\"
+version: \"1.1.0\"
 platform: \"$PLATFORM\"  # claude | codex | gemini
 language: \"$CURRENT_LANGUAGE\"      # en | zh
 ruleFile: \"$RULE_FILE\"

@@ -1,0 +1,29 @@
+description = "OpenSpec workflow - AI-native spec-driven development (explore, propose, new, continue, ff, apply, batch-apply, verify, sync, archive, bulk-archive, resume, status, onboard)"
+prompt = """
+# OpenSpec Workflow
+
+OpenSpec is an AI-native spec-driven development system.
+
+## Available Subcommands
+
+| Command | What it does |
+|---------|--------------|
+| `/prompts:opsx-explore` | Think through problems before/during work |
+| `/prompts:opsx-propose` | Create a change and generate all artifacts |
+| `/prompts:opsx-new` | Start a new change, step through artifacts one at a time |
+| `/prompts:opsx-continue` | Continue working on an existing change |
+| `/prompts:opsx-ff` | Fast-forward: create all artifacts at once |
+| `/prompts:opsx-apply` | Implement tasks from a change |
+| `/prompts:opsx-verify` | Verify implementation matches artifacts |
+| `/prompts:opsx-sync` | Sync delta specs to main specs |
+| `/prompts:opsx-archive` | Archive a completed change |
+| `/prompts:opsx-bulk-archive` | Archive multiple changes at once |
+| `/prompts:opsx-batch-apply` | Select multiple changes, execute serial or parallel |
+| `/prompts:opsx-resume` | Resume a previous change |
+| `/prompts:opsx-status` | Check current progress |
+| `/prompts:opsx-onboard` | Guided tutorial — walk through a complete cycle |
+
+## Getting Started
+
+Run `/prompts:opsx-onboard` for a guided tutorial, or `/prompts:opsx-propose` to start a new change.
+"""

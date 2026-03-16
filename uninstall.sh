@@ -144,12 +144,12 @@ fi
 PLATFORM_HOME="$HOME/.${PLATFORM}"
 if [ "$PLATFORM" = "codex" ]; then
     cleanup_empty_chain "$PLATFORM_HOME/prompts"
-    cleanup_empty_chain "$PLATFORM_HOME/skills/openspec-workflow"
+    cleanup_empty_chain "$PLATFORM_HOME/skills/openspec"
     cleanup_empty_chain "$PLATFORM_HOME/skills"
 else
     cleanup_empty_chain "$PLATFORM_HOME/commands/opsx"
     cleanup_empty_chain "$PLATFORM_HOME/commands"
-    cleanup_empty_chain "$PLATFORM_HOME/skills/openspec-workflow"
+    cleanup_empty_chain "$PLATFORM_HOME/skills/openspec"
     cleanup_empty_chain "$PLATFORM_HOME/skills"
 fi
 

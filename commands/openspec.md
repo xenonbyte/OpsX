@@ -99,7 +99,7 @@ Output format:
 **Platform Files**:
   ✓ ~/.claude/commands/openspec.md
   ✓ ~/.claude/commands/opsx/
-  ✓ ~/.claude/skills/openspec-workflow/
+  ✓ ~/.claude/skills/openspec/
 
 **Workspace**: /path/to/project
   ✓ CLAUDE.md (rule file)
@@ -135,14 +135,14 @@ Display the embedded OpenSpec guide **in the current language**.
 
 1. Read `~/.openspec/.opsx-config.yaml` for the `language` field
 2. Determine the guide file:
-   - If `language: zh` → read `~/.openspec/skills/openspec-workflow/GUIDE-zh.md`
-   - If `language: en` or missing → read `~/.openspec/skills/openspec-workflow/GUIDE-en.md`
+   - If `language: zh` → read `~/.openspec/skills/openspec/GUIDE-zh.md`
+   - If `language: en` or missing → read `~/.openspec/skills/openspec/GUIDE-en.md`
 3. Output the full contents of the guide file
 
 If the file does not exist, display:
 ```
-文档未找到。请确认 ~/.openspec/skills/openspec-workflow/GUIDE-<lang>.md 存在。
-Guide not found. Please verify ~/.openspec/skills/openspec-workflow/GUIDE-<lang>.md exists.
+文档未找到。请确认 ~/.openspec/skills/openspec/GUIDE-<lang>.md 存在。
+Guide not found. Please verify ~/.openspec/skills/openspec/GUIDE-<lang>.md exists.
 ```
 
 ### Unknown flags
