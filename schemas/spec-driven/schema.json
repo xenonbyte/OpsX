@@ -1,0 +1,96 @@
+{
+  "id": "spec-driven",
+  "description": "Schema-driven OpenSpec workflow for proposal, specs, design, and tasks.",
+  "checkpoints": [
+    {
+      "id": "spec-checkpoint",
+      "phase": "planning",
+      "trigger": "after-design-before-tasks",
+      "insertion": {
+        "after": ["design"],
+        "before": ["tasks"]
+      },
+      "states": ["PASS", "WARN", "BLOCK"]
+    },
+    {
+      "id": "task-checkpoint",
+      "phase": "planning",
+      "trigger": "after-tasks-before-apply",
+      "insertion": {
+        "after": ["tasks"],
+        "before": ["apply"]
+      },
+      "states": ["PASS", "WARN", "BLOCK"]
+    },
+    {
+      "id": "execution-checkpoint",
+      "phase": "execution",
+      "trigger": "after-each-top-level-task-group",
+      "insertion": {
+        "within": ["apply"],
+        "frequency": "per-top-level-task-group"
+      },
+      "states": ["PASS", "WARN", "BLOCK"]
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "proposal",
+      "path": "proposal.md",
+      "requires": []
+    },
+    {
+      "id": "specs",
+      "path": "specs/<capability>/spec.md",
+      "requires": ["proposal"]
+    },
+    {
+      "id": "design",
+      "path": "design.md",
+      "requires": ["proposal"]
+    },
+    {
+      "id": "security-review",
+      "path": "security-review.md",
+      "requires": ["specs", "design"],
+      "optional": true,
+      "gates": ["tasks"],
+      "activation": {
+        "hardGate": {
+          "changeMetadata": ["securitySensitive"],
+          "config": ["securityReview.required"]
+        },
+        "heuristic": {
+          "inputs": ["request", "proposal", "specs", "design"],
+          "keywords": [
+            "auth",
+            "permission",
+            "token",
+            "session",
+            "cookie",
+            "upload",
+            "payment",
+            "admin",
+            "pii",
+            "secret",
+            "tenant",
+            "webhook",
+            "callback",
+            "encryption",
+            "signature"
+          ]
+        },
+        "waiver": {
+          "approvedField": "securityWaiver.approved",
+          "reasonField": "securityWaiver.reason"
+        }
+      },
+      "states": ["required", "recommended", "waived", "completed"]
+    },
+    {
+      "id": "tasks",
+      "path": "tasks.md",
+      "requires": ["specs", "design"]
+    }
+  ]
+}

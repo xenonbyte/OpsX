@@ -1,0 +1,21 @@
+---
+description: OpenSpec entrypoint for Codex. Prefer the openspec skill for natural-language workflow requests.
+---
+# OpenSpec
+
+Use the `openspec` skill for this request.
+
+Codex usage model:
+- Preferred: `$openspec <request>`
+- Explicit routing: `/prompts:openspec` and `/prompts:opsx-*`
+- Active profile: `{{profile}}`
+
+Available routes:
+{{command_list}}
+
+Important:
+- Treat `/prompts:*` as action selectors in Codex.
+- If details are still needed after command selection, provide them in the next message.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Security-review states: {{review_state_note}}
+- Checkpoints: {{checkpoint_note}}

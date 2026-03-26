@@ -1,63 +1,26 @@
 ---
-description: Guided onboarding - walk through a complete OpenSpec workflow cycle with narration
+description: Walk a user through the minimum OpenSpec workflow path.
 ---
-# OPSX: Onboard
+# OpenSpec route: Onboard
 
-Guide the user through their first complete OpenSpec workflow cycle.
+Use the `openspec` skill for this request.
 
-## Language Preference
-Before responding, read `~/.openspec/.opsx-config.yaml`.
-- If `language: zh` → respond in Chinese (简体中文)
-- If `language: en` or missing → respond in English
+Workflow action: `onboard`
+Profile availability: `expanded`
+Primary workflow entry: `/openspec <request>`
+Explicit action route: `/opsx:onboard`
 
-## Phases
+Execution rules:
+- Follow the `onboard` playbook from the `openspec` skill and its referenced files.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Use request details already present in the conversation.
+- Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
+- Security-review states are `required`, `recommended`, `waived`, `completed`.
+- If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
+- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
+- `execution checkpoint` runs after each top-level task group during `apply`.
+- Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
+- If the required change name, description, or selection is missing, ask for the minimum clarification needed.
+- Keep onboarding instructional until the user chooses a real change to create.
+- When files are mutated, report changed files, current state, next step, and blockers.
 
-### Phase 1: Welcome
-Display welcome message and explain what we'll do:
-1. Pick a small, real task in the codebase
-2. Explore the problem briefly
-3. Create a change
-4. Build the artifacts: proposal → specs → design → tasks
-5. Implement the tasks
-6. Archive the completed change
-
-### Phase 2: Task Selection
-Scan the codebase for small improvement opportunities:
-- TODO/FIXME comments
-- Missing error handling
-- Functions without tests
-- Debug artifacts
-
-Present 3-4 specific suggestions.
-
-### Phase 3: Explore Demo
-Briefly demonstrate explore mode (1-2 minutes).
-
-### Phase 4-8: Create Artifacts
-Follow EXPLAIN → DO → SHOW → PAUSE pattern:
-- Create the change directory
-- Create proposal.md
-- Create specs/
-- Create design.md
-- Create tasks.md
-
-### Phase 9: Apply (Implementation)
-For each task:
-1. Announce: "Working on task N"
-2. Implement the change
-3. Mark complete in tasks.md
-4. Brief status: "✓ Task N complete"
-
-### Phase 10: Archive
-Move to `openspec/changes/archive/YYYY-MM-DD-<name>/`
-
-### Phase 11: Recap
-Show command reference and suggest next steps.
-
-## Guardrails
-
-- Follow the EXPLAIN → DO → SHOW → PAUSE pattern
-- Keep narration light
-- Don't skip phases
-- Handle exits gracefully
-- Use real codebase tasks

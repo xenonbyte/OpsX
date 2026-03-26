@@ -1,53 +1,26 @@
 ---
-description: Select and execute multiple changes - choose serial or parallel execution mode
+description: Apply multiple ready changes in a controlled sequence.
 ---
-# OPSX: Batch Apply
+# OpenSpec route: Batch apply
 
-Select multiple active changes and execute their tasks, with the option to run serially or in parallel.
+Use the `openspec` skill for this request.
 
-## Language Preference
-Before responding, read `~/.openspec/.opsx-config.yaml`.
-- If `language: zh` → respond in Chinese (简体中文)
-- If `language: en` or missing → respond in English
+Workflow action: `batch-apply`
+Profile availability: `expanded`
+Primary workflow entry: `$openspec <request>`
+Explicit action route: `/prompts:opsx-batch-apply`
 
-## Steps
+Execution rules:
+- Follow the `batch-apply` playbook from the `openspec` skill and its referenced files.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Use request details already present in the conversation.
+- Do not assume text typed after a `/prompts:` command is reliably available as an inline argument in Codex.
+- Security-review states are `required`, `recommended`, `waived`, `completed`.
+- If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
+- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
+- `execution checkpoint` runs after each top-level task group during `apply`.
+- Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
+- If the required change name, description, or selection is missing, ask for the minimum clarification needed.
+- Clarify execution order or target changes when that affects behavior.
+- When files are mutated, report changed files, current state, next step, and blockers.
 
-1. **List implementable changes**
-   - List directories under `openspec/changes/` (excluding `archive/`)
-   - Show only changes with `tasks.md` and at least one pending task (`- [ ]`)
-
-2. **Ask user to select changes**
-   ```
-   Select changes to execute (multi-select):
-
-   1. add-dark-mode
-      Tasks: 0/8 complete
-      Planning: proposal ✓ | specs ✓ | design ✓ | tasks ✓
-
-   2. fix-login-bug
-      Tasks: 2/5 complete
-      Planning: proposal ✓ | specs ✓ | tasks ✓
-   ```
-
-3. **Ask user to select execution mode**:
-   - `Serial` (recommended): finish one change before starting next
-   - `Parallel`: round-robin batches across changes
-   - `Plan only`: show consolidated task summary without code changes
-
-4. **If mode is `Serial`, execute sequentially**
-   - For each selected change, read context artifacts and execute pending tasks
-
-5. **If mode is `Parallel`, execute round-robin**
-   - Default batch size: one task group per change per round
-
-6. **Show final summary**:
-   - Per-change task completion
-   - Total completed tasks
-   - Suggested next commands
-
-## Pause and Resume
-
-If user says "pause" / "stop":
-- Stop execution safely
-- Show current progress
-- Progress is persisted in each `tasks.md`

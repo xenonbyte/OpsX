@@ -1,44 +1,26 @@
 ---
-description: Resume a previous change - list active changes and pick up where you left off
+description: Restore context around active changes and recommend the next move.
 ---
-# OPSX: Resume
+# OpenSpec route: Resume
 
-Resume work on a previous change by listing active changes, helping user select one, loading context, and suggesting the next action.
+Use the `openspec` skill for this request.
 
-## Language Preference
-Before responding, read `~/.openspec/.opsx-config.yaml`.
-- If `language: zh` → respond in Chinese (简体中文)
-- If `language: en` or missing → respond in English
+Workflow action: `resume`
+Profile availability: `expanded`
+Primary workflow entry: `$openspec <request>`
+Explicit action route: `/prompts:opsx-resume`
 
-## Steps
+Execution rules:
+- Follow the `resume` playbook from the `openspec` skill and its referenced files.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Use request details already present in the conversation.
+- Do not assume text typed after a `/prompts:` command is reliably available as an inline argument in Codex.
+- Security-review states are `required`, `recommended`, `waived`, `completed`.
+- If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
+- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
+- `execution checkpoint` runs after each top-level task group during `apply`.
+- Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
+- If the required change name, description, or selection is missing, ask for the minimum clarification needed.
+- If no change is specified, recommend the best active candidate and explain why.
+- When files are mutated, report changed files, current state, next step, and blockers.
 
-1. **List active changes**
-   - List directories under `openspec/changes/` (excluding `archive/`)
-   - If none exist: "No active changes. Start one with /prompts:opsx-propose or /prompts:opsx-new."
-
-2. **Resolve target change**:
-   - If user provided a valid change name, use it
-   - If omitted and exactly one active change exists, auto-select it
-   - If omitted and multiple active changes exist, ask user to choose
-
-3. **Build progress summary for each candidate**:
-   - Read `.openspec.yaml` if present
-   - Check artifact presence (`proposal.md`, `specs/*/spec.md`, `design.md`, `tasks.md`)
-   - **Source of Truth**: If `tasks.md` exists, parse `[x]` vs `[ ]` to determine ACTUAL progress.
-   - **Integrity Check**: Compare computed hash of `tasks.md` with `checkpoint.integrity.tasksHash` in `.openspec.yaml`.
-   - If hash mismatch: "检测到任务列表手动变更，正在重新校验进度"
-
-4. **Load selected change context**
-   - Read all existing artifacts
-   - Sync `stage` and `checkpoint` information from `.openspec.yaml`
-
-5. **Show concise resume report**:
-   - Change path
-   - Artifact completion state
-   - Task progress (based on `tasks.md`)
-   - `checkpoint` status (targetTask, gitRef, isDirty)
-   - A 1-sentence proposal summary (if proposal exists)
-   - Recommended next commands
-
-6. **Wait for explicit user instruction**
-   - Do not auto-execute the next command

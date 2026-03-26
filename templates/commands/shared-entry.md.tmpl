@@ -1,0 +1,28 @@
+---
+description: OpenSpec workflow overview shared across supported tools.
+---
+# OpenSpec
+
+OpenSpec is a schema-driven workflow system distributed as a skill-first experience.
+
+Artifacts in `spec-driven`:
+{{artifact_list}}
+
+Checkpoints in `spec-driven`:
+{{checkpoint_list}}
+
+Core profile commands:
+{{core_actions}}
+
+Expanded profile commands:
+{{expanded_actions}}
+
+Codex guidance:
+- Prefer `$openspec <request>` for natural-language requests.
+- Use `/prompts:openspec` or `/prompts:opsx-*` for explicit routing.
+
+Security review guidance:
+- Use `security-review.md` after `design` and before `tasks` for security-sensitive changes.
+- Explicit markers force the review; heuristic matches recommend it and allow waiver with recorded reasoning.
+- Review states: {{review_states}}
+- Checkpoint states: {{checkpoint_states}}

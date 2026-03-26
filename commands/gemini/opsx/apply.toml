@@ -1,82 +1,30 @@
-description = "Implement the tasks - work through the checklist, marking items complete as you go"
+description = "Implement tasks from a change and update task state."
 prompt = """
-# OPSX: Apply
-
-You are executing the **OPSX Apply** command to implement the planned change.
-
-## Language Preference
-Before responding, read `~/.openspec/.opsx-config.yaml`.
-- If `language: zh` → respond in Chinese (简体中文)
-- If `language: en` or missing → respond in English
-
-## Your Task
-
-1. **Identify the current change**:
-   - If user specified a change name, use it
-   - If omitted, list active changes and ask user to choose
-
-2. **Read all context**:
-   - Read `proposal.md` — understand WHY
-   - Read all `specs/**/*.md` — understand WHAT
-   - Read `design.md` if exists — understand HOW
-   - Read `tasks.md` — understand implementation plan
-   - Read `.openspec.yaml` — check `checkpoint` status
-
-3. **Check task status**:
-   - Parse tasks.md for checkboxes
-   - Identify: completed (`- [x]`), pending (`- [ ]`)
-   - Start from first pending task
-
-4. **Implement tasks in order**:
-   - Read the task description
-   - Understand what it's asking for
-   - Implement the changes
-   - Test/verify the implementation
-   - Update the checkbox: `- [x]`
-   - Update `checkpoint` in `.openspec.yaml` (targetTask, tasksHash, gitRef, isDirty)
-   - Update `## Current Status` in `tasks.md`
-   - Report progress to user
-
-5. **Handle issues gracefully**:
-   - If something is unclear, ask the user
-   - If design needs adjustment, update design.md
-   - If blockers arise, pause and ask for guidance
-
-6. **When all tasks complete**:
-   - Verify implementation against specs
-   - Update `stage` to `verify` in `.openspec.yaml`
-   - Show completion summary
-   - Suggest `/opsx:verify` to validate, then `/opsx:archive`
-
-## Task Checkbox Format
-
-CRITICAL: Maintain exact checkbox format
-```markdown
-- [x] 1.1 Completed task
-- [ ] 1.2 Pending task
-```
-
-## Current Status Block (MANDATORY)
-
-Maintain this block at the end of `tasks.md`:
-```markdown
 ---
+description: Implement tasks from a change and update task state.
+---
+# OpenSpec route: Apply
 
-## Current Status
+Use the `openspec` skill for this request.
 
-> **Stage**: apply
-> **Progress**: X/Y tasks (Z%)
-> **Last Checkpoint**: <ISO-8601>
->
-> **Next Action**: Continue with task <ID> - <Description>
->
-> **Resume Command**: `/opsx:resume <change-name>`
-```
+Workflow action: `apply`
+Profile availability: `core, expanded`
+Primary workflow entry: `/openspec <request>`
+Explicit action route: `/opsx:apply`
 
-## Phase Boundary Guard
+Execution rules:
+- Follow the `apply` playbook from the `openspec` skill and its referenced files.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Use request details already present in the conversation.
+- Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
+- Security-review states are `required`, `recommended`, `waived`, `completed`.
+- If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
+- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
+- `execution checkpoint` runs after each top-level task group during `apply`.
+- Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
+- If the required change name, description, or selection is missing, ask for the minimum clarification needed.
+- Read the relevant change artifacts before modifying product code.
+- When files are mutated, report changed files, current state, next step, and blockers.
 
-✅ You are in APPLY phase. This is the ONLY phase where you can modify code files.
-- Proceed with implementation
-- Update tasks.md checkboxes as you complete each task
-- Create checkpoints after completing 1-3 tasks (use git commit and update .openspec.yaml)
 """
+

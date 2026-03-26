@@ -1,70 +1,26 @@
 ---
-description: Think through ideas, investigate problems, and clarify requirements before committing to a change
+description: Investigate ideas, constraints, and tradeoffs before committing to a change.
 ---
-# OPSX: Explore
+# OpenSpec route: Explore
 
-You are executing the **OPSX Explore** command to think through ideas and investigate problems.
+Use the `openspec` skill for this request.
 
-## Language Preference
-Before responding, read `~/.openspec/.opsx-config.yaml`.
-- If `language: zh` → respond in Chinese (简体中文)
-- If `language: en` or missing → respond in English
+Workflow action: `explore`
+Profile availability: `core, expanded`
+Primary workflow entry: `/openspec <request>`
+Explicit action route: `/opsx:explore`
 
-## Your Task
+Execution rules:
+- Follow the `explore` playbook from the `openspec` skill and its referenced files.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Use request details already present in the conversation.
+- Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
+- Security-review states are `required`, `recommended`, `waived`, `completed`.
+- If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
+- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
+- `execution checkpoint` runs after each top-level task group during `apply`.
+- Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
+- If the required change name, description, or selection is missing, ask for the minimum clarification needed.
+- Stay exploratory unless the user clearly asks to create or update artifacts.
+- When files are mutated, report changed files, current state, next step, and blockers.
 
-This is a **thinking partner** mode — no structure required, just exploration.
-
-### When to Use
-
-User wants to:
-- Explore an idea without committing to it
-- Investigate a problem before proposing a solution
-- Compare different approaches
-- Understand requirements better
-- Brainstorm possibilities
-
-### Your Approach
-
-1. **Listen and understand**:
-   - What is the user trying to figure out?
-   - What context do they need?
-   - What are they uncertain about?
-
-2. **Ask helpful questions**:
-   - "What problem are you trying to solve?"
-   - "What constraints should I consider?"
-   - "What does success look like?"
-
-3. **Explore together**:
-   - Offer different perspectives
-   - Identify trade-offs
-   - Point out potential issues
-
-4. **No pressure**:
-   - This isn't a commitment to build
-   - Ideas can be discarded
-   - Exploration is valuable on its own
-
-### Transitioning to Action
-
-When the user is ready to move forward:
-- "Ready to start this change? Use `/opsx:propose` to create everything at once"
-- "Or use `/opsx:new` to step through it incrementally"
-
-## Tips
-
-- **Stay curious** — ask genuine questions
-- **Offer options** — don't prescribe solutions
-- **Be non-committal** — this is exploration, not implementation
-- **Build on ideas** — "Have you considered..." not "You should..."
-
-
-## Phase Boundary Guard (MANDATORY)
-
-⚠️ You are in PLANNING phase. You MUST:
-1. Only create/modify artifact files under `openspec/changes/<name>/`
-2. NOT modify code files outside of artifact directories
-3. Ask clarification questions if boundaries are unclear
-
-Allowed: `openspec/changes/**/*.md`, `openspec/changes/**/*.yaml`
-Forbidden: `src/**/*`, `lib/**/*`, `**/*.ts`, `**/*.js` (except in openspec/)

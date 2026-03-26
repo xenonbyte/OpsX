@@ -1,54 +1,30 @@
-description = "Sync delta specs from a change to main specs"
+description = "Merge delta specs from a change into the main spec set."
 prompt = """
-# OPSX: Sync
+---
+description: Merge delta specs from a change into the main spec set.
+---
+# OpenSpec route: Sync
 
-Sync delta specs from a change to main specs.
+Use the `openspec` skill for this request.
 
-## Language Preference
-Before responding, read `~/.openspec/.opsx-config.yaml`.
-- If `language: zh` → respond in Chinese (简体中文)
-- If `language: en` or missing → respond in English
+Workflow action: `sync`
+Profile availability: `expanded`
+Primary workflow entry: `/openspec <request>`
+Explicit action route: `/opsx:sync`
 
-## Input
+Execution rules:
+- Follow the `sync` playbook from the `openspec` skill and its referenced files.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Use request details already present in the conversation.
+- Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
+- Security-review states are `required`, `recommended`, `waived`, `completed`.
+- If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
+- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
+- `execution checkpoint` runs after each top-level task group during `apply`.
+- Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
+- If the required change name, description, or selection is missing, ask for the minimum clarification needed.
+- Merge only the requested delta specs and report conflicts explicitly.
+- When files are mutated, report changed files, current state, next step, and blockers.
 
-Optionally specify a change name after `/opsx:sync`. If omitted, prompt for selection.
-
-## Steps
-
-1. **If no change name provided, prompt for selection**
-   - List directories under `openspec/changes/` (excluding `archive/`)
-   - Show changes that have delta specs (under `specs/` directory)
-
-2. **Find delta specs**
-   - Look for delta spec files in `openspec/changes/<name>/specs/*/spec.md`
-   - Each delta spec contains: `## ADDED Requirements`, `## MODIFIED Requirements`, `## REMOVED Requirements`, `## RENAMED Requirements`
-
-3. **For each delta spec, apply changes to main specs**:
-   - **ADDED**: Add new requirement blocks to main spec
-   - **MODIFIED**: Find existing requirement and apply changes
-   - **REMOVED**: Remove requirement block from main spec
-   - **RENAMED**: Rename requirement from old title to new title
-
-4. **Show summary**:
-   - Which capabilities were updated
-   - What changes were made (requirements added/modified/removed/renamed)
-
-## Delta Spec Format Reference
-
-```markdown
-## ADDED Requirements
-### Requirement: New Feature
-The system SHALL do something new.
-
-## MODIFIED Requirements
-### Requirement: Existing Feature
-#### Scenario: New scenario to add
-
-## REMOVED Requirements
-### Requirement: Deprecated Feature
-
-## RENAMED Requirements
-- FROM: `### Requirement: Old Name`
-- TO: `### Requirement: New Name`
-```
 """
+

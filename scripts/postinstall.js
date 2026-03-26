@@ -1,27 +1,21 @@
 #!/usr/bin/env node
 
 console.log(`
-╔═══════════════════════════════════════════════════════════════╗
-║                                                               ║
-║   OpenSpec v1.1.0 installed successfully!                     ║
-║                                                               ║
-║   AI-native spec-driven development system                    ║
-║                                                               ║
-╚═══════════════════════════════════════════════════════════════╝
+OpenSpec v1.3.0 installed successfully.
 
 Next steps:
+1. Initialize your project:
+   openspec init --platform codex --profile core
 
-1. Install for your platform:
-   npx @xenonbyte/openspec install --platform claude
+2. Install assets for one or more tools:
+   openspec install --platform claude,codex,gemini --profile core
 
-   Or for all supported platforms:
-   npx @xenonbyte/openspec install --platform claude,gemini,codex
+3. For Codex, prefer:
+   $openspec help me start an OpenSpec workflow
 
-2. After installation, run the guided tutorial:
-   /opsx:onboard
-
-3. View documentation:
-   npx @xenonbyte/openspec help
-
-GitHub: https://github.com/xenonbyte/openspec
+Documentation:
+- README.md
+- docs/commands.md
+- docs/codex.md
+- docs/customization.md
 `);

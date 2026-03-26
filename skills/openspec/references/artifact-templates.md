@@ -1,133 +1,76 @@
 # Artifact Templates
 
-Use this file when creating or editing `proposal.md`, `specs/**/*.md`, `design.md`, or `tasks.md`.
+Apply these rules after resolving project context and per-artifact rules from `openspec/config.yaml`.
 
-## 1) Proposal (`proposal.md`)
-
-Purpose: explain why the change is needed and what capabilities are affected.
-
-Template:
+## proposal.md
 
 ```markdown
 ## Why
-<!-- 1-2 sentences on problem/opportunity -->
 
 ## What Changes
-<!-- Bulleted change summary. Mark breaking changes with **BREAKING** -->
 
 ## Capabilities
 
 ### New Capabilities
-- `<capability-name>`: <short description>
 
 ### Modified Capabilities
-- `<existing-capability>`: <what changes>
 
 ## Impact
-<!-- Affected code, APIs, data, dependencies, teams -->
 ```
 
-Rules:
-
-- Keep concise (usually 1-2 pages).
-- Focus on intent and scope, not implementation detail.
-- Ensure capabilities listed here match specs later.
-
-## 2) Specs (`specs/<capability>/spec.md`)
-
-Purpose: define required behavior (WHAT).
-
-Template:
+## specs/<capability>/spec.md
 
 ```markdown
 ## ADDED Requirements
 
-### Requirement: User can export data
-The system SHALL allow users to export their data in CSV format.
+### Requirement: Example requirement
+The system SHALL ...
 
-#### Scenario: Successful export
-- **WHEN** user clicks "Export"
-- **THEN** system downloads a CSV containing the user's data
-
-## MODIFIED Requirements
-<!-- Include full updated requirement text -->
-
-## REMOVED Requirements
-<!-- Include reason and migration path -->
+#### Scenario: Example scenario
+- **WHEN** ...
+- **THEN** ...
 ```
 
 Rules:
+- Use `SHALL` or `MUST` in requirements.
+- Every requirement needs at least one scenario.
+- Use `ADDED`, `MODIFIED`, and `REMOVED` sections as needed.
 
-- Use normative language (`SHALL`/`MUST`) for requirements.
-- Give every requirement at least one scenario.
-- Use exactly `#### Scenario:` heading format.
-- Use clear `WHEN`/`THEN` steps in scenarios.
-
-Delta semantics:
-
-- `ADDED`: new capability behavior
-- `MODIFIED`: changed existing behavior (full replacement text)
-- `REMOVED`: deleted behavior with reason and migration guidance
-
-## 3) Design (`design.md`, optional)
-
-Purpose: explain implementation approach (HOW) for non-trivial changes.
-
-Add design when change includes one or more:
-
-- Cross-module or cross-service impact
-- New dependency or data model changes
-- Security/performance/migration complexity
-- Major trade-offs requiring explicit decisions
-
-Template:
+## design.md
 
 ```markdown
 ## Context
-
 ## Goals / Non-Goals
-
 ## Decisions
-
 ## Risks / Trade-offs
-
 ## Migration Plan
 ```
 
-Rules:
-
-- Document key decisions and rationale.
-- Record risks with mitigation.
-- Keep non-goals explicit to limit scope creep.
-
-## 4) Tasks (`tasks.md`)
-
-Purpose: break implementation into checkable units.
-
-Template:
+## security-review.md
 
 ```markdown
-## 1. Setup
-- [ ] 1.1 Create module structure
-- [ ] 1.2 Add dependencies
-
-## 2. Core Implementation
-- [ ] 2.1 Implement feature logic
-- [ ] 2.2 Add tests
+## Scope
+## Sensitive Surfaces
+## Risks
+## Required Controls
+## Waiver
 ```
 
 Rules:
+- Use this after `design` and before `tasks` for security-sensitive changes.
+- If the review is waived, fill `## Waiver` with the reason and decision context.
+- Make it explicit whether the review is `required`, `recommended`, `waived`, or `completed`.
 
-- Use exact checkbox syntax: `- [ ] X.Y Description`
-- Mark completion with `- [x]`
-- Keep tasks small enough for one focused session
-- Order tasks by dependency
+## tasks.md
 
-## Artifact Quality Checklist
+```markdown
+## 1. Setup
+- [ ] 1.1 Example task
+```
 
-Before completing a planning phase, verify:
-
-- Proposal capabilities map cleanly to specs
-- Specs are testable and scenario-complete
-- Design decisions cover major technical uncertainty
-- Tasks cover implementation and validation work
+Rules:
+- Use exact checkbox format `- [ ] X.Y Description`.
+- Mark completed work with `- [x]`.
+- Order tasks by dependency.
+- Organize work under top-level task groups such as `## 1. Setup`; `execution checkpoint` runs after each top-level group.
+- If a checkpoint finds drift or missing coverage, patch `tasks.md` instead of creating a separate review artifact.

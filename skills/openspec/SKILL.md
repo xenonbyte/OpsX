@@ -1,32 +1,43 @@
 ---
 name: openspec
-description: Run OpenSpec spec-driven development without the OpenSpec CLI by creating and maintaining `openspec/changes/*` artifacts (proposal, specs, design, tasks), implementing tasks, verifying against requirements, syncing deltas, and archiving changes. Use when users ask for `/openspec`, `/opsx:*`, or Codex `/prompts:opsx-*` workflows, or when they need help authoring or operating OpenSpec change lifecycle files.
+description: Run OpenSpec spec-driven development without the OpenSpec CLI by creating and maintaining `openspec/changes/*` artifacts, implementing tasks, verifying against requirements, syncing deltas, and archiving changes. Use when users ask for `/openspec`, `/opsx:*`, Codex `/prompts:openspec`, Codex `/prompts:opsx-*`, or explicit `$openspec` workflow help.
 ---
 
 # OpenSpec Workflow
 
-Use OpenSpec as a fluid, iterative workflow. Keep one change per folder and keep artifacts consistent with each other.
+Use OpenSpec as a schema-driven workflow system. Keep one change per folder and keep artifacts aligned.
 
-## Resolve Language
+## Resolve Config
 
-Read `~/.openspec/.opsx-config.yaml` before replying.
+Read config in this order before replying:
+1. `openspec/changes/<name>/.openspec.yaml` when a specific change is active
+2. `openspec/config.yaml` if present
+3. `~/.openspec/.opsx-config.yaml`
 
-- If `language: zh`, respond in Chinese (简体中文).
-- If `language: en` or config is missing, respond in English.
-- Keep file paths, artifact names, and command tokens in English.
+Use the resolved config for:
+- `schema`
+- `language`
+- `profile`
+- `context`
+- `rules`
+- `securityReview`
 
-## Map Invocation Format
+If `language: zh`, respond in Chinese (简体中文). Otherwise respond in English.
+Keep file paths, artifact names, and command tokens in English.
+
+## Invocation Model
 
 Canonical workflow names are `openspec` and `opsx`.
 
-- Claude/Gemini examples: `/openspec ...`, `/opsx:*`
-- Codex examples: `/prompts:openspec ...`, `/prompts:opsx-*`
+- Claude/Gemini preferred: `/openspec <request>` and `/opsx:*`
+- Codex preferred: `$openspec <request>`
+- Codex explicit routes: `/prompts:openspec` and `/prompts:opsx-*`
 
-When user platform is Codex, always adapt displayed command text to `/prompts:` format.
+On Codex, treat `/prompts:*` as routing commands, not a reliable inline-argument transport.
 
 ## Work Directly On Files
 
-Operate without the OpenSpec CLI. Use filesystem reads/writes under `openspec/`.
+Operate without the OpenSpec CLI. Use the repository files under `openspec/`.
 
 Typical structure:
 
@@ -43,89 +54,73 @@ openspec/
 └── specs/
 ```
 
-Initialize a new change with:
+## Schema Runtime
 
-```bash
-mkdir -p openspec/changes/<name>/specs
-```
+Read `schemas/<schema>/schema.json` to determine artifacts and dependencies.
+For the default `spec-driven` schema, the artifacts are proposal, specs, design, optional `security-review`, and tasks.
 
-Then write `.openspec.yaml`:
+## Security Review Triggering
+
+- If change metadata or project config explicitly marks a change as security-sensitive, treat `security-review.md` as required before `tasks`.
+- If the change touches authentication, authorization, tokens, sessions, cookies, uploads, payments, admin flows, PII, secrets, tenant isolation, webhooks, callbacks, encryption, or signatures, recommend `security-review.md` even if the user did not ask for it.
+- If the user chooses to skip a recommended security review, record the waiver and the reason in artifacts before continuing.
+- Canonical security-review states are `required`, `recommended`, `waived`, and `completed`.
+
+Recommended change metadata shape:
 
 ```yaml
-name: <name>
+name: <change-name>
 schema: spec-driven
-createdAt: <YYYY-MM-DDTHH:mm:ss>
+createdAt: <ISO-8601>
+securitySensitive: true
+securityWaiver:
+  approved: false
+  reason: ""
 ```
 
-## Artifact Dependency Model
+## Checkpoints
 
-Use these readiness rules:
-
-- `proposal`: requires `[]`
-- `specs`: requires `[proposal]`
-- `design`: requires `[proposal]`
-- `tasks`: requires `[specs, design]`
-
-Default state model:
-
-- `BLOCKED`: missing dependencies
-- `READY`: dependencies satisfied
-- `DONE`: artifact file exists
+- `spec checkpoint`: after `design`, before `tasks`
+- `task checkpoint`: after `tasks`, before `apply`
+- `execution checkpoint`: after each top-level task group during `apply`
+- Canonical checkpoint states are `PASS`, `WARN`, and `BLOCK`.
+- Checkpoints do not create `spec-review.md`, `task-review.md`, or `execution-review.md`.
+- When a checkpoint finds issues, update existing artifacts such as `proposal.md`, `specs/*.md`, `design.md`, `security-review.md`, or `tasks.md`.
 
 ## Load References On Demand
 
-Keep context lean. Load only the needed reference file and section.
-
 If `language: zh`:
+- Read `references/artifact-templates-zh.md` for artifact writing rules.
+- Read `references/action-playbooks-zh.md` for action behavior.
 
-- For artifact templates and normative writing rules, read: [references/artifact-templates-zh.md](references/artifact-templates-zh.md)
-- For command workflows (`propose`, `apply`, `verify`, `sync`, `archive`, etc.), read: [references/action-playbooks-zh.md](references/action-playbooks-zh.md)
-
-If `language: en` or missing:
-
-- For artifact templates and normative writing rules, read: [references/artifact-templates.md](references/artifact-templates.md)
-- For command workflows (`propose`, `apply`, `verify`, `sync`, `archive`, etc.), read: [references/action-playbooks.md](references/action-playbooks.md)
+If `language: en`:
+- Read `references/artifact-templates.md` for artifact writing rules.
+- Read `references/action-playbooks.md` for action behavior.
 
 ## Default Execution Loop
 
-1. Identify target change name.
-2. Inspect current artifact presence and dependency readiness.
-3. Determine next valid action for user intent.
-4. Read dependency artifacts before writing new artifacts.
-5. Create or update files using required template/rules.
-6. Report what changed, what is unlocked, and what is blocked.
+1. Identify the active change name.
+2. Inspect artifact presence and dependency readiness from the active schema.
+3. Apply project context, per-artifact rules, and `securityReview` policy from `openspec/config.yaml`.
+4. Read dependency artifacts before writing a new artifact.
+5. Run `spec checkpoint` before entering `tasks`, and `task checkpoint` before entering `apply`.
+6. During `apply`, run `execution checkpoint` after each top-level task group.
+7. Create or update files using the schema and template rules.
+8. Report changed files, current state, next step, and blockers.
 
-## Route By User Intent
+## Profile Guidance
 
-- User asks to start quickly: use `propose` playbook.
-- User asks to start step by step: use `new` then `continue` playbook.
-- User asks to generate all planning docs: use `ff` playbook.
-- User asks to code: use `apply` playbook.
-- User asks to validate: use `verify` playbook.
-- User asks to merge delta specs: use `sync` playbook.
-- User asks to finish: use `archive` or `bulk-archive` playbook.
-- User asks to resume: use `resume` playbook.
-- User asks for progress: use `status` playbook.
-- User is new to workflow: use `onboard` playbook.
+- `core`: focus on `propose`, `explore`, `apply`, `archive`
+- `expanded`: allow the full command surface including `new`, `continue`, `ff`, `verify`, `sync`, `resume`, `status`, and onboarding
 
 ## Guardrails
 
-- Keep workflow fluid; allow artifact edits at any time.
+- Ask concise clarification questions when missing scope can materially change behavior.
 - Do not skip dependency checks silently.
-- Do not archive incomplete changes unless user explicitly accepts the risk.
-- If requirements are ambiguous, ask focused clarifying questions before implementation.
+- Do not archive incomplete changes unless the user explicitly accepts the risk.
 - Keep outputs concise and action-oriented.
-
-## Output Requirements
-
-When mutating files, always report:
-
-- Files created or updated
-- Current completion state (`proposal/specs/design/tasks`)
-- Next available command or step
-- Any blockers that require user input
 
 ## Resources
 
-- GitHub: https://github.com/xenonbyte/openspec
-- Docs: https://github.com/xenonbyte/openspec#readme
+- Docs: `docs/commands.md`, `docs/codex.md`, `docs/customization.md`
+- Schema: `schemas/spec-driven/schema.json`

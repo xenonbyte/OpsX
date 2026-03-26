@@ -1,129 +1,86 @@
 # Action Playbooks
 
-Use this file when user asks for specific `opsx`/`openspec` workflow actions.
+Use these when the active workflow action is explicit.
 
-## `propose`
+## Common setup
 
-Use for one-shot creation of planning artifacts.
+1. Resolve config from change metadata, project config, then global config.
+2. Apply `context` and per-artifact `rules` before writing.
+3. Read dependency artifacts from the active schema.
+4. If config explicitly marks a change as security-sensitive, require `security-review.md` before `tasks`.
+5. If the change matches security heuristics, recommend `security-review.md`; if waived, record the reason in artifacts.
+6. Run `spec checkpoint` after `design` and before `tasks`.
+7. Run `task checkpoint` after `tasks` and before `apply`.
 
-1. Clarify ambiguous scope quickly.
-2. Derive kebab-case change name.
-3. Create change directory and `.openspec.yaml`.
-4. Create proposal/specs/design/tasks in dependency order.
-5. Summarize generated files and suggest next step (`apply`).
+## propose
 
-## `explore`
+- Create a change name.
+- Create `.openspec.yaml`.
+- Generate proposal, specs, design, and tasks.
+- Hand off to `apply`.
 
-Use for pre-planning discovery.
+## explore
 
-1. Clarify problem, constraints, and success criteria.
-2. Surface options and trade-offs.
-3. Recommend whether to proceed with `new` or `propose`.
+- Clarify scope, constraints, and success criteria.
+- Compare approaches.
+- Recommend `propose` or `new`.
 
-## `new`
+## new
 
-Use for initializing change only.
+- Create the change container and metadata only.
+- Report that proposal is the next ready artifact.
 
-1. Create `openspec/changes/<name>/specs`.
-2. Write `.openspec.yaml` metadata.
-3. Report that proposal is the next READY artifact.
+## continue
 
-## `continue`
+- Inspect dependency readiness.
+- Create the next ready artifact.
+- Report what became ready next.
 
-Use for iterative artifact creation.
+## ff
 
-1. Detect existing artifacts in current change.
-2. Compute READY artifacts from dependency rules.
-3. Create the next selected artifact.
-4. Report unlocked next artifacts.
+- Generate all planning artifacts in dependency order.
+- Record assumptions explicitly.
+- Insert `security-review.md` between `design` and `tasks` when explicit config requires it or when the workflow chooses to include it after a heuristic match.
+- Finish planning by passing `spec checkpoint` and `task checkpoint` before handing off to `apply`.
 
-## `ff`
+## security-review
 
-Use for fast-forward planning generation.
+- Summarize the sensitive surfaces in scope.
+- List concrete risks, mitigations, and required controls.
+- State whether `tasks` may proceed or what remains blocked.
+- If the review is waived, record the waiver reason and approver context.
 
-1. Read user intent once.
-2. Generate all planning artifacts in order.
-3. Flag assumptions explicitly.
-4. Hand off to `apply`.
+## apply
 
-## `apply`
+- Read proposal, specs, design if present, and tasks.
+- Execute tasks in order.
+- Use top-level task groups as execution milestones.
+- Run `execution checkpoint` after each top-level task group.
+- If `execution checkpoint` returns `WARN` or `BLOCK`, patch existing artifacts before continuing.
+- Mark completed tasks with `- [x]`.
+- Update artifacts when implementation changes scope.
 
-Use for implementation.
+## verify
 
-1. Read `proposal.md`, all `specs`, `design.md` (if present), and `tasks.md`.
-2. Implement tasks in order.
-3. Update tasks to `- [x]` as work completes.
-4. If implementation changes scope, update relevant planning artifacts.
-5. Stop and ask when blocked by missing requirements.
+- Check completeness, correctness, and coherence.
+- Report `CRITICAL`, `WARNING`, and `SUGGESTION` items.
 
-## `verify`
+## sync
 
-Validate across three axes.
+- Merge delta specs into `openspec/specs/`.
+- Preserve unrelated content.
+- Report conflicts.
 
-1. Completeness: all tasks done and all required artifacts present.
-2. Correctness: implementation matches requirement statements and scenarios.
-3. Coherence: implementation aligns with design decisions.
-4. Report issues using severity levels: `CRITICAL`, `WARNING`, `SUGGESTION`.
+## archive
 
-## `sync`
+- Confirm task completion state.
+- Sync specs when needed.
+- Move the change to archive.
 
-Merge change delta specs into main specs.
+## status
 
-1. Read delta specs in `changes/<name>/specs/`.
-2. Read corresponding files in `openspec/specs/`.
-3. Apply `ADDED`, `MODIFIED`, `REMOVED` semantics.
-4. Preserve unrelated content.
-5. Report merge summary and any manual conflict points.
-
-## `archive`
-
-Finalize one completed change.
-
-1. Confirm task completion status.
-2. Ask whether spec sync is needed (if not already done).
-3. Move folder to `openspec/changes/archive/YYYY-MM-DD-<name>/`.
-4. Report archive location and next active changes.
-
-## `bulk-archive`
-
-Finalize multiple completed changes.
-
-1. List candidate changes.
-2. Detect overlapping spec targets.
-3. Resolve ordering/conflicts before moving.
-4. Archive each selected change.
-5. Provide consolidated result summary.
-
-## `batch-apply`
-
-Implement multiple changes with controlled execution.
-
-1. Validate each selected change is READY for apply.
-2. Choose serial or parallel mode based on coupling risk.
-3. Execute per-change `apply` loop.
-4. Report per-change outcomes and blockers.
-
-## `resume`
-
-Rehydrate context in a new session.
-
-1. List active changes (exclude `archive/`).
-2. Show artifact completion for each change.
-3. Recommend one next action per change.
-
-## `status`
-
-Show point-in-time workflow state.
-
-1. List changes and artifact presence.
-2. Highlight READY/BLOCKED/DONE per artifact.
-3. Show blockers and immediate next commands.
-
-## `onboard`
-
-Teach first-time usage.
-
-1. Explain workflow concepts briefly.
-2. Show minimum command path: `propose -> apply -> verify -> archive`.
-3. Provide one concrete example change.
-4. Suggest first action to start now.
+- Report artifact readiness from the active schema.
+- Report blockers and next actions.
+- Make `security-review` readiness explicit when it is required or recommended.
+- Use `required`, `recommended`, `waived`, and `completed` for security-review state.
+- Use `PASS`, `WARN`, and `BLOCK` for checkpoint output.

@@ -1,49 +1,26 @@
 ---
-description: Archive a completed change - move to archive directory and update main specs if needed
+description: Archive a completed change and sync specs if needed.
 ---
-# OPSX: Archive
+# OpenSpec route: Archive
 
-You are executing the **OPSX Archive** command to archive a completed change.
+Use the `openspec` skill for this request.
 
-## Language Preference
-Before responding, read `~/.openspec/.opsx-config.yaml`.
-- If `language: zh` → respond in Chinese (简体中文)
-- If `language: en` or missing → respond in English
+Workflow action: `archive`
+Profile availability: `core, expanded`
+Primary workflow entry: `/openspec <request>`
+Explicit action route: `/opsx:archive`
 
-## Your Task
+Execution rules:
+- Follow the `archive` playbook from the `openspec` skill and its referenced files.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Use request details already present in the conversation.
+- Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
+- Security-review states are `required`, `recommended`, `waived`, `completed`.
+- If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
+- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
+- `execution checkpoint` runs after each top-level task group during `apply`.
+- Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
+- If the required change name, description, or selection is missing, ask for the minimum clarification needed.
+- Archive only completed or explicitly user-approved incomplete changes.
+- When files are mutated, report changed files, current state, next step, and blockers.
 
-1. **Identify target change**:
-   - If user specified a change name, use it
-   - If omitted, list active changes and ask user to choose
-
-2. **Verify completion**:
-   - Check if all tasks are marked complete (`- [x]`)
-   - If not, ask user: "Some tasks are incomplete. Archive anyway?"
-   - Get confirmation before proceeding
-
-3. **Check for delta specs**:
-   - Look in `openspec/changes/<change-name>/specs/` for delta sections
-   - If any delta exists, ask user: "Should specs be synced to main?"
-
-4. **Handle spec sync** (if user says yes):
-   - Apply changes: ADDED, MODIFIED, REMOVED, RENAMED
-   - Update main spec files
-
-5. **Create archive directory and move change**:
-   ```bash
-   mkdir -p "openspec/changes/archive"
-   mv "openspec/changes/<change-name>" "openspec/changes/archive/<date>-<change-name>"
-   ```
-   - Use format: `YYYY-MM-DD-<name>`
-
-6. **Show completion summary**:
-   ```
-   ✓ Archived to: openspec/changes/archive/2026-01-23-add-dark-mode/
-
-   Change Summary:
-   - Added: 2 capabilities
-   - Implemented: 12 tasks
-   - Specs synced: Yes
-
-   Ready for the next change! Use /opsx:new or /opsx:propose to start.
-   ```

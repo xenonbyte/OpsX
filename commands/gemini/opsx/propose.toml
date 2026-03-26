@@ -1,71 +1,30 @@
-description = "Propose a new change - create it and generate all artifacts in one step"
+description = "Create a change and generate planning artifacts in one step."
 prompt = """
-# OPSX: Propose
+---
+description: Create a change and generate planning artifacts in one step.
+---
+# OpenSpec route: Propose
 
-Propose a new change - create the change and generate all artifacts in one step.
+Use the `openspec` skill for this request.
 
-## Language Preference
-Before responding, read `~/.openspec/.opsx-config.yaml`.
-- If `language: zh` → respond in Chinese (简体中文)
-- If `language: en` or missing → respond in English
+Workflow action: `propose`
+Profile availability: `core, expanded`
+Primary workflow entry: `/openspec <request>`
+Explicit action route: `/opsx:propose`
 
-## Input
-
-The argument after `/opsx:propose` is the change name (kebab-case), OR a description of what the user wants to build.
-
-## Steps
-
-1. **If no input provided, ask what they want to build**
-
-2. **Create the change directory**:
-   ```bash
-   mkdir -p openspec/changes/<name>/specs
-   ```
-
-3. **Create `.openspec.yaml`**:
-   Initialize with full schema:
-   ```yaml
-   name: <name>
-   schema: spec-driven
-   createdAt: <ISO-8601>
-   stage: propose
-   artifacts:
-     proposal: { path: proposal.md }
-   assumptions: []
-   openQuestions: []
-   ```
-
-4. **Create artifacts in dependency order**:
-   - proposal.md (what & why)
-   - specs/<capability>/spec.md (requirements and scenarios)
-   - design.md (how)
-   - tasks.md (implementation steps)
-
-5. **Update `.openspec.yaml` as artifacts are created**:
-   - Add paths to `artifacts` block
-   - Update `stage` to `tasks` when tasks.md is done
-
-6. **Show final status**:
-   - Change name and location
-   - List of artifacts created
-   - Prompt: "Run `/opsx:apply` to start implementing."
-
-## Artifact Creation Guidelines
-
-- **proposal.md**: Focus on WHY and WHAT — include Why, What Changes, Capabilities, Impact sections
-- **specs/**: Use ADDED/MODIFIED/REMOVED format with WHEN/THEN scenarios
-- **design.md**: Include Context, Goals/Non-Goals, Decisions, Risks sections
-- **tasks.md**: Use numbered checkbox format `- [ ] X.Y Task description`
-
-
-## Phase Boundary Guard (MANDATORY)
-
-⚠️ You are in PLANNING phase. You MUST:
-1. Only create/modify artifact files under `openspec/changes/<name>/`
-2. NOT modify code files outside of artifact directories
-3. Ask clarification questions if boundaries are unclear
-
-Allowed: `openspec/changes/**/*.md`, `openspec/changes/**/*.yaml`
-Forbidden: `src/**/*`, `lib/**/*`, `**/*.ts`, `**/*.js` (except in openspec/)
+Execution rules:
+- Follow the `propose` playbook from the `openspec` skill and its referenced files.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Use request details already present in the conversation.
+- Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
+- Security-review states are `required`, `recommended`, `waived`, `completed`.
+- If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
+- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
+- `execution checkpoint` runs after each top-level task group during `apply`.
+- Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
+- If the required change name, description, or selection is missing, ask for the minimum clarification needed.
+- Keep planning-phase edits inside `openspec/changes/<name>/` unless the user explicitly asks to move into implementation.
+- When files are mutated, report changed files, current state, next step, and blockers.
 
 """
+

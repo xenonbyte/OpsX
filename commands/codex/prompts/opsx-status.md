@@ -1,49 +1,26 @@
 ---
-description: Show the current status of a change - what's done, what's ready, what's blocked
+description: Show change progress, readiness, and blockers.
 ---
-# OPSX: Status
+# OpenSpec route: Status
 
-You are executing the **OPSX Status** command to check the current state of a change.
+Use the `openspec` skill for this request.
 
-## Language Preference
-Before responding, read `~/.openspec/.opsx-config.yaml`.
-- If `language: zh` → respond in Chinese (简体中文)
-- If `language: en` or missing → respond in English
+Workflow action: `status`
+Profile availability: `expanded`
+Primary workflow entry: `$openspec <request>`
+Explicit action route: `/prompts:opsx-status`
 
-## Your Task
+Execution rules:
+- Follow the `status` playbook from the `openspec` skill and its referenced files.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Use request details already present in the conversation.
+- Do not assume text typed after a `/prompts:` command is reliably available as an inline argument in Codex.
+- Security-review states are `required`, `recommended`, `waived`, `completed`.
+- If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
+- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
+- `execution checkpoint` runs after each top-level task group during `apply`.
+- Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
+- If the required change name, description, or selection is missing, ask for the minimum clarification needed.
+- Inspect artifacts and task state without changing unrelated files.
+- When files are mutated, report changed files, current state, next step, and blockers.
 
-1. **Identify the current change**:
-   - Use specified change name or find most recent in `openspec/changes/` (excluding `archive/`)
-   - If multiple active changes, ask user to choose
-
-2. **Check what exists**:
-   - List files in change directory
-   - Check for: `.openspec.yaml`, `proposal.md`, `specs/`, `design.md`, `tasks.md`
-
-3. **Determine artifact status**:
-   ```
-   ✓ proposal (done) — file exists
-   ○ specs (ready) — dependencies met, doesn't exist
-   ○ design (optional-ready) — create when complexity warrants it
-   ○ tasks (blocked) — waiting for specs
-   ```
-
-4. **Check task progress** (if tasks.md exists):
-   - Parse checkboxes: `- [x]` = done, `- [ ]` = pending
-   - Count: total tasks, completed, pending
-
-5. **Read Checkpoint & Integrity**:
-   - Check `.openspec.yaml` for `checkpoint` block
-   - Report:
-     - `stage`: Current phase
-     - `targetTask`: Next task ID
-     - `gitRef`: Current Git state
-     - `isDirty`: Worktree status
-     - `tasksHash`: Validation status (compute hash of `tasks.md` and compare if needed)
-
-6. **Display status report with available commands**
-
-## Artifact Status Legend
-- ✓ done — artifact exists and complete
-- ○ ready — all dependencies met, ready to create
-- ○ blocked — waiting for dependencies

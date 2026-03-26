@@ -1,0 +1,25 @@
+---
+description: {{description}}
+---
+# {{title}}
+
+Use the `openspec` skill for this request.
+
+Workflow action: `{{action}}`
+Profile availability: `{{profiles}}`
+Primary workflow entry: `{{open_spec_syntax}}`
+Explicit action route: `{{action_syntax}}`
+
+Execution rules:
+- Follow the `{{action}}` playbook from the `openspec` skill and its referenced files.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Use request details already present in the conversation.
+- {{inline_argument_note}}
+- Security-review states are {{review_state_note}}.
+- If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
+- {{planning_checkpoint_note}}
+- {{execution_checkpoint_note}}
+- Checkpoint outcomes use {{checkpoint_state_note}} and update existing artifacts instead of creating new review files.
+- If the required change name, description, or selection is missing, ask for the minimum clarification needed.
+- {{scope}}
+- When files are mutated, report changed files, current state, next step, and blockers.

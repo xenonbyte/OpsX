@@ -1,129 +1,86 @@
 # Action Playbooks（中文）
 
-当用户请求特定 `opsx`/`openspec` 动作时使用本文件。
+在执行显式 workflow action 时使用本文件。
 
-## `propose`
+## 通用前置步骤
 
-用于一站式生成规划工件。
+1. 先解析 change metadata、project config、global config。
+2. 在写工件前应用 `context` 和对应工件的 `rules`。
+3. 按 active schema 读取依赖工件。
+4. 如果 config 或 metadata 显式标记为 security-sensitive，则在 `tasks` 之前强制要求 `security-review.md`。
+5. 如果命中安全启发式信号，则默认建议补 `security-review.md`；若用户选择跳过，必须在工件里记录原因。
+6. 在 `design` 之后、`tasks` 之前运行 `spec checkpoint`。
+7. 在 `tasks` 之后、`apply` 之前运行 `task checkpoint`。
 
-1. 快速澄清含糊范围。
-2. 生成 kebab-case 变更名。
-3. 创建变更目录与 `.openspec.yaml`。
-4. 按依赖顺序创建 proposal/specs/design/tasks。
-5. 汇总生成结果，并建议下一步（`apply`）。
+## propose
 
-## `explore`
+- 生成 change 名称。
+- 创建 `.openspec.yaml`。
+- 一次生成 proposal、specs、design、tasks。
+- 完成后交接到 `apply`。
 
-用于正式立项前的探索。
+## explore
 
-1. 澄清问题、约束、成功标准。
-2. 给出可行方案与权衡。
-3. 建议下一步走 `new` 或 `propose`。
+- 澄清范围、约束、成功标准。
+- 比较方案和权衡。
+- 推荐走 `propose` 或 `new`。
 
-## `new`
+## new
 
-仅初始化 change。
+- 仅创建 change 容器和 metadata。
+- 报告 proposal 是下一个 READY 工件。
 
-1. 创建 `openspec/changes/<name>/specs`。
-2. 写入 `.openspec.yaml` 元数据。
-3. 说明 proposal 是下一个 READY 工件。
+## continue
 
-## `continue`
+- 检测依赖就绪状态。
+- 创建下一个 READY 工件。
+- 报告新的可执行后续步骤。
 
-用于增量创建工件。
+## ff
 
-1. 检测当前 change 已有工件。
-2. 按依赖规则计算 READY 工件。
-3. 创建用户选择的下一个工件。
-4. 报告新解锁的后续工件。
+- 按依赖顺序一次生成所有规划工件。
+- 显式记录假设。
+- 在显式要求或启发式命中时，将 `security-review.md` 插入到 `design` 和 `tasks` 之间。
+- 在交给 `apply` 前，先通过 `spec checkpoint` 和 `task checkpoint`。
 
-## `ff`
+## security-review
 
-用于快速补齐规划文档。
+- 总结本次变更涉及的敏感面。
+- 列出具体风险、缓解措施和必须落实的控制项。
+- 明确 `tasks` 是否可以继续，或还有哪些阻塞。
+- 如果跳过评审，必须记录豁免原因。
 
-1. 一次读取用户意图。
-2. 按顺序生成所有规划工件。
-3. 显式标注假设。
-4. 交接到 `apply`。
+## apply
 
-## `apply`
+- 读取 proposal、specs、可选 design、tasks。
+- 按顺序执行 tasks。
+- 以一级任务组作为执行里程碑。
+- 每完成一个一级任务组后运行 `execution checkpoint`。
+- 如果 `execution checkpoint` 返回 `WARN` 或 `BLOCK`，先回写已有工件再继续。
+- 完成后将任务更新为 `- [x]`。
+- 如实现改变范围，及时同步工件。
 
-用于实现阶段。
+## verify
 
-1. 读取 `proposal.md`、全部 `specs`、`design.md`（若存在）、`tasks.md`。
-2. 按顺序执行 tasks。
-3. 完成后将任务更新为 `- [x]`。
-4. 若实现改变范围，同步更新相关工件。
-5. 遇到需求缺口时暂停并提问。
+- 从 Completeness、Correctness、Coherence 三个维度检查。
+- 输出 `CRITICAL`、`WARNING`、`SUGGESTION`。
 
-## `verify`
+## sync
 
-按三维度验证。
+- 将 delta specs 合并进 `openspec/specs/`。
+- 保留无关内容不变。
+- 输出冲突点。
 
-1. Completeness：任务是否完成、必要工件是否齐全。
-2. Correctness：实现是否匹配 requirements 与 scenarios。
-3. Coherence：实现是否遵循设计决策。
-4. 用 `CRITICAL`、`WARNING`、`SUGGESTION` 输出问题级别。
+## archive
 
-## `sync`
+- 确认任务完成状态。
+- 需要时先做 spec sync。
+- 将 change 移入 archive。
 
-将 change 的 delta specs 合并到主 specs。
+## status
 
-1. 读取 `changes/<name>/specs/` 下的 delta。
-2. 读取 `openspec/specs/` 对应主文件。
-3. 按 `ADDED`、`MODIFIED`、`REMOVED` 语义合并。
-4. 保留无关内容不变。
-5. 输出合并摘要与需要人工确认的冲突点。
-
-## `archive`
-
-归档单个已完成 change。
-
-1. 确认任务完成状态。
-2. 询问是否需要先做 spec sync（若尚未做）。
-3. 移动目录到 `openspec/changes/archive/YYYY-MM-DD-<name>/`。
-4. 输出归档路径与剩余 active changes。
-
-## `bulk-archive`
-
-归档多个已完成 change。
-
-1. 列出候选 changes。
-2. 检测 specs 目标重叠。
-3. 先解决顺序与冲突，再执行归档。
-4. 逐个归档所选 changes。
-5. 输出汇总结果。
-
-## `batch-apply`
-
-受控执行多个 change 的实现。
-
-1. 验证每个选中 change 都是 READY for apply。
-2. 按耦合风险选择串行或并行模式。
-3. 对每个 change 执行 `apply` 循环。
-4. 输出逐项结果与阻塞项。
-
-## `resume`
-
-在新会话中恢复上下文。
-
-1. 列出 active changes（排除 `archive/`）。
-2. 展示每个 change 的工件完成度。
-3. 为每个 change 推荐一个下一步动作。
-
-## `status`
-
-输出当前工作流状态快照。
-
-1. 列出 changes 与工件存在情况。
-2. 标注各工件 READY/BLOCKED/DONE。
-3. 给出阻塞项和可立即执行的命令。
-
-## `onboard`
-
-用于新手引导。
-
-1. 简要解释工作流概念。
-2. 展示最小路径：`propose -> apply -> verify -> archive`。
-3. 给出一个具体示例 change。
-4. 建议立即执行的第一步。
+- 根据 active schema 输出工件 READY/BLOCKED/DONE。
+- 报告阻塞项和下一步动作。
+- 在需要或建议进行 `security-review` 时，明确显示其状态。
+- `security-review` 使用 `required`、`recommended`、`waived`、`completed`。
+- checkpoint 使用 `PASS`、`WARN`、`BLOCK`。

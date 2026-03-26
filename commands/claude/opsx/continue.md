@@ -1,63 +1,26 @@
 ---
-description: Create the next artifact in the OpenSpec workflow based on what's ready
+description: Create the next ready artifact based on dependencies.
 ---
-# OPSX: Continue
+# OpenSpec route: Continue
 
-You are executing the **OPSX Continue** command to create the next artifact in the OpenSpec workflow.
+Use the `openspec` skill for this request.
 
-## Language Preference
-Before responding, read `~/.openspec/.opsx-config.yaml`.
-- If `language: zh` → respond in Chinese (简体中文)
-- If `language: en` or missing → respond in English
+Workflow action: `continue`
+Profile availability: `expanded`
+Primary workflow entry: `/openspec <request>`
+Explicit action route: `/opsx:continue`
 
-## Your Task
+Execution rules:
+- Follow the `continue` playbook from the `openspec` skill and its referenced files.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Use request details already present in the conversation.
+- Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
+- Security-review states are `required`, `recommended`, `waived`, `completed`.
+- If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
+- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
+- `execution checkpoint` runs after each top-level task group during `apply`.
+- Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
+- If the required change name, description, or selection is missing, ask for the minimum clarification needed.
+- Read the current change state first and create only the next valid artifact.
+- When files are mutated, report changed files, current state, next step, and blockers.
 
-1. **Identify the current change**:
-   - If user specified a change name, use that
-   - Otherwise: Look for most recent change in `openspec/changes/` (excluding `archive/`)
-
-2. **Check current state and dependencies**:
-   ```
-   proposal: requires []
-   specs: requires [proposal]
-   design: requires [proposal] (optional)
-   tasks: requires [specs] (design recommended when complexity warrants it)
-   ```
-
-3. **Show status**:
-   ```
-   Current change: <name>
-   Status:
-   ✓ proposal (done)
-   ○ specs (ready)
-   ○ tasks (blocked - waiting for specs)
-   ```
-
-4. **Create the next ready artifact**:
-   - Read completed artifacts for context
-   - Get the appropriate template
-   - Apply instructions from schema or defaults
-
-5. **Update `.openspec.yaml`**:
-   - Update `stage` (explore/propose/specs/design/tasks)
-   - Add newly created artifact path to `artifacts` index
-
-6. **Display next steps**
-
-## Artifact Creation Guide
-
-- **proposal.md**: Focus on WHY this change is needed, keep concise (1-2 pages)
-- **specs/**: Read proposal.md for capabilities, create one spec per capability, use delta operations
-- **design.md**: Check if needed (cross-cutting, new dependencies, complexity)
-- **tasks.md**: MUST use checkbox format: `- [ ] X.Y Task description`
-
-## Phase Boundary Guard (MANDATORY)
-
-⚠️ You are in PLANNING phase. You MUST:
-1. Only create/modify artifact files under `openspec/changes/<name>/`
-2. NOT modify code files outside of artifact directories
-3. Ask clarification questions if boundaries are unclear
-4. Wait for user confirmation before phase transition
-
-Allowed: `openspec/changes/**/*.md`, `openspec/changes/**/*.yaml`
-Forbidden: `src/**/*`, `lib/**/*`, `**/*.ts`, `**/*.js` (except in openspec/)

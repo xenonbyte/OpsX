@@ -1,0 +1,15 @@
+schema: spec-driven
+language: "zh"
+profile: "expanded"
+context: |
+  Project: OpenSpec distribution package
+  Goal: Keep the workflow schema-driven, cross-platform, and suitable for npm distribution.
+rules:
+  proposal: "Include platform compatibility and migration impact."
+  design: "Explain CLI/runtime separation and compatibility wrappers."
+  tasks: "Keep tasks implementation-first, dependency-ordered, and grouped into top-level milestones."
+securityReview:
+  mode: "heuristic"
+  required: false
+  allowWaiver: true
+  heuristicHint: "auth, permission, token, session, cookie, upload, payment, admin, pii, secret, tenant, webhook, callback, encryption, signature"

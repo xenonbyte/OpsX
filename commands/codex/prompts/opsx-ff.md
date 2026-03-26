@@ -1,45 +1,26 @@
 ---
-description: Fast-forward - create all planning artifacts (proposal, specs, design, tasks) at once
+description: Generate all planning artifacts in dependency order.
 ---
-# OPSX: Fast-Forward
+# OpenSpec route: Fast-forward
 
-You are executing the **OPSX Fast-Forward** command to create all planning artifacts at once.
+Use the `openspec` skill for this request.
 
-## Language Preference
-Before responding, read `~/.openspec/.opsx-config.yaml`.
-- If `language: zh` → respond in Chinese (简体中文)
-- If `language: en` or missing → respond in English
+Workflow action: `ff`
+Profile availability: `expanded`
+Primary workflow entry: `$openspec <request>`
+Explicit action route: `/prompts:opsx-ff`
 
-## Your Task
+Execution rules:
+- Follow the `ff` playbook from the `openspec` skill and its referenced files.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Use request details already present in the conversation.
+- Do not assume text typed after a `/prompts:` command is reliably available as an inline argument in Codex.
+- Security-review states are `required`, `recommended`, `waived`, `completed`.
+- If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
+- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
+- `execution checkpoint` runs after each top-level task group during `apply`.
+- Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
+- If the required change name, description, or selection is missing, ask for the minimum clarification needed.
+- Keep fast-forward output limited to planning artifacts.
+- When files are mutated, report changed files, current state, next step, and blockers.
 
-1. **Identify the current change**:
-   - Use specified change name or find most recent
-   - Verify change directory exists
-
-2. **Check current state**:
-   - See what artifacts already exist
-   - Only create missing ones
-
-3. **Create all planning artifacts in order**:
-   - **Step 1**: Proposal (if not exists) - Focus on WHY, what changes, capabilities, impact
-   - **Step 2**: Specs (if not exists) - Use proper delta operations (ADDED, MODIFIED, REMOVED)
-   - **Step 3**: Design (if not exists and needed) - Assess if design.md is needed
-   - **Step 4**: Tasks (if not exists) - MUST use format: `- [ ] X.Y Task description`
-
-4. **Show summary**:
-   ```
-   ✓ Created proposal.md — why we're doing this, what's changing
-   ✓ Created specs/
-   ✓ Created design.md — technical approach
-   ✓ Created tasks.md — implementation tasks
-
-   Ready for implementation!
-   Run /prompts:opsx-apply to start implementing tasks.
-   ```
-
-## When to Use Fast-Forward
-
-Use `/prompts:opsx-ff` when:
-- User has a clear picture of what they're building
-- Requirements are well-understood
-- User wants to move quickly to implementation

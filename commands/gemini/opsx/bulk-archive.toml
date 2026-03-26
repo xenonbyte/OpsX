@@ -1,53 +1,30 @@
-description = "Archive multiple completed changes at once"
+description = "Archive multiple completed changes together."
 prompt = """
-# OPSX: Bulk Archive
+---
+description: Archive multiple completed changes together.
+---
+# OpenSpec route: Bulk archive
 
-Archive multiple completed changes in a single operation.
+Use the `openspec` skill for this request.
 
-## Language Preference
-Before responding, read `~/.openspec/.opsx-config.yaml`.
-- If `language: zh` → respond in Chinese (简体中文)
-- If `language: en` or missing → respond in English
+Workflow action: `bulk-archive`
+Profile availability: `expanded`
+Primary workflow entry: `/openspec <request>`
+Explicit action route: `/opsx:bulk-archive`
 
-## Steps
+Execution rules:
+- Follow the `bulk-archive` playbook from the `openspec` skill and its referenced files.
+- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Use request details already present in the conversation.
+- Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
+- Security-review states are `required`, `recommended`, `waived`, `completed`.
+- If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
+- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
+- `execution checkpoint` runs after each top-level task group during `apply`.
+- Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
+- If the required change name, description, or selection is missing, ask for the minimum clarification needed.
+- Ask the user to confirm the target set when it is not explicit.
+- When files are mutated, report changed files, current state, next step, and blockers.
 
-1. **Get active changes**
-   - List directories under `openspec/changes/` (excluding `archive/`)
-   - If no active changes exist, inform user and stop
-
-2. **Prompt for change selection**
-   - Show each change with its schema (read `.openspec.yaml`)
-   - Include an option for "All changes"
-   - Allow any number of selections
-
-3. **Batch validation — gather status for all selected changes**:
-   - Artifact status (proposal.md, specs/*/spec.md, design.md, tasks.md)
-   - Task completion (count `- [ ]` vs `- [x]`)
-   - Delta specs (list which capability specs exist)
-
-4. **Detect spec conflicts**
-   - Build a map of `capability -> [changes that touch it]`
-   - A conflict exists when 2+ selected changes have delta specs for the same capability
-
-5. **Resolve conflicts agentically**
-   - Read delta specs from each conflicting change
-   - Search codebase for implementation evidence
-   - Determine resolution based on what's actually implemented
-
-6. **Show consolidated status table**:
-   ```
-   | Change               | Artifacts | Tasks | Specs   | Conflicts | Status |
-   |---------------------|-----------|-------|---------|-----------|--------|
-   | schema-management   | Done      | 5/5   | 2 delta | None      | Ready  |
-   | project-config      | Done      | 3/3   | 1 delta | None      | Ready  |
-   ```
-
-7. **Confirm batch operation**
-
-8. **Execute archive for each confirmed change**
-
-9. **Display summary**:
-   - Archived N changes
-   - Skipped N changes
-   - Spec sync summary
 """
+
