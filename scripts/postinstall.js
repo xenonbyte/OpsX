@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 console.log(`
-OpenSpec v1.3.0 installed successfully.
+OpenSpec v1.3.1 installed successfully.
 
 Next steps:
 1. Initialize your project:

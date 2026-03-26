@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.3.1
+
+Release date: 2026-03-27
+
+Highlights:
+- Fix Codex install output path so generated prompt assets land in `~/.codex/prompts/` instead of `~/.codex/prompts/prompts/`
+- Keep `1.3.0` workflow runtime, checkpoint, and Node-first CLI behavior unchanged
+
 ## v1.3.0
 
 Release date: 2026-03-26

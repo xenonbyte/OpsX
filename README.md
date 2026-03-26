@@ -18,9 +18,10 @@ openspec init --platform codex --profile core
 openspec install --platform claude,codex,gemini --profile core
 ```
 
-Current release: `1.3.0`
+Current release: `1.3.1`
 
 Release focus:
+- Codex install path fix for generated prompt assets
 - Node-first CLI distribution
 - schema-driven workflow runtime
 - `security-review` hard/soft gating
