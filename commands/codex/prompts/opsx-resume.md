@@ -20,7 +20,7 @@ Execution rules:
 - `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
 - `execution checkpoint` runs after each top-level task group during `apply`.
 - Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
+- Keep checkpoint reporting compatible: include status, findings, patchTargets, and nextStep when presenting resume context.
 - If the required change name, description, or selection is missing, ask for the minimum clarification needed.
 - If no change is specified, recommend the best active candidate and explain why.
 - When files are mutated, report changed files, current state, next step, and blockers.
-

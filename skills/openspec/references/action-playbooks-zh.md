@@ -82,5 +82,6 @@
 - 根据 active schema 输出工件 READY/BLOCKED/DONE。
 - 报告阻塞项和下一步动作。
 - 在需要或建议进行 `security-review` 时，明确显示其状态。
+- checkpoint 输出需包含标准字段：`status`、`findings`、`patchTargets`、`nextStep`。
 - `security-review` 使用 `required`、`recommended`、`waived`、`completed`。
 - checkpoint 使用 `PASS`、`WARN`、`BLOCK`。

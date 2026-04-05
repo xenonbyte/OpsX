@@ -33,6 +33,16 @@ Adds:
 - `execution checkpoint`: after each top-level task group during `apply`
 - Checkpoints update existing artifacts and do not create separate review files
 
+Checkpoint output contract (stable for prompt/runtime callers):
+- `checkpoint`
+- `phase`
+- `status` (`PASS` | `WARN` | `BLOCK`)
+- `findings`
+- `patchTargets`
+- `nextStep`
+
+`status`/`resume` surfaces should keep reporting the canonical checkpoint status and next-step recommendation from this contract.
+
 ## CLI commands
 
 - `openspec install`

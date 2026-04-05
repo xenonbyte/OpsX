@@ -69,3 +69,49 @@ Rules:
 - `execution checkpoint` runs after each top-level task group during `apply`
 - Checkpoints use `PASS`, `WARN`, and `BLOCK`
 - Checkpoints patch existing artifacts instead of creating `spec-review.md`, `task-review.md`, or `execution-review.md`
+
+## Automatic checkpoint evidence
+
+Checkpoint runtime now derives normalized evidence directly from artifacts and runtime inputs.
+
+Planning evidence includes:
+- proposal/spec/design presence
+- requirement and scenario counts
+- rollout/migration/rollback/compatibility signals
+- task groups and checklist items
+- required commitment categories from specs/design and task coverage
+
+Execution evidence includes:
+- top-level task-group identifier and completed checklist items
+- implementation summary and changed files
+- behavior classification (`behavior changed` vs docs-only/non-behavioral)
+- referenced spec/design commitments
+- verification or test evidence summary
+- newly discovered constraints requiring artifact updates
+
+Minimum execution evidence fields:
+- `group id/title`
+- `completed checklist items`
+- `changed files or implementation summary`
+- `behavior classification`
+- `referenced commitments`
+- `verification summary`
+
+Derivation rules:
+- docs-only/non-behavioral classification is automatically derived from changed files and evidence text when no explicit override is supplied
+- behavior-changing work defaults to requiring verification evidence
+
+## Legacy flag compatibility
+
+Legacy review flags remain supported during migration. Compatibility rules:
+- automatic normalized evidence is the primary source for core drift detection
+- legacy flags can add stricter findings (`WARN`/`BLOCK`)
+- legacy flags cannot downgrade a `BLOCK` produced by automatic evidence
+- canonical checkpoint output remains stable for prompt and runtime callers
+
+## Rollout and rollback expectations
+
+- Rollout, migration, rollback, and compatibility detail should stay aligned across proposal/spec/design/tasks.
+- Missing detail without contradiction should produce `WARN`.
+- Direct contradiction should produce `BLOCK`.
+- If required `security-review.md` is still missing at `task checkpoint`, handoff to `apply` remains blocked.

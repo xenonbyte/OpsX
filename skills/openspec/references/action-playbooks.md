@@ -82,5 +82,6 @@ Use these when the active workflow action is explicit.
 - Report artifact readiness from the active schema.
 - Report blockers and next actions.
 - Make `security-review` readiness explicit when it is required or recommended.
+- Surface checkpoint output using canonical fields: `status`, `findings`, `patchTargets`, and `nextStep`.
 - Use `required`, `recommended`, `waived`, and `completed` for security-review state.
 - Use `PASS`, `WARN`, and `BLOCK` for checkpoint output.
