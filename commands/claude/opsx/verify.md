@@ -6,7 +6,6 @@ description: Check completeness, correctness, and coherence against artifacts.
 Use the `openspec` skill for this request.
 
 Workflow action: `verify`
-Profile availability: `expanded`
 Primary workflow entry: `/openspec <request>`
 Explicit action route: `/opsx:verify`
 

@@ -17,13 +17,7 @@ Checkpoints in `spec-driven`:
 - `task-checkpoint` -> after tasks before apply
 - `execution-checkpoint` -> after-each-top-level-task-group
 
-Core profile commands:
-- `/opsx:propose` - Create a change and generate planning artifacts in one step.
-- `/opsx:explore` - Investigate ideas, constraints, and tradeoffs before committing to a change.
-- `/opsx:apply` - Implement tasks from a change and update task state.
-- `/opsx:archive` - Archive a completed change and sync specs if needed.
-
-Expanded profile commands:
+Available commands:
 - `/opsx:propose` - Create a change and generate planning artifacts in one step.
 - `/opsx:explore` - Investigate ideas, constraints, and tradeoffs before committing to a change.
 - `/opsx:apply` - Implement tasks from a change and update task state.
@@ -48,4 +42,3 @@ Security review guidance:
 - Explicit markers force the review; heuristic matches recommend it and allow waiver with recorded reasoning.
 - Review states: `required`, `recommended`, `waived`, `completed`
 - Checkpoint states: `PASS`, `WARN`, `BLOCK`
-

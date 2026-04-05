@@ -1,25 +1,21 @@
 # OpenSpec Commands
 
-## Core profile
+## Available commands
 
 - `/opsx:propose` or `/prompts:opsx-propose`
 - `/opsx:explore` or `/prompts:opsx-explore`
 - `/opsx:apply` or `/prompts:opsx-apply`
 - `/opsx:archive` or `/prompts:opsx-archive`
-
-## Expanded profile
-
-Adds:
-- `new`
-- `continue`
-- `ff`
-- `verify`
-- `sync`
-- `bulk-archive`
-- `batch-apply`
-- `resume`
-- `status`
-- `onboard`
+- `/opsx:new` or `/prompts:opsx-new`
+- `/opsx:continue` or `/prompts:opsx-continue`
+- `/opsx:ff` or `/prompts:opsx-ff`
+- `/opsx:verify` or `/prompts:opsx-verify`
+- `/opsx:sync` or `/prompts:opsx-sync`
+- `/opsx:bulk-archive` or `/prompts:opsx-bulk-archive`
+- `/opsx:batch-apply` or `/prompts:opsx-batch-apply`
+- `/opsx:resume` or `/prompts:opsx-resume`
+- `/opsx:status` or `/prompts:opsx-status`
+- `/opsx:onboard` or `/prompts:opsx-onboard`
 
 ## Workflow states
 

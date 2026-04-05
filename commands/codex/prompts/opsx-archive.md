@@ -6,7 +6,6 @@ description: Archive a completed change and sync specs if needed.
 Use the `openspec` skill for this request.
 
 Workflow action: `archive`
-Profile availability: `core, expanded`
 Primary workflow entry: `$openspec <request>`
 Explicit action route: `/prompts:opsx-archive`
 

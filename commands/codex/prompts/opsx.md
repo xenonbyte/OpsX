@@ -6,7 +6,6 @@ description: OpenSpec workflow command index for Codex
 Use the `openspec` skill for this request.
 
 Platform: Codex
-Default profile: `expanded`
 Primary workflow entry: `$openspec <request>`
 
 Available routes:
@@ -26,7 +25,7 @@ Available routes:
 - `/prompts:opsx-onboard` - Walk a user through the minimum OpenSpec workflow path.
 
 Notes:
-- `openspec/config.yaml` controls schema, language, context, rules, and profile.
+- `openspec/config.yaml` controls schema, language, context, and rules.
 - `Treat `/prompts:*` as action selectors in Codex. If details are still needed, provide them in the next message.`
 - Security-review states: `required`, `recommended`, `waived`, `completed`
 - Checkpoints: `spec checkpoint` before `tasks`, `task checkpoint` before `apply`, and `execution checkpoint` after each top-level task group.

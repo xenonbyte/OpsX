@@ -8,7 +8,6 @@ Use the `openspec` skill for this request.
 Codex usage model:
 - Preferred: `$openspec <request>`
 - Explicit routing: `/prompts:openspec` and `/prompts:opsx-*`
-- Active profile: `expanded`
 
 Available routes:
 - `/prompts:opsx-propose` - Create a change and generate planning artifacts in one step.

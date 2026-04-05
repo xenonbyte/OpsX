@@ -6,7 +6,6 @@ description: Investigate ideas, constraints, and tradeoffs before committing to 
 Use the `openspec` skill for this request.
 
 Workflow action: `explore`
-Profile availability: `core, expanded`
 Primary workflow entry: `$openspec <request>`
 Explicit action route: `/prompts:opsx-explore`
 

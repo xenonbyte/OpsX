@@ -6,7 +6,6 @@ description: Implement tasks from a change and update task state.
 Use the `openspec` skill for this request.
 
 Workflow action: `apply`
-Profile availability: `core, expanded`
 Primary workflow entry: `/openspec <request>`
 Explicit action route: `/opsx:apply`
 

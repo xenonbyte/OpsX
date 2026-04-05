@@ -6,7 +6,6 @@ description: Create an empty change container and metadata.
 Use the `openspec` skill for this request.
 
 Workflow action: `new`
-Profile availability: `expanded`
 Primary workflow entry: `/openspec <request>`
 Explicit action route: `/opsx:new`
 

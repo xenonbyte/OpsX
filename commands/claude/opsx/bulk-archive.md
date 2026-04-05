@@ -6,7 +6,6 @@ description: Archive multiple completed changes together.
 Use the `openspec` skill for this request.
 
 Workflow action: `bulk-archive`
-Profile availability: `expanded`
 Primary workflow entry: `/openspec <request>`
 Explicit action route: `/opsx:bulk-archive`
 

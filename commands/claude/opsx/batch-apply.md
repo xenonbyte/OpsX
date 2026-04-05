@@ -6,7 +6,6 @@ description: Apply multiple ready changes in a controlled sequence.
 Use the `openspec` skill for this request.
 
 Workflow action: `batch-apply`
-Profile availability: `expanded`
 Primary workflow entry: `/openspec <request>`
 Explicit action route: `/opsx:batch-apply`
 

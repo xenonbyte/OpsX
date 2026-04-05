@@ -6,7 +6,6 @@ description: Create a change and generate planning artifacts in one step.
 Use the `openspec` skill for this request.
 
 Workflow action: `propose`
-Profile availability: `core, expanded`
 Primary workflow entry: `/openspec <request>`
 Explicit action route: `/opsx:propose`
 

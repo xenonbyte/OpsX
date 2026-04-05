@@ -7,7 +7,6 @@ Create or edit `openspec/config.yaml`:
 ```yaml
 schema: spec-driven
 language: "zh"
-profile: "expanded"
 context: |
   Project: your project
   Tech stack: TypeScript, React, Node.js
@@ -28,11 +27,6 @@ securityReview:
 2. project config (`openspec/config.yaml`)
 3. global config (`~/.openspec/.opsx-config.yaml`)
 4. package defaults
-
-## Profiles
-
-- `core` keeps the command surface small
-- `expanded` enables all workflow actions
 
 ## Security review policy
 

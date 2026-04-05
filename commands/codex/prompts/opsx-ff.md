@@ -6,7 +6,6 @@ description: Generate all planning artifacts in dependency order.
 Use the `openspec` skill for this request.
 
 Workflow action: `ff`
-Profile availability: `expanded`
 Primary workflow entry: `$openspec <request>`
 Explicit action route: `/prompts:opsx-ff`
 

@@ -8,7 +8,6 @@ description: OpenSpec workflow command index for Gemini
 Use the `openspec` skill for this request.
 
 Platform: Gemini
-Default profile: `expanded`
 Primary workflow entry: `/openspec <request>`
 
 Available routes:
@@ -28,7 +27,7 @@ Available routes:
 - `/opsx:onboard` - Walk a user through the minimum OpenSpec workflow path.
 
 Notes:
-- `openspec/config.yaml` controls schema, language, context, rules, and profile.
+- `openspec/config.yaml` controls schema, language, context, and rules.
 - `Inline command arguments are acceptable, but the workflow should still confirm missing or ambiguous details.`
 - Security-review states: `required`, `recommended`, `waived`, `completed`
 - Checkpoints: `spec checkpoint` before `tasks`, `task checkpoint` before `apply`, and `execution checkpoint` after each top-level task group.

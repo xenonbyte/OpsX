@@ -6,7 +6,6 @@ description: Merge delta specs from a change into the main spec set.
 Use the `openspec` skill for this request.
 
 Workflow action: `sync`
-Profile availability: `expanded`
 Primary workflow entry: `$openspec <request>`
 Explicit action route: `/prompts:opsx-sync`
 

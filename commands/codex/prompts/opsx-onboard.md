@@ -6,7 +6,6 @@ description: Walk a user through the minimum OpenSpec workflow path.
 Use the `openspec` skill for this request.
 
 Workflow action: `onboard`
-Profile availability: `expanded`
 Primary workflow entry: `$openspec <request>`
 Explicit action route: `/prompts:opsx-onboard`
 
