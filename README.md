@@ -3,19 +3,19 @@
 OpenSpec is an AI-native spec-driven workflow system for Claude, Codex, and Gemini.
 
 This package now ships as a Node CLI with:
-- project-local `openspec/config.yaml`
+- optional project-local `openspec/config.yaml` overrides
 - `core` and `expanded` workflow profiles
 - schema-driven workflow metadata
 - generated platform adapters
-- pure Node install/update/uninstall commands
+- pure Node install/uninstall commands
 - built-in security-review gating and workflow checkpoints
 
 ## Quick start
 
 ```bash
 npm install -g @xenonbyte/openspec
-openspec init --platform codex --profile core
 openspec install --platform claude,codex,gemini --profile core
+$openspec help me start an OpenSpec workflow
 ```
 
 Current release: `1.3.1`
@@ -75,27 +75,12 @@ Precedence:
 ## Commands
 
 ```bash
-openspec init --platform codex --profile core
 openspec install --platform codex --profile core
-openspec update --platform codex --profile expanded
 openspec uninstall --platform codex
-openspec generate-assets
-openspec validate-assets
 openspec --check
 openspec --doc
 openspec --language zh
 ```
-
-## Release gate
-
-Before npm publish or local reinstall:
-
-```bash
-openspec generate-assets
-openspec validate-assets
-```
-
-Only proceed when generated assets, workflow contracts, and packaging metadata are all in sync.
 
 ## Documentation
 

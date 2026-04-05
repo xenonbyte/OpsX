@@ -35,18 +35,8 @@ Adds:
 
 ## CLI commands
 
-- `openspec init`
 - `openspec install`
-- `openspec update`
 - `openspec uninstall`
-- `openspec generate-assets`
-- `openspec validate-assets`
 - `openspec --check`
 - `openspec --doc`
 - `openspec --language <en|zh>`
-
-## Release gate
-
-- Run `openspec generate-assets`
-- Run `openspec validate-assets`
-- Publish or reinstall only after validation passes

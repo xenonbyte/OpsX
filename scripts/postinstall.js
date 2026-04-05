@@ -4,14 +4,13 @@ console.log(`
 OpenSpec v1.3.1 installed successfully.
 
 Next steps:
-1. Initialize your project:
-   openspec init --platform codex --profile core
-
-2. Install assets for one or more tools:
+1. Install assets for one or more tools:
    openspec install --platform claude,codex,gemini --profile core
 
-3. For Codex, prefer:
+2. For Codex, prefer:
    $openspec help me start an OpenSpec workflow
+
+3. Optional: create \`openspec/config.yaml\` if you want project-local overrides.
 
 Documentation:
 - README.md

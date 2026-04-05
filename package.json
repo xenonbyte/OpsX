@@ -6,8 +6,6 @@
     "openspec": "bin/openspec.js"
   },
   "scripts": {
-    "generate": "node scripts/generate-assets.js",
-    "validate:assets": "node scripts/validate-assets.js",
     "postinstall": "node scripts/postinstall.js"
   },
   "files": [
