@@ -18,14 +18,14 @@ openspec install --platform claude,codex,gemini --profile core
 $openspec help me start an OpenSpec workflow
 ```
 
-Current release: `1.3.1`
+Current release: `1.3.2`
 
 Release focus:
-- Codex install path fix for generated prompt assets
+- checkpoint evidence review accuracy fixes (template rollout/migration headings, changed-files-only drift checks)
+- command and skill prompt updates now count as behavior-changing execution evidence
 - Node-first CLI distribution
 - schema-driven workflow runtime
 - `security-review` hard/soft gating
-- planning and execution checkpoints
 
 ## Codex usage
 
