@@ -17,7 +17,6 @@ Read config in this order before replying:
 Use the resolved config for:
 - `schema`
 - `language`
-- `profile`
 - `context`
 - `rules`
 - `securityReview`
@@ -107,11 +106,6 @@ If `language: en`:
 6. During `apply`, run `execution checkpoint` after each top-level task group.
 7. Create or update files using the schema and template rules.
 8. Report changed files, current state, next step, and blockers.
-
-## Profile Guidance
-
-- `core`: focus on `propose`, `explore`, `apply`, `archive`
-- `expanded`: allow the full command surface including `new`, `continue`, `ff`, `verify`, `sync`, `resume`, `status`, and onboarding
 
 ## Guardrails
 

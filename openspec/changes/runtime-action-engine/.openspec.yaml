@@ -1,0 +1,6 @@
+name: runtime-action-engine
+schema: spec-driven
+createdAt: 2026-04-05T21:10:00
+securityWaiver:
+  approved: true
+  reason: "Runtime command and release automation change; no additional security review required."

@@ -19,6 +19,7 @@
 - generated files live under `commands/gemini/`
 
 All three platforms share the same workflow semantics from `schemas/spec-driven/schema.json` and the shared skill bundle.
+CLI installation always deploys the full command surface (no `--profile` split).
 
 Shared semantics:
 - Security-review states: `required`, `recommended`, `waived`, `completed`

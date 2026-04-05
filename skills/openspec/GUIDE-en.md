@@ -2,19 +2,28 @@
 
 ## Quick path
 
-1. `openspec init --platform codex --profile core`
-2. `openspec install --platform codex --profile core`
+1. `openspec install --platform codex`
+2. `openspec --check`
 3. In Codex, use `$openspec create an OpenSpec change for <work>`
 
 ## Config
 
-Use `openspec/config.yaml` for schema, language, profile, context, and per-artifact rules.
+Use `openspec/config.yaml` for `schema`, `language`, `context`, per-artifact `rules`, and `securityReview`.
 
-## Profiles
+## Command Surface
 
-- `core`: propose, explore, apply, archive
-- `expanded`: full workflow command surface
+- `openspec install --platform <claude|codex|gemini[,...]>`
+- `openspec uninstall --platform <claude|codex|gemini[,...]>`
+- `openspec --check`
+- `openspec --doc`
+- `openspec --language <en|zh>`
+- `openspec --help`
+- `openspec --version`
 
-## Generated adapters
+## Notes
 
-Run `openspec generate-assets` after changing workflow definitions, then `openspec validate-assets` before publishing.
+- Install always deploys the full command surface (no `--profile` split).
+- `--check` reports installed manifests and treats config `platform` as last selected platform.
+- `--doc` prefers package-local guide content over installed shared copies.
+- Command bundles are generated during `install`; no extra build/validation command is required.
+- In Codex, prefer `$openspec <request>` and `/prompts:opsx-*` for explicit routing.

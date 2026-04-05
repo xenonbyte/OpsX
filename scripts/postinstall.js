@@ -1,7 +1,8 @@
 #!/usr/bin/env node
+const { PACKAGE_VERSION } = require('../lib/constants');
 
 console.log(`
-OpenSpec v1.3.2 installed successfully.
+OpenSpec v${PACKAGE_VERSION} installed successfully.
 
 Next steps:
 1. Install assets for one or more tools:

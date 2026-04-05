@@ -31,3 +31,8 @@ coverage/
 
 # Local npm cache artifacts
 .npm-cache/
+
+# Keep OpenSpec change artifacts trackable even if globally ignored.
+!openspec/
+!openspec/changes/
+!openspec/changes/**

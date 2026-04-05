@@ -1,0 +1,6 @@
+name: auto-checkpoint-review
+schema: spec-driven
+createdAt: 2026-04-05T22:25:00
+securityWaiver:
+  approved: false
+  reason: ""

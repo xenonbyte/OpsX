@@ -28,6 +28,14 @@ securityReview:
 3. global config (`~/.openspec/.opsx-config.yaml`)
 4. package defaults
 
+## Global config semantics
+
+`~/.openspec/.opsx-config.yaml` is installation/runtime shared config.
+
+- `platform` stores the last selected install target (not a single source of truth for installed platforms).
+- Installed platform state is derived from manifest files under `~/.openspec/manifests/*.manifest`.
+- `openspec --check` reports both views so partial uninstall states are explicit and non-blocking.
+
 ## Security review policy
 
 - `securityReview.required: true` means `security-review.md` is a hard gate before `tasks`
@@ -93,6 +101,9 @@ Minimum execution evidence fields:
 
 Derivation rules:
 - docs-only/non-behavioral classification is automatically derived from changed files and evidence text when no explicit override is supplied
+- template-only headings are ignored for rollout/migration inference (for example `## Migration Plan` without body detail)
+- changed-files-only evidence is valid; automatic drift blocking depends on semantic implementation summary, not filename token overlap
+- `commands/**` and `skills/openspec/**` changes are treated as behavior-changing by default
 - behavior-changing work defaults to requiring verification evidence
 
 ## Legacy flag compatibility

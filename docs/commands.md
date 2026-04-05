@@ -1,33 +1,46 @@
 # OpenSpec Commands
 
-## Available commands
+## Agent entrypoints
 
-- `/opsx:propose` or `/prompts:opsx-propose`
-- `/opsx:explore` or `/prompts:opsx-explore`
-- `/opsx:apply` or `/prompts:opsx-apply`
-- `/opsx:archive` or `/prompts:opsx-archive`
-- `/opsx:new` or `/prompts:opsx-new`
-- `/opsx:continue` or `/prompts:opsx-continue`
-- `/opsx:ff` or `/prompts:opsx-ff`
-- `/opsx:verify` or `/prompts:opsx-verify`
-- `/opsx:sync` or `/prompts:opsx-sync`
-- `/opsx:bulk-archive` or `/prompts:opsx-bulk-archive`
-- `/opsx:batch-apply` or `/prompts:opsx-batch-apply`
-- `/opsx:resume` or `/prompts:opsx-resume`
-- `/opsx:status` or `/prompts:opsx-status`
-- `/opsx:onboard` or `/prompts:opsx-onboard`
+Canonical workflow names are `openspec` and `opsx`.
+
+- Claude/Gemini:
+  - `/openspec <request>`
+  - `/opsx:<action>`
+- Codex (recommended):
+  - `$openspec <request>`
+- Codex (explicit routes):
+  - `/prompts:openspec`
+  - `/prompts:opsx-<action>`
+
+## Workflow action routes
+
+- `propose`: `/opsx:propose` or `/prompts:opsx-propose`
+- `explore`: `/opsx:explore` or `/prompts:opsx-explore`
+- `new`: `/opsx:new` or `/prompts:opsx-new`
+- `continue`: `/opsx:continue` or `/prompts:opsx-continue`
+- `ff`: `/opsx:ff` or `/prompts:opsx-ff`
+- `status`: `/opsx:status` or `/prompts:opsx-status`
+- `resume`: `/opsx:resume` or `/prompts:opsx-resume`
+- `apply`: `/opsx:apply` or `/prompts:opsx-apply`
+- `verify`: `/opsx:verify` or `/prompts:opsx-verify`
+- `sync`: `/opsx:sync` or `/prompts:opsx-sync`
+- `archive`: `/opsx:archive` or `/prompts:opsx-archive`
+- `batch-apply`: `/opsx:batch-apply` or `/prompts:opsx-batch-apply`
+- `bulk-archive`: `/opsx:bulk-archive` or `/prompts:opsx-bulk-archive`
+- `onboard`: `/opsx:onboard` or `/prompts:opsx-onboard`
 
 ## Workflow states
 
 - Security-review: `required`, `recommended`, `waived`, `completed`
-- Checkpoints: `PASS`, `WARN`, `BLOCK`
+- Checkpoint: `PASS`, `WARN`, `BLOCK`
 
 ## Workflow checkpoints
 
 - `spec checkpoint`: after `design`, before `tasks`
 - `task checkpoint`: after `tasks`, before `apply`
 - `execution checkpoint`: after each top-level task group during `apply`
-- Checkpoints update existing artifacts and do not create separate review files
+- Checkpoints update existing artifacts and do not create separate review files.
 
 Checkpoint output contract (stable for prompt/runtime callers):
 - `checkpoint`
@@ -37,12 +50,22 @@ Checkpoint output contract (stable for prompt/runtime callers):
 - `patchTargets`
 - `nextStep`
 
-`status`/`resume` surfaces should keep reporting the canonical checkpoint status and next-step recommendation from this contract.
+`status`/`resume` surfaces should report canonical checkpoint status and next-step recommendation from this contract.
 
 ## CLI commands
 
-- `openspec install`
-- `openspec uninstall`
-- `openspec --check`
-- `openspec --doc`
-- `openspec --language <en|zh>`
+```bash
+openspec install --platform <claude|codex|gemini[,...]>
+openspec uninstall --platform <claude|codex|gemini[,...]>
+openspec --check
+openspec --doc
+openspec --language <en|zh>
+openspec --help
+openspec --version
+```
+
+Behavior notes:
+- `install` / `uninstall` require `--platform` and support comma-separated multi-platform values.
+- Installation always deploys the full command surface; there is no `--profile` split.
+- `--check` lists installed manifests under `~/.openspec/manifests/*.manifest` and reports config `platform` as the last selected platform.
+- `--doc` prefers package-local guides and falls back to shared installed guides.

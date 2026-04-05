@@ -1,12 +1,13 @@
 {
   "name": "@xenonbyte/openspec",
-  "version": "1.3.2",
+  "version": "2.0.0",
   "description": "AI-native spec-driven workflow system for Claude, Codex, and Gemini",
   "bin": {
     "openspec": "bin/openspec.js"
   },
   "scripts": {
-    "postinstall": "node scripts/postinstall.js"
+    "postinstall": "node scripts/postinstall.js",
+    "test:workflow-runtime": "node scripts/test-workflow-runtime.js"
   },
   "files": [
     "bin/",
