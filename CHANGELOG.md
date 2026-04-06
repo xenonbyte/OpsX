@@ -1,5 +1,23 @@
 # Changelog
 
+## v2.0.1
+
+Release date: 2026-04-06
+
+Highlights:
+- Make advisory `security-review` non-actionable across runtime guidance, workflow state, and summarized workflow output while preserving visible review state
+- Preserve caller-provided preview sources for heuristic review detection and apply previews when on-disk artifacts are absent or whitespace-only
+- Normalize array-backed `tasks` preview sources and keep `buildApplyInstructions().ready` gated by on-disk required artifact completion
+
+## v2.0.0
+
+Release date: 2026-04-05
+
+Highlights:
+- Ship the unified OpenSpec 2.0 CLI surface with schema-driven workflow metadata and generated platform adapters
+- Add the runtime-guidance kernel for artifact graph resolution, status/instructions integrations, and apply preflight
+- Stabilize security-review gating plus spec/task/execution checkpoint contracts across install/check/doc flows
+
 ## v1.3.1
 
 Release date: 2026-03-27

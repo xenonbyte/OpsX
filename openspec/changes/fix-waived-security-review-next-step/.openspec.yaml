@@ -1,0 +1,6 @@
+name: fix-waived-security-review-next-step
+schema: spec-driven
+createdAt: 2026-04-06T01:45:00
+securityWaiver:
+  approved: false
+  reason: ""

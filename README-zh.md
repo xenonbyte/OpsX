@@ -19,14 +19,14 @@ openspec install --platform claude,codex,gemini
 $openspec help me start an OpenSpec workflow
 ```
 
-当前版本：`2.0.0`
+当前版本：`2.0.1`
 
 本次版本重点：
-- 统一安装命令面（移除 `--profile`，默认安装完整命令集）
-- checkpoint 证据准确性与漂移/约束识别修复
-- 新增 runtime-guidance 内核（artifact graph、status/instructions、apply 预检）
-- 强化多平台 `--check`/`--doc` 行为（manifest 聚合检查、包内 guide 优先）
-- `security-review` 硬/软门禁与 checkpoint 契约稳定性
+- advisory `security-review` 在 runtime、workflow、summary API 中统一为“可见但不抢占下一步”
+- runtime guidance 会保留调用方传入的 preview sources，除非磁盘工件已有有效内容
+- 仅含空白的 planning 文件不再覆盖内存中的 preview 文本
+- apply 预览现在会正确归一化数组形式的 `tasks` source
+- apply readiness 继续以磁盘工件完成状态为准，未保存的 planning preview 不能绕过必需工件
 
 ## Codex 使用
 

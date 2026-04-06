@@ -19,14 +19,14 @@ openspec install --platform claude,codex,gemini
 $openspec help me start an OpenSpec workflow
 ```
 
-Current release: `2.0.0`
+Current release: `2.0.1`
 
 Release focus:
-- unified install surface (no `--profile`; always installs full command set)
-- checkpoint evidence accuracy and drift/constraint detection fixes
-- runtime-guidance kernel for artifact graph, status/instructions, and apply preflight
-- multi-platform check/doc behavior hardening (`--check` manifest enumeration, `--doc` local guide precedence)
-- security-review hard/soft gating with canonical checkpoint contract stability
+- advisory `security-review` is now consistently non-actionable in runtime, workflow, and summary APIs
+- runtime guidance preserves caller-provided preview sources unless on-disk artifacts contain meaningful content
+- whitespace-only planning files no longer erase in-memory preview text
+- apply previews now normalize array-backed `tasks` sources correctly
+- apply readiness stays file-based, so unsaved planning previews cannot bypass required artifacts
 
 ## Codex usage
 

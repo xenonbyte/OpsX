@@ -16,6 +16,7 @@ const {
 } = require('../lib/runtime-guidance');
 const {
   runExecutionCheckpoint,
+  summarizeWorkflowState,
   validatePhaseOneWorkflowContract,
   validateCheckpointContracts
 } = require('../lib/workflow');
@@ -134,7 +135,7 @@ function runTests() {
     assert.strictEqual(kernel.progress.requiredTotal, 4);
   });
 
-  test('runtime respects security-review hard gates and does not force inactive optional steps', () => {
+  test('runtime respects security-review hard gates, advisory review inactivity, and inactive optional steps', () => {
     const gatedChange = 'security-gated';
     createChange(fixtureRoot, gatedChange, {
       '.openspec.yaml': [
@@ -161,6 +162,66 @@ function runTests() {
     assert.strictEqual(gatedKernel.artifactStates.tasks.state, 'blocked');
     assert(gatedKernel.artifactStates.tasks.missingDependencies.includes('security-review'));
     assert.strictEqual(gatedKernel.next.artifactId, 'security-review');
+
+    const waivedChange = 'security-waived';
+    createChange(fixtureRoot, waivedChange, {
+      '.openspec.yaml': [
+        `name: ${waivedChange}`,
+        'schema: spec-driven',
+        `createdAt: ${new Date('2026-01-03T00:00:00.000Z').toISOString()}`,
+        'securityWaiver:',
+        '  approved: true',
+        '  reason: Reviewed manually outside workflow.'
+      ].join('\n'),
+      'proposal.md': '## Why\nNeed admin auth workflow guidance.',
+      'specs/security/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Auth workflow',
+        'The system SHALL support admin auth workflow.'
+      ].join('\n'),
+      'design.md': [
+        '## Context',
+        'Admin auth workflow.',
+        '## Migration Plan',
+        'No migration.'
+      ].join('\n'),
+      'tasks.md': '## 1. Setup\n- [x] 1.1 Complete task'
+    });
+    const waivedKernel = buildRuntimeKernel({ repoRoot: fixtureRoot, changeName: waivedChange });
+    assert.strictEqual(waivedKernel.review.state, 'waived');
+    assert.strictEqual(waivedKernel.review.active, false);
+    assert.strictEqual(waivedKernel.artifactStates['security-review'].active, false);
+    assert.strictEqual(waivedKernel.next.stage, 'apply');
+    assert.strictEqual(waivedKernel.next.artifactId, null);
+
+    const recommendedChange = 'security-recommended';
+    createChange(fixtureRoot, recommendedChange, {
+      'proposal.md': '## Why\nNeed workflow guidance.',
+      'specs/core/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Workflow guidance',
+        'The system SHALL support workflow guidance.'
+      ].join('\n'),
+      'design.md': [
+        '## Context',
+        'Workflow guidance.',
+        '## Migration Plan',
+        'No migration.'
+      ].join('\n'),
+      'tasks.md': '## 1. Setup\n- [x] 1.1 Complete task'
+    });
+    const recommendedKernel = buildRuntimeKernel({
+      repoRoot: fixtureRoot,
+      changeName: recommendedChange,
+      sources: {
+        request: 'add admin auth token workflow'
+      }
+    });
+    assert.strictEqual(recommendedKernel.review.state, 'recommended');
+    assert.strictEqual(recommendedKernel.review.active, false);
+    assert.strictEqual(recommendedKernel.artifactStates['security-review'].active, false);
+    assert.strictEqual(recommendedKernel.next.stage, 'apply');
+    assert.strictEqual(recommendedKernel.next.artifactId, null);
 
     const noSecurityChange = 'security-inactive';
     createChange(fixtureRoot, noSecurityChange, {
@@ -205,6 +266,270 @@ function runTests() {
     assert.deepStrictEqual(first, second);
     assert.strictEqual(first.artifacts.proposal.state, 'ready');
     assert.strictEqual(first.next.artifactId, 'proposal');
+  });
+
+  test('status and apply instructions preserve caller-provided request text for review heuristics', () => {
+    const changeName = 'request-source-review';
+    createChange(fixtureRoot, changeName, {
+      'proposal.md': [
+        '## Why',
+        'Need runtime status output with rollout migration, rollback, and compatibility guidance.'
+      ].join('\n'),
+      'specs/core/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Runtime status',
+        'The system SHALL support runtime status output with migration, rollback, and compatibility guidance.',
+        '',
+        '#### Scenario: Runtime status verification',
+        '- **WHEN** runtime status output is generated',
+        '- **THEN** migration, rollback, compatibility, and verification guidance remain visible'
+      ].join('\n'),
+      'design.md': [
+        '## Context',
+        'Runtime status output with rollout compatibility.',
+        '## Migration Plan',
+        'Rollout migration and rollback compatibility guidance remain required.'
+      ].join('\n'),
+      'tasks.md': [
+        '## 1. Runtime status guidance',
+        '- [x] 1.1 Add runtime status output implementation',
+        '- [x] 1.2 Add verification, security, and compatibility checks',
+        '- [x] 1.3 Document rollout migration and rollback guidance'
+      ].join('\n')
+    });
+
+    const status = buildStatus({
+      repoRoot: fixtureRoot,
+      changeName,
+      sources: {
+        request: 'add admin auth token workflow'
+      }
+    });
+    assert.strictEqual(status.review.state, 'recommended');
+    assert.strictEqual(status.review.active, false);
+    assert.strictEqual(status.artifacts['security-review'].active, false);
+    assert.strictEqual(status.next.stage, 'apply');
+    assert.strictEqual(status.next.artifactId, null);
+
+    const apply = buildApplyInstructions({
+      repoRoot: fixtureRoot,
+      changeName,
+      sources: {
+        request: 'add admin auth token workflow'
+      }
+    });
+    assert.strictEqual(apply.checkpoint.status, 'WARN');
+    assert(apply.checkpoint.findings.some((finding) => finding.code === 'security-review-recommended-task-checkpoint'));
+  });
+
+  test('caller-provided artifact sources survive when files are absent', () => {
+    const changeName = 'in-memory-artifacts';
+    createChange(fixtureRoot, changeName, {});
+
+    const inMemorySources = {
+      proposal: [
+        '## Why',
+        'Need runtime preview flow with rollout migration, rollback, and compatibility guidance.'
+      ].join('\n'),
+      specs: [
+        '## ADDED Requirements',
+        '### Requirement: Runtime preview',
+        'The system SHALL support runtime preview flow with migration, rollback, and compatibility guidance.',
+        '',
+        '#### Scenario: Runtime preview verification',
+        '- **WHEN** runtime preview instructions are generated',
+        '- **THEN** verification and compatibility guidance remain visible'
+      ].join('\n'),
+      design: [
+        '## Context',
+        'Runtime preview flow with rollout compatibility.',
+        '## Migration Plan',
+        'Rollout migration and rollback compatibility guidance remain required.'
+      ].join('\n'),
+      tasks: [
+        '## 1. Runtime preview',
+        '- [x] 1.1 Add runtime preview implementation',
+        '- [x] 1.2 Add verification and compatibility checks',
+        '- [x] 1.3 Document rollout migration and rollback guidance'
+      ].join('\n')
+    };
+
+    const status = buildStatus({
+      repoRoot: fixtureRoot,
+      changeName,
+      sources: Object.assign({
+        request: 'add admin auth token workflow'
+      }, inMemorySources)
+    });
+    assert.strictEqual(status.review.state, 'recommended');
+    assert.strictEqual(status.review.active, false);
+    assert.strictEqual(status.artifacts.proposal.state, 'ready');
+    assert.strictEqual(status.next.artifactId, 'proposal');
+
+    const apply = buildApplyInstructions({
+      repoRoot: fixtureRoot,
+      changeName,
+      sources: Object.assign({
+        request: 'add admin auth token workflow'
+      }, inMemorySources)
+    });
+    assert.strictEqual(apply.ready, false);
+    assert(apply.prerequisites.includes('tasks artifact is not completed'));
+    assert.strictEqual(apply.checkpoint.status, 'WARN');
+    assert(!apply.checkpoint.findings.some((finding) => finding.code === 'tasks-missing'));
+    assert(!apply.checkpoint.findings.some((finding) => finding.code === 'specs-missing'));
+    assert(!apply.checkpoint.findings.some((finding) => finding.code === 'design-missing'));
+    assert(apply.checkpoint.findings.some((finding) => finding.code === 'security-review-recommended-task-checkpoint'));
+  });
+
+  test('whitespace-only files do not override in-memory sources and array-backed tasks still drive apply previews', () => {
+    const changeName = 'whitespace-preview';
+    createChange(fixtureRoot, changeName, {
+      'proposal.md': '\n',
+      'specs/core/spec.md': '   \n',
+      'design.md': '\n\n',
+      'tasks.md': ' \n'
+    });
+
+    const previewSources = {
+      request: 'add admin auth token workflow',
+      proposal: [
+        '## Why',
+        'Need whitespace-safe preview flow with rollout migration, rollback, and compatibility guidance.'
+      ].join('\n'),
+      specs: [
+        '## ADDED Requirements',
+        '### Requirement: Preview flow',
+        'The system SHALL support preview flow with migration, rollback, and compatibility guidance.',
+        '',
+        '#### Scenario: Preview verification',
+        '- **WHEN** preview instructions are generated',
+        '- **THEN** verification and compatibility guidance remain visible'
+      ].join('\n'),
+      design: [
+        '## Context',
+        'Preview flow with rollout compatibility.',
+        '## Migration Plan',
+        'Rollout migration and rollback compatibility guidance remain required.'
+      ].join('\n'),
+      tasks: [
+        '## 1. Preview base',
+        '- [x] 1.1 Add preview flow implementation',
+        '- [x] 1.2 Add verification and compatibility checks',
+        '',
+        '## 2. Preview follow-up',
+        '- [ ] 2.1 Add preview follow-up API',
+        '- [ ] 2.2 Add preview follow-up verification'
+      ]
+    };
+
+    const status = buildStatus({
+      repoRoot: fixtureRoot,
+      changeName,
+      sources: previewSources
+    });
+    assert.strictEqual(status.review.state, 'recommended');
+    assert.strictEqual(status.review.active, false);
+    assert.strictEqual(status.next.stage, 'apply');
+    assert.strictEqual(status.next.artifactId, null);
+
+    const apply = buildApplyInstructions({
+      repoRoot: fixtureRoot,
+      changeName,
+      sources: previewSources
+    });
+    assert.strictEqual(apply.remainingTaskGroups.length, 1);
+    assert.strictEqual(apply.nextTaskGroup, '2. Preview follow-up');
+    assert(!apply.checkpoint.findings.some((finding) => finding.code === 'tasks-missing'));
+    assert(!apply.checkpoint.findings.some((finding) => finding.code === 'specs-missing'));
+    assert(!apply.checkpoint.findings.some((finding) => finding.code === 'design-missing'));
+    assert(apply.checkpoint.findings.some((finding) => finding.code === 'security-review-recommended-task-checkpoint'));
+  });
+
+  test('apply readiness stays false until required planning artifacts exist on disk', () => {
+    const changeName = 'apply-preview-not-ready';
+    createChange(fixtureRoot, changeName, {
+      'tasks.md': [
+        '## 1. Runtime preview',
+        '- [x] 1.1 Add runtime preview implementation',
+        '- [x] 1.2 Add runtime preview verification'
+      ].join('\n')
+    });
+
+    const previewSources = {
+      proposal: [
+        '## Why',
+        'Need runtime preview flow with rollout migration, rollback, and compatibility guidance.'
+      ].join('\n'),
+      specs: [
+        '## ADDED Requirements',
+        '### Requirement: Runtime preview',
+        'The system SHALL support runtime preview flow with migration, rollback, and compatibility guidance.',
+        '',
+        '#### Scenario: Runtime preview verification',
+        '- **WHEN** runtime preview instructions are generated',
+        '- **THEN** verification and compatibility guidance remain visible'
+      ].join('\n'),
+      design: [
+        '## Context',
+        'Runtime preview flow with rollout compatibility.',
+        '## Migration Plan',
+        'Rollout migration and rollback compatibility guidance remain required.'
+      ].join('\n')
+    };
+
+    const status = buildStatus({
+      repoRoot: fixtureRoot,
+      changeName,
+      sources: previewSources
+    });
+    assert.strictEqual(status.next.artifactId, 'proposal');
+
+    const apply = buildApplyInstructions({
+      repoRoot: fixtureRoot,
+      changeName,
+      sources: previewSources
+    });
+    assert.strictEqual(apply.ready, false);
+    assert(apply.prerequisites.includes('proposal artifact is not completed'));
+    assert(apply.prerequisites.includes('specs artifact is not completed'));
+    assert(apply.prerequisites.includes('design artifact is not completed'));
+    assert(!apply.checkpoint.findings.some((finding) => finding.code === 'proposal-missing'));
+    assert(!apply.checkpoint.findings.some((finding) => finding.code === 'specs-missing'));
+    assert(!apply.checkpoint.findings.some((finding) => finding.code === 'design-missing'));
+  });
+
+  test('workflow summary exposes advisory review inactivity', () => {
+    const summary = summarizeWorkflowState({
+      config: {
+        schema: 'spec-driven',
+        securityReview: {
+          mode: 'heuristic',
+          required: false,
+          allowWaiver: true,
+          heuristicHint: 'auth, admin, token, payment'
+        }
+      },
+      change: {
+        securitySensitive: false,
+        securityWaiver: { approved: false, reason: '' }
+      },
+      artifacts: {
+        proposal: true,
+        specs: true,
+        design: true,
+        tasks: false,
+        'security-review': false
+      },
+      sources: {
+        request: 'add admin auth token workflow'
+      }
+    });
+    assert(summary.securityReview);
+    assert.strictEqual(summary.securityReview.state, 'recommended');
+    assert.strictEqual(summary.securityReview.active, false);
+    assert.strictEqual(summary.artifacts['security-review'].state, 'READY');
+    assert.strictEqual(summary.artifacts['security-review'].active, false);
   });
 
   test('artifact instructions include dependency context, target path, and template', () => {
