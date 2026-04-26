@@ -11,7 +11,7 @@
 - [x] **NAME-02**: User can invoke the CLI as `opsx` with `--help`, `--version`, `install`, `uninstall`, `check`, `doc`, `language`, `migrate`, and `status`.
 - [x] **NAME-03**: User-facing docs, package metadata, templates, generated command text, and runtime messages consistently use `OpsX`, `opsx`, and `@xenonbyte/opsx`.
 - [x] **NAME-04**: Historical OpenSpec references remain only where they explain source lineage, migration, or changelog history.
-- [ ] **NAME-05**: Release metadata clearly communicates `3.0.0` as a breaking OpsX rename and workflow-state upgrade.
+- [x] **NAME-05**: Release metadata clearly communicates `3.0.0` as a breaking OpsX rename and workflow-state upgrade.
 
 ### Workspace and Migration
 
