@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
-status: Phase 1 ready to execute
-last_updated: "2026-04-26T19:01:16.922Z"
-last_activity: 2026-04-27 — Phase 1 planned and checker PASS
+status: executing
+last_updated: "2026-04-26T19:06:49.833Z"
+last_activity: 2026-04-27 — Phase 1 execution started
 progress:
   total_phases: 8
   completed_phases: 0
@@ -20,14 +20,14 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-27)
 
 **Core value:** Agents can reliably continue spec-driven work from disk-backed OpsX artifacts instead of relying on fragile chat history.
-**Current focus:** Milestone v3.0 OpsX migration and state-machine workflow
+**Current focus:** Phase 1 — OpsX Naming and CLI Surface
 
 ## Current Position
 
-Phase: 1 — OpsX Naming and CLI Surface (planned)
-Plan: 6 execution plans ready across 4 waves
-Status: Ready to execute
-Last activity: 2026-04-27 — Phase 1 planned and checker PASS
+Phase: 1 — OpsX Naming and CLI Surface (executing)
+Plan: 0 of 6 complete
+Status: Executing Phase 1
+Last activity: 2026-04-27 — Phase 1 execution started
 
 ## Next Action
 
