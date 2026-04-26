@@ -1,56 +1,55 @@
-# OpenSpec
+# OpsX
 
-OpenSpec is an AI-native spec-driven workflow system for Claude, Codex, and Gemini.
+OpsX is an AI-native operational spec execution workflow for Claude, Codex, and Gemini.
 
-This package now ships as a Node CLI with:
-- optional project-local `openspec/config.yaml` overrides
-- full workflow command set by default (no profile split)
-- schema-driven workflow metadata
-- generated platform adapters
-- pure Node install/uninstall/check/doc/language commands
-- built-in security-review gating and workflow checkpoints
-- runtime guidance primitives for status/instructions integrations
+OpsX was originally adapted from Fission-AI/OpenSpec.
 
-## Quick start
+## Quick Start
 
 ```bash
-npm install -g @xenonbyte/openspec
-openspec install --platform claude,codex,gemini
-$openspec help me start an OpenSpec workflow
+npm install -g @xenonbyte/opsx
+opsx install --platform claude,codex,gemini
+opsx check
 ```
 
-Current release: `2.0.1`
+Current release: `3.0.0`
 
-Release focus:
-- advisory `security-review` is now consistently non-actionable in runtime, workflow, and summary APIs
-- runtime guidance preserves caller-provided preview sources unless on-disk artifacts contain meaningful content
-- whitespace-only planning files no longer erase in-memory preview text
-- apply previews now normalize array-backed `tasks` sources correctly
-- apply readiness stays file-based, so unsaved planning previews cannot bypass required artifacts
+## CLI Surface
 
-## Codex usage
+```bash
+opsx install --platform <claude|codex|gemini[,...]>
+opsx uninstall --platform <claude|codex|gemini[,...]>
+opsx check
+opsx doc
+opsx language <en|zh>
+opsx migrate
+opsx status
+opsx --help
+opsx --version
+```
 
-Preferred:
+Compatibility aliases (secondary):
+- `opsx --check`
+- `opsx --doc`
+- `opsx --language`
+
+## Codex Usage
+
+Preferred entrypoint:
 ```text
-$openspec create an OpenSpec change for add-dark-mode
+$opsx <request>
 ```
 
-Explicit routing:
+Explicit action routes:
 ```text
-/prompts:openspec
-/prompts:opsx-propose
+$opsx-propose
+$opsx-apply
+$opsx-status
 ```
 
-If a `/prompts:*` route still needs a change name or description, provide it in the next message.
+## Project Config
 
-## Project config
-
-`openspec/config.yaml` controls:
-- `schema`
-- `language`
-- `context`
-- `rules`
-- `securityReview`
+Project-level workflow defaults live in `.opsx/config.yaml`.
 
 Precedence:
 - change metadata
@@ -58,7 +57,7 @@ Precedence:
 - global config
 - package defaults
 
-## Workflow checkpoints
+## Workflow Checkpoints
 
 - `security-review` sits after `design` and before `tasks`
 - `spec checkpoint` runs before `tasks`
@@ -66,23 +65,6 @@ Precedence:
 - `execution checkpoint` runs after each top-level task group during `apply`
 - Security-review states: `required`, `recommended`, `waived`, `completed`
 - Checkpoint states: `PASS`, `WARN`, `BLOCK`
-
-## Commands
-
-```bash
-openspec install --platform claude,codex,gemini
-openspec uninstall --platform codex
-openspec --check
-openspec --doc
-openspec --language zh
-openspec --help
-openspec --version
-```
-
-Behavior notes:
-- `install` and `uninstall` accept comma-separated platforms via `--platform`.
-- `--check` lists installed platform manifests from `~/.openspec/manifests/*.manifest`; config `platform` is reported as the last selected platform.
-- `--doc` prefers the package-local guide (`skills/openspec/GUIDE-*.md`) and falls back to the shared installed copy.
 
 ## Documentation
 
@@ -92,11 +74,11 @@ Behavior notes:
 - [Runtime guidance kernel](docs/runtime-guidance.md)
 - [Supported tools](docs/supported-tools.md)
 
-## Repository shape
+## Repository Shape
 
 - `lib/`: runtime modules for config, generation, install, and CLI behavior
 - `schemas/`: workflow schema definitions
 - `templates/`: command and project templates
 - `commands/`: generated platform adapters
-- `skills/openspec/`: distributed skill bundle
-- `openspec/`: dogfooded project workspace for this repository
+- `skills/opsx/`: distributed skill bundle
+- `.opsx/`: workflow workspace (created in projects that adopt OpsX)

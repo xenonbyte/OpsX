@@ -1,34 +1,34 @@
-# OpenSpec for Codex
+# OpsX for Codex
 
-## Preferred entrypoint
+## Preferred Entrypoint
 
 Use the skill directly:
 
 ```text
-$openspec create an OpenSpec change for add-dark-mode
+$opsx <request>
 ```
 
-## Explicit routing
+## Explicit Routing
 
 Use these when you want a fixed workflow action:
 
 ```text
-/prompts:openspec
-/prompts:opsx-propose
-/prompts:opsx-apply
+$opsx-propose
+$opsx-apply
+$opsx-status
 ```
 
-Codex treats `/prompts:*` as action selectors. If the selected route still needs a name or description, provide it in the next message.
+If the selected route still needs a change name or description, provide it in the next message.
 
 Install note:
-- Use `openspec install --platform codex` (or multi-platform via comma-separated `--platform`).
-- Install always deploys the full workflow command surface; there is no `--profile` split.
+- Use `opsx install --platform codex` (or comma-separated multi-platform values).
+- Install always deploys the full workflow command surface; there is no profile split.
 
 ## Why this model
 
-Codex is more reliable when natural-language intent goes through the skill entrypoint. The prompt files remain available for command discovery and explicit action routing.
+Codex is more reliable when natural-language intent goes through the skill entrypoint. Explicit action routes remain available for deterministic execution.
 
-## Workflow semantics
+## Workflow Semantics
 
 - `security-review` is required on explicit security-sensitive changes and recommended on heuristic matches
 - `spec checkpoint` runs before `tasks`

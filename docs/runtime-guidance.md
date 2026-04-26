@@ -20,17 +20,19 @@
 
 ## Runtime Semantics
 - Artifact readiness respects workflow security-review gating; if security review is required and missing, gated artifacts stay blocked.
-- `buildArtifactInstructions()` loads template indexes from the package reference bundle (`skills/openspec/references/*`) instead of the caller repo root.
+- `buildArtifactInstructions()` loads template indexes from the package reference bundle (`skills/opsx/references/*`) instead of the caller repo root.
 - Parameterized artifact paths (for example `specs/<capability>/spec.md`) are not writable until `capability` resolves a concrete `targetPath`.
 - `readyForWrite` is true only when dependencies are satisfied and a concrete output path exists.
 
 ## Compatibility Notes
 - Existing public CLI usage remains unchanged:
-  - `openspec install`
-  - `openspec uninstall`
-  - `openspec --check`
-  - `openspec --doc`
-  - `openspec --language`
+  - `opsx install`
+  - `opsx uninstall`
+  - `opsx check`
+  - `opsx doc`
+  - `opsx language`
+  - `opsx migrate`
+  - `opsx status`
 - Existing checkpoint contracts stay canonical (`PASS`, `WARN`, `BLOCK`, `patchTargets`, `nextStep`).
 
 ## Rollback Guidance

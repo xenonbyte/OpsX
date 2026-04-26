@@ -2,20 +2,18 @@
 
 ## Claude
 
-- `/openspec`
-- `/opsx:*`
+- `/opsx-<action>`
 - generated files live under `commands/claude/`
 
 ## Codex
 
-- preferred: `$openspec <request>`
-- explicit routes: `/prompts:openspec`, `/prompts:opsx-*`
+- preferred: `$opsx <request>`
+- explicit routes: `$opsx-<action>`
 - generated files live under `commands/codex/`
 
 ## Gemini
 
-- `/openspec`
-- `/opsx:*`
+- `/opsx-<action>`
 - generated files live under `commands/gemini/`
 
 All three platforms share the same workflow semantics from `schemas/spec-driven/schema.json` and the shared skill bundle.
