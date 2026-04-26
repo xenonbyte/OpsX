@@ -28,6 +28,7 @@ const {
   showDoc,
   setLanguage
 } = require('../lib/install');
+const { buildPlatformBundle } = require('../lib/generator');
 
 function expectRuntimeError(run, code) {
   let caught = null;
@@ -772,6 +773,64 @@ function runTests() {
     assert(statusOutput.stdout.includes(`OpsX v${PACKAGE_VERSION}`));
     assert(statusOutput.stdout.includes('Phase 1'));
     assert(statusOutput.stdout.includes('Phase 4'));
+  });
+
+  test('runtime suite locks renamed skill targets, generated bundles, and checked-in command entries', () => {
+    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-home-surface-'));
+    cleanupTargets.push(tempHome);
+
+    const installResults = install({ platform: 'claude,codex,gemini', homeDir: tempHome, language: 'en' });
+    assert.strictEqual(installResults.length, 3);
+    installResults.forEach((result) => {
+      assert(result.platformSkillDir.includes(path.join('skills', 'opsx')));
+      assert(!result.platformSkillDir.includes(path.join('skills', 'openspec')));
+      assert(fs.existsSync(result.platformSkillDir));
+    });
+
+    const sharedSkillDir = path.join(tempHome, '.openspec', 'skills', 'opsx');
+    assert(fs.existsSync(sharedSkillDir));
+    assert(fs.existsSync(path.join(sharedSkillDir, 'SKILL.md')));
+    assert(!fs.existsSync(path.join(tempHome, '.openspec', 'skills', 'openspec', 'SKILL.md')));
+
+    const sharedCommandPath = path.join(tempHome, '.openspec', 'commands', 'opsx.md');
+    assert(fs.existsSync(sharedCommandPath));
+    const sharedCommandContent = fs.readFileSync(sharedCommandPath, 'utf8');
+    assert(sharedCommandContent.includes('OpsX'));
+
+    const generatedBundles = {
+      claude: buildPlatformBundle('claude'),
+      codex: buildPlatformBundle('codex'),
+      gemini: buildPlatformBundle('gemini')
+    };
+    assert(generatedBundles.claude['opsx.md'].includes('OpsX'));
+    assert(generatedBundles.codex['prompts/opsx.md'].includes('$opsx <request>'));
+    assert(generatedBundles.gemini['opsx.toml'].includes('OpsX Workflow'));
+    Object.entries(generatedBundles).forEach(([platform, bundle]) => {
+      Object.keys(bundle).forEach((relativePath) => {
+        assert(!relativePath.includes('openspec'), `${platform} bundle contains legacy path: ${relativePath}`);
+      });
+    });
+
+    const checkedInEntries = [
+      path.join(REPO_ROOT, 'commands', 'claude', 'opsx.md'),
+      path.join(REPO_ROOT, 'commands', 'codex', 'prompts', 'opsx.md'),
+      path.join(REPO_ROOT, 'commands', 'gemini', 'opsx.toml')
+    ];
+    checkedInEntries.forEach((entryPath) => {
+      assert(fs.existsSync(entryPath), `Missing checked-in command entry: ${entryPath}`);
+      const entryContent = fs.readFileSync(entryPath, 'utf8');
+      assert(entryContent.includes('OpsX'), `Expected OpsX branding in ${entryPath}`);
+    });
+
+    const removedLegacyEntries = [
+      path.join(REPO_ROOT, 'commands', 'openspec.md'),
+      path.join(REPO_ROOT, 'commands', 'claude', 'openspec.md'),
+      path.join(REPO_ROOT, 'commands', 'codex', 'prompts', 'openspec.md'),
+      path.join(REPO_ROOT, 'commands', 'gemini', 'openspec.toml')
+    ];
+    removedLegacyEntries.forEach((legacyPath) => {
+      assert(!fs.existsSync(legacyPath), `Legacy command entry should be removed: ${legacyPath}`);
+    });
   });
 
   test('public install/check/doc/language command surface remains compatible', () => {
