@@ -1,6 +1,6 @@
 ---
 phase: 01-opsx-naming-and-cli-surface
-reviewed: 2026-04-26T20:31:41Z
+reviewed: 2026-04-26T21:00:26Z
 depth: standard
 files_reviewed: 37
 files_reviewed_list:
@@ -43,39 +43,68 @@ files_reviewed_list:
   - uninstall.sh
 findings:
   critical: 0
-  warning: 0
-  info: 0
-  total: 0
-status: clean
+  warning: 1
+  info: 1
+  total: 2
+status: issues_found
 ---
 
 # Phase 01: Code Review Report
 
-**Reviewed:** 2026-04-26T20:31:41Z
+**Reviewed:** 2026-04-26T21:00:26Z
 **Depth:** standard
 **Files Reviewed:** 37
-**Status:** clean
+**Status:** issues_found
 
 ## Summary
 
-Re-reviewed Phase 01 after commit `fb9de5a fix(01): address code review findings`, covering the package/install runtime, command generation, checked-in command entries, docs, tests, and legacy allowlist behavior.
+Reviewed the Phase 1 OpsX naming and CLI surface files at standard depth, including the package/bin surface, CLI dispatch, install/generator plumbing, workflow classification logic, public command adapters, docs, templates, skill bundle, and regression scripts.
 
-All reviewed files meet quality standards. No issues found.
-
-Focused follow-up checks confirmed:
-- Claude and Gemini generated/checked-in command bundles now use `/opsx-<action>` as their primary workflow entry and no longer advertise `$opsx <request>` as their primary route.
-- Docs and skill wording now keeps `.opsx` / `~/.opsx` path guidance phase-accurate and does not claim Phase 2 path migration is runtime-complete in Phase 1.
-- Partial uninstall preserves shared OpsX assets while other platform manifests remain installed, and regression coverage is present.
-- Generated command bundle content matches checked-in command files after trailing-newline normalization.
+The main runtime issue is a Phase 1 rename regression in execution-evidence classification: `skills/opsx/**` changes are currently treated as documentation-only, so checkpoint verification can be skipped for behavior-changing skill updates.
 
 Verification run:
 - `node scripts/test-workflow-runtime.js` - PASS, 23 tests passed
 - `node scripts/check-phase1-legacy-allowlist.js` - PASS, scanned 88 files with 54 allowlisted legacy-token hits
 - `npm_config_cache=/tmp/opsx-npm-cache npm pack --dry-run` - PASS, package `@xenonbyte/opsx@3.0.0` dry-run tarball includes 88 files
-- Partial uninstall smoke check - PASS, shared assets survive partial removal and are removed after the final platform uninstall
+
+## Warnings
+
+### WR-01: Renamed skill changes are classified as docs-only
+
+**File:** `lib/workflow.js:487`
+**Issue:** `isDocsPath()` excludes command files and the old `skills/openspec/` prefix from docs-only handling, but it does not exclude the renamed `skills/opsx/` bundle. A changed file such as `skills/opsx/SKILL.md` now derives `behavior.changed: false`, `docsOnly: true`, and `verification.requiresTesting: false`, so `execution checkpoint` can skip verification for behavior-changing skill or playbook edits.
+**Fix:**
+```js
+const OPSX_SKILL_DIR_PREFIX = 'skills/opsx/';
+
+function isDocsPath(filePath = '') {
+  const normalized = String(filePath || '').replace(/\\/g, '/').toLowerCase();
+  if (
+    /^commands\//.test(normalized)
+    || normalized.startsWith(OPSX_SKILL_DIR_PREFIX)
+    || normalized.startsWith(LEGACY_SKILL_DIR_PREFIX)
+  ) return false;
+  return (
+    /\.md$/i.test(normalized)
+    || /^docs\//i.test(normalized)
+    || normalized.startsWith(LEGACY_CHANGE_DIR_PREFIX)
+    || /readme/i.test(normalized)
+    || /changelog/i.test(normalized)
+  );
+}
+```
+Add a regression assertion beside the existing command/prompt classification test for `changedFiles: ['skills/opsx/SKILL.md']`.
+
+## Info
+
+### IN-01: Compatibility language alias docs omit the required value
+
+**File:** `README.md:31`, `README-zh.md:31`, `docs/commands.md:60`
+**Issue:** The compatibility alias lists show `opsx --language`, but the CLI requires a language value and fails without `<en|zh>`. The CLI help already documents `opsx --language <en|zh>`, so these docs are inconsistent with runtime behavior.
+**Fix:** Change each compatibility alias bullet to `opsx --language <en|zh>`.
 
 ---
 
-_Reviewed: 2026-04-26T20:31:41Z_
+_Reviewed: 2026-04-26T21:00:26Z_
 _Reviewer: Codex (gsd-code-reviewer)_
 _Depth: standard_
