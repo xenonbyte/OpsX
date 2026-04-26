@@ -619,7 +619,7 @@ function runTests() {
       artifactId: 'tasks'
     });
     assert(payload.template.content.includes('- [ ] 1.1 Example task'));
-    assert(payload.template.sourcePath.includes(path.join('skills', 'openspec', 'references')));
+    assert(payload.template.sourcePath.includes(path.join('skills', 'opsx', 'references')));
   });
 
   test('apply instructions report remaining task groups and prerequisites', () => {
@@ -747,11 +747,11 @@ function runTests() {
 
     const docCommand = runOpsxCli(['doc'], cliOptions);
     assert.strictEqual(docCommand.status, 0, docCommand.stderr);
-    assert(docCommand.stdout.includes('# OpenSpec Guide'));
+    assert(docCommand.stdout.includes('# OpsX Guide'));
 
     const docAlias = runOpsxCli(['--doc'], cliOptions);
     assert.strictEqual(docAlias.status, 0, docAlias.stderr);
-    assert(docAlias.stdout.includes('# OpenSpec Guide'));
+    assert(docAlias.stdout.includes('# OpsX Guide'));
 
     const languageCommand = runOpsxCli(['language', 'zh'], cliOptions);
     assert.strictEqual(languageCommand.status, 0, languageCommand.stderr);
@@ -775,14 +775,14 @@ function runTests() {
   });
 
   test('public install/check/doc/language command surface remains compatible', () => {
-    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'openspec-home-'));
+    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-home-'));
     cleanupTargets.push(tempHome);
 
     const results = install({ platform: 'claude,codex,gemini', homeDir: tempHome, language: 'en' });
     assert.strictEqual(results.length, 3);
 
     const checkOutput = runCheck({ homeDir: tempHome, cwd: fixtureRoot });
-    assert(checkOutput.includes('OpenSpec Installation Check'));
+    assert(checkOutput.includes('OpsX Installation Check'));
     assert(checkOutput.includes('Config'));
     assert(checkOutput.includes('Found 3 manifest(s)'));
     assert(checkOutput.includes('claude'));
@@ -790,19 +790,19 @@ function runTests() {
     assert(checkOutput.includes('gemini'));
 
     const englishDoc = showDoc({ homeDir: tempHome });
-    assert(englishDoc.includes('# OpenSpec Guide'));
+    assert(englishDoc.includes('# OpsX Guide'));
 
     const language = setLanguage('zh', { homeDir: tempHome });
     assert.strictEqual(language, 'zh');
     const chineseDoc = showDoc({ homeDir: tempHome });
-    assert(chineseDoc.includes('OpenSpec'));
+    assert(chineseDoc.includes('OpsX'));
 
     const removed = uninstall({ platform: 'claude,codex,gemini', homeDir: tempHome });
     assert.deepStrictEqual(removed.sort(), ['claude', 'codex', 'gemini']);
   });
 
   test('check output remains accurate after partial uninstall across platforms', () => {
-    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'openspec-home-check-'));
+    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-home-check-'));
     cleanupTargets.push(tempHome);
 
     install({ platform: 'claude,codex,gemini', homeDir: tempHome, language: 'en' });
@@ -817,16 +817,16 @@ function runTests() {
   });
 
   test('doc output prefers package guide over stale installed guide copy', () => {
-    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'openspec-home-doc-'));
+    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-home-doc-'));
     cleanupTargets.push(tempHome);
 
-    const staleGuideDir = path.join(tempHome, '.openspec', 'skills', 'openspec');
+    const staleGuideDir = path.join(tempHome, '.openspec', 'skills', 'opsx');
     ensureDir(staleGuideDir);
     writeText(path.join(staleGuideDir, 'GUIDE-en.md'), [
-      '# OpenSpec Guide',
+      '# Stale OpsX Guide',
       '',
-      '1. `openspec init --platform codex --profile core`',
-      '2. `openspec install --platform codex --profile core`'
+      '1. `opsx init --platform codex --profile core`',
+      '2. `opsx install --platform codex --profile core`'
     ].join('\n'));
     writeText(path.join(tempHome, '.openspec', '.opsx-config.yaml'), [
       'version: "2.0.0"',
@@ -836,8 +836,8 @@ function runTests() {
     ].join('\n'));
 
     const doc = showDoc({ homeDir: tempHome });
-    assert(doc.includes('openspec install --platform codex'));
-    assert(!doc.includes('openspec init --platform codex --profile core'));
+    assert(doc.includes('opsx install --platform codex'));
+    assert(!doc.includes('opsx init --platform codex --profile core'));
     assert(!doc.includes('--profile core'));
   });
 
