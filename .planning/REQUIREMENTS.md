@@ -97,11 +97,11 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NAME-01 | Phase 1 | Pending |
-| NAME-02 | Phase 1 | Pending |
+| NAME-01 | Phase 1 | Completed |
+| NAME-02 | Phase 1 | Completed |
 | NAME-03 | Phase 1 | Completed |
 | NAME-04 | Phase 1 | Completed |
-| NAME-05 | Phase 1 | Pending |
+| NAME-05 | Phase 1 | Completed |
 | DIR-01 | Phase 2 | Pending |
 | DIR-02 | Phase 2 | Pending |
 | DIR-03 | Phase 2 | Pending |
@@ -148,4 +148,4 @@
 
 ---
 *Requirements defined: 2026-04-27*
-*Last updated: 2026-04-27 after milestone v3.0 definition*
+*Last updated: 2026-04-27 after Phase 1 verification*

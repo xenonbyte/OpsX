@@ -27,6 +27,10 @@ This roadmap turns the current OpenSpec `2.0.1` repository into OpsX `3.0.0`. It
 
 **Requirements:** NAME-01, NAME-02, NAME-03, NAME-04, NAME-05
 
+**Status:** Complete — 2026-04-26
+
+**Verification:** `.planning/phases/01-opsx-naming-and-cli-surface/01-VERIFICATION.md`
+
 **Success criteria:**
 1. `package.json` uses `@xenonbyte/opsx`, binary `opsx`, repository `xenonbyte/opsx`, and version `3.0.0`.
 2. `bin/opsx.js` works for `--help`, `--version`, and existing non-migration CLI actions.

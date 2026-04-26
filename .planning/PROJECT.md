@@ -4,7 +4,7 @@
 
 OpsX is the next major version of the current `xenonbyte/openspec` repository. It is an AI-native operational spec execution workflow for Claude Code, Codex, and Gemini that turns user intent into versioned specs, lightweight TDD tasks, state-machine-driven execution steps, checkpoint reviews, verification records, and archive history.
 
-The current codebase still ships as OpenSpec `2.0.1` with `openspec` paths, commands, package metadata, and skill names. The v3.0 milestone converts the product to OpsX as a breaking release and makes `.opsx/` the source of truth for recoverable agent workflows.
+The repository is being converted to OpsX as a breaking v3.0 release. Phase 1 has converted the public package, CLI, skill, command, docs, and release surface to OpsX; later phases still own `.opsx/` workspace migration, state-machine behavior, spec review, TDD-light, and archive/verify quality gates.
 
 ## Core Value
 
@@ -32,10 +32,10 @@ Agents can reliably continue spec-driven work from disk-backed OpsX artifacts in
 - ✓ Security-review gating supports required, recommended, waived, and completed states — v2.0.0/v2.0.1
 - ✓ Spec, task, and execution checkpoint concepts are implemented in the runtime schema — v2.0.0
 - ✓ Runtime guidance APIs can compute workflow status and apply instructions from artifacts — v2.0.0/v2.0.1
+- ✓ Phase 1 OpsX package, CLI, skill, command, docs, release metadata, and legacy allowlist surface verified against NAME-01 through NAME-05 — v3.0 Phase 1
 
 ### Active
 
-- [ ] Complete the OpsX naming and package migration for the v3.0 breaking release.
 - [ ] Move project and global workflow state to `.opsx/` and `~/.opsx/` with a safe migration command.
 - [ ] Rewrite command, skill, template, and documentation surfaces around `/opsx-*`, `$opsx-*`, and `opsx`.
 - [ ] Introduce a durable change-level state machine that every command reads before acting.
@@ -74,7 +74,7 @@ Agents can reliably continue spec-driven work from disk-backed OpsX artifacts in
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Rename OpenSpec to OpsX for v3.0 | Current naming is mixed and old entrypoints keep agents/users on stale mental models | Pending |
+| Rename OpenSpec to OpsX for v3.0 | Current naming is mixed and old entrypoints keep agents/users on stale mental models | Phase 1 complete for package, CLI, skill, command, docs, and release surface; path/state migration remains in later phases |
 | Use `.opsx/` and `~/.opsx/` as canonical directories | Dot-directory state is explicit workflow metadata and aligns project/global naming | Pending |
 | Keep full `opsx-*` command set, no Lite profile | User explicitly wants complete workflow power without profile choice overhead | Pending |
 | Add state/context/drift runtime artifacts | Durable disk state reduces chat-summary drift and enables clean-context recovery | Pending |
@@ -99,4 +99,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-27 after starting milestone v3.0*
+*Last updated: 2026-04-27 after Phase 1 verification*
