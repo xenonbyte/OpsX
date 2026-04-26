@@ -1,7 +1,7 @@
 ## Snapshot
 - 2026-04-27 [USER] Goal: Start a new GSD milestone from the supplied OpsX optimization report.
 - 2026-04-27 [CODE] Current milestone: `v3.0 OpsX migration and state-machine workflow`.
-- 2026-04-27 [CODE] Current phase context: Phase 1 `OpsX Naming and CLI Surface` now has 6 revised execution plans across 4 waves after checker-driven plan splitting.
+- 2026-04-27 [CODE] Current phase context: Phase 1 `OpsX Naming and CLI Surface` is planned and checker PASS, with 6 execution plans across 4 waves.
 - 2026-04-27 [TOOL] Repo had OpenSpec artifacts under `openspec/` but no existing `.planning/` directory.
 - 2026-04-27 [ASSUMPTION] Because interactive question tooling is unavailable in Default mode and the user supplied a complete implementation report, the milestone goals and roadmap approval are treated as covered by the user input.
 - 2026-04-27 [CODE] GSD planning layer now exists under `.planning/`; phase numbering is reset to Phase 1.
@@ -10,6 +10,7 @@
 - 2026-04-27 [CODE] Created `.planning/phases/01-opsx-naming-and-cli-surface/01-RESEARCH.md` with naming-surface inventory, phase boundaries, implementation order, runtime-state inventory, verification gates, and rename risks.
 - 2026-04-27 [CODE] Created `.planning/phases/01-opsx-naming-and-cli-surface/01-01-PLAN.md`, `01-02-PLAN.md`, and `01-03-PLAN.md` covering package/CLI identity, install+generated asset rename, and docs/release allowlist gating.
 - 2026-04-27 [CODE] Revised Phase 1 plans so `opsx check|doc|language` are the primary CLI surface and the over-wide plans are now split into `01-02` skill/plumbing, `01-03` generator/assets, `01-04` runtime regressions, `01-05` docs/templates, and `01-06` changelog/allowlist gates.
+- 2026-04-27 [CODE] Finalized Phase 1 plan checker issues by grouping `01-03` command asset file scope and adding `lib/config.js`, `lib/constants.js`, `lib/install.js`, and `lib/runtime-guidance.js` to the explicit `01-06` deferred-runtime allowlist contract.
 - 2026-04-27 [CODE] Created `.planning/PROJECT.md` with OpsX v3.0 goals, validated OpenSpec context, active requirements, out-of-scope boundaries, constraints, and decisions.
 - 2026-04-27 [CODE] Created `.planning/REQUIREMENTS.md` with 43 mapped v3.0 requirements across naming, workspace migration, commands/skills, state machine, spec review, TDD-light, quality gates, and tests.
 - 2026-04-27 [CODE] Created `.planning/ROADMAP.md` with 8 phases mapped to all requirements.
@@ -49,5 +50,7 @@
 - 2026-04-27 [TOOL] `schemas/spec-driven/schema.json` currently has `spec-checkpoint`, `task-checkpoint`, and `execution-checkpoint`, but not `spec-split-checkpoint`.
 - 2026-04-27 [TOOL] Global gitignore ignored `.planning/`; repo `.gitignore` now explicitly tracks `.planning/**`.
 - 2026-04-27 [TOOL] Phase 1 context committed as `9a2aae4 docs(01): capture phase context`.
+- 2026-04-27 [TOOL] `gsd-sdk query verify.plan-structure` passed for `01-01-PLAN.md` through `01-06-PLAN.md`.
+- 2026-04-27 [TOOL] Final `gsd-plan-checker` result for Phase 1 was `CHECKER PASS`.
+- 2026-04-27 [TOOL] `gsd-sdk query state.planned-phase --phase "1" --name "OpsX Naming and CLI Surface" --plans "6"` updated `.planning/STATE.md`.
 - 2026-04-27 [CODE] Next executable step: `$gsd-execute-phase 1` for Phase 1: OpsX Naming and CLI Surface.
-- 2026-04-27 [TOOL] `gsd-sdk query verify.plan-structure` previously passed for `01-01-PLAN.md`, `01-02-PLAN.md`, and `01-03-PLAN.md`; re-run validation is required after the latest plan split to cover `01-04` through `01-06`.
