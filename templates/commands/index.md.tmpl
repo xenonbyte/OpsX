@@ -3,17 +3,18 @@ description: {{description}}
 ---
 # {{heading}}
 
-Use the `openspec` skill for this request.
+Use the `opsx` skill for this request.
 
 Platform: {{platform_label}}
-Primary workflow entry: `{{open_spec_syntax}}`
+Primary workflow entry: `{{primary_workflow_syntax}}`
 
 Available routes:
 {{command_list}}
 
 Notes:
-- `openspec/config.yaml` controls schema, language, context, and rules.
+- CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
 - `{{inline_note}}`
+- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
 - Security-review states: {{review_state_note}}
 - Checkpoints: {{checkpoint_note}}
 - Checkpoint outcomes: {{checkpoint_state_note}}

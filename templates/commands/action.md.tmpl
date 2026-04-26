@@ -3,15 +3,16 @@ description: {{description}}
 ---
 # {{title}}
 
-Use the `openspec` skill for this request.
+Use the `opsx` skill for this request.
 
 Workflow action: `{{action}}`
-Primary workflow entry: `{{open_spec_syntax}}`
+Primary workflow entry: `{{primary_workflow_syntax}}`
 Explicit action route: `{{action_syntax}}`
 
 Execution rules:
-- Follow the `{{action}}` playbook from the `openspec` skill and its referenced files.
-- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Follow the `{{action}}` playbook from the `opsx` skill and its referenced files.
+- CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
+- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
 - Use request details already present in the conversation.
 - {{inline_argument_note}}
 - Security-review states are {{review_state_note}}.

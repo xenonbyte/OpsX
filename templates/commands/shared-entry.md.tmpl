@@ -1,9 +1,9 @@
 ---
-description: OpenSpec workflow overview shared across supported tools.
+description: OpsX workflow overview shared across supported tools.
 ---
-# OpenSpec
+# OpsX
 
-OpenSpec is a schema-driven workflow system distributed as a skill-first experience.
+OpsX is a schema-driven workflow system distributed as a skill-first experience.
 
 Artifacts in `spec-driven`:
 {{artifact_list}}
@@ -15,8 +15,10 @@ Available commands:
 {{command_list}}
 
 Codex guidance:
-- Prefer `$openspec <request>` for natural-language requests.
-- Use `/prompts:openspec` or `/prompts:opsx-*` for explicit routing.
+- Prefer `$opsx <request>` for natural-language requests.
+- Use `$opsx-*` or `/opsx-*` for explicit routing.
+- CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
+- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
 
 Security review guidance:
 - Use `security-review.md` after `design` and before `tasks` for security-sensitive changes.

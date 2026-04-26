@@ -1,20 +1,21 @@
 ---
-description: OpenSpec entrypoint for Codex. Prefer the openspec skill for natural-language workflow requests.
+description: OpsX entrypoint for Codex. Prefer the opsx skill for natural-language workflow requests.
 ---
-# OpenSpec
+# OpsX
 
-Use the `openspec` skill for this request.
+Use the `opsx` skill for this request.
 
 Codex usage model:
-- Preferred: `$openspec <request>`
-- Explicit routing: `/prompts:openspec` and `/prompts:opsx-*`
+- Preferred: `$opsx <request>`
+- Explicit routing: `$opsx-*`
 
 Available routes:
 {{command_list}}
 
 Important:
-- Treat `/prompts:*` as action selectors in Codex.
+- Treat `$opsx-*` as action selectors in Codex.
 - If details are still needed after command selection, provide them in the next message.
-- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- CLI quick checks: `opsx check`, `opsx doc`, `opsx language <en|zh>`.
+- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
 - Security-review states: {{review_state_note}}
 - Checkpoints: {{checkpoint_note}}
