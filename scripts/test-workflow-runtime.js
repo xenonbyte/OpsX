@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
 const assert = require('assert');
+const { spawnSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { copyDir, ensureDir, removePath, writeText } = require('../lib/fs-utils');
-const { REPO_ROOT } = require('../lib/constants');
+const { REPO_ROOT, PACKAGE_VERSION } = require('../lib/constants');
 const {
   RuntimeGuidanceError,
   validateSchemaGraph,
@@ -74,6 +75,20 @@ function createChange(fixtureRoot, changeName, files = {}) {
     writeText(path.join(changeDir, relativePath), files[relativePath]);
   });
   return changeDir;
+}
+
+function runOpsxCli(args, options = {}) {
+  const env = Object.assign({}, process.env, options.env || {});
+  const result = spawnSync(process.execPath, [path.join(REPO_ROOT, 'bin', 'opsx.js'), ...args], {
+    cwd: options.cwd || REPO_ROOT,
+    env,
+    encoding: 'utf8'
+  });
+  return {
+    status: result.status,
+    stdout: result.stdout || '',
+    stderr: result.stderr || ''
+  };
 }
 
 function runTests() {
@@ -684,6 +699,79 @@ function runTests() {
   test('checkpoint contract validators remain green after runtime module integration', () => {
     assert.deepStrictEqual(validatePhaseOneWorkflowContract(), []);
     assert.deepStrictEqual(validateCheckpointContracts(), []);
+  });
+
+  test('opsx help and version output expose renamed Phase 1 command surface', () => {
+    const versionOutput = runOpsxCli(['--version']);
+    assert.strictEqual(versionOutput.status, 0, versionOutput.stderr);
+    assert.strictEqual(versionOutput.stdout.trim(), `OpsX v${PACKAGE_VERSION}`);
+
+    const helpOutput = runOpsxCli(['--help']);
+    assert.strictEqual(helpOutput.status, 0, helpOutput.stderr);
+    assert(helpOutput.stdout.includes(`OpsX v${PACKAGE_VERSION}`));
+    assert(helpOutput.stdout.includes('opsx install --platform <claude|codex|gemini[,...]>'));
+    assert(helpOutput.stdout.includes('opsx uninstall --platform <claude|codex|gemini[,...]>'));
+    assert(helpOutput.stdout.includes('opsx check'));
+    assert(helpOutput.stdout.includes('opsx doc'));
+    assert(helpOutput.stdout.includes('opsx language <en|zh>'));
+    assert(helpOutput.stdout.includes('opsx migrate'));
+    assert(helpOutput.stdout.includes('opsx status'));
+    assert(helpOutput.stdout.includes('opsx --help'));
+    assert(helpOutput.stdout.includes('opsx --version'));
+    assert(helpOutput.stdout.includes('opsx --check'));
+    assert(helpOutput.stdout.includes('opsx --doc'));
+    assert(helpOutput.stdout.includes('opsx --language <en|zh>'));
+    assert(helpOutput.stdout.includes('$opsx <request>'));
+    assert(!helpOutput.stdout.includes('openspec'));
+    assert(!helpOutput.stdout.includes('$openspec'));
+    assert(!helpOutput.stdout.includes('/prompts:openspec'));
+  });
+
+  test('opsx check/doc/language work as subcommands and compatibility aliases', () => {
+    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-home-cli-'));
+    cleanupTargets.push(tempHome);
+    install({ platform: 'claude,codex,gemini', homeDir: tempHome, language: 'en' });
+
+    const cliOptions = {
+      cwd: fixtureRoot,
+      env: { HOME: tempHome }
+    };
+
+    const checkCommand = runOpsxCli(['check'], cliOptions);
+    assert.strictEqual(checkCommand.status, 0, checkCommand.stderr);
+    assert(checkCommand.stdout.includes('Installation Check'));
+
+    const checkAlias = runOpsxCli(['--check'], cliOptions);
+    assert.strictEqual(checkAlias.status, 0, checkAlias.stderr);
+    assert(checkAlias.stdout.includes('Installation Check'));
+
+    const docCommand = runOpsxCli(['doc'], cliOptions);
+    assert.strictEqual(docCommand.status, 0, docCommand.stderr);
+    assert(docCommand.stdout.includes('# OpenSpec Guide'));
+
+    const docAlias = runOpsxCli(['--doc'], cliOptions);
+    assert.strictEqual(docAlias.status, 0, docAlias.stderr);
+    assert(docAlias.stdout.includes('# OpenSpec Guide'));
+
+    const languageCommand = runOpsxCli(['language', 'zh'], cliOptions);
+    assert.strictEqual(languageCommand.status, 0, languageCommand.stderr);
+    assert(languageCommand.stdout.includes('语言已切换为中文。'));
+
+    const languageAlias = runOpsxCli(['--language', 'en'], cliOptions);
+    assert.strictEqual(languageAlias.status, 0, languageAlias.stderr);
+    assert(languageAlias.stdout.includes('Language switched to English.'));
+  });
+
+  test('opsx migrate and status return truthful Phase 1 placeholder messaging', () => {
+    const migrateOutput = runOpsxCli(['migrate']);
+    assert.strictEqual(migrateOutput.status, 0, migrateOutput.stderr);
+    assert(migrateOutput.stdout.includes('Phase 2'));
+
+    const statusOutput = runOpsxCli(['status']);
+    assert.strictEqual(statusOutput.status, 0, statusOutput.stderr);
+    assert(statusOutput.stdout.includes(`OpsX v${PACKAGE_VERSION}`));
+    assert(statusOutput.stdout.includes('Phase 1'));
+    assert(statusOutput.stdout.includes('Phase 4'));
   });
 
   test('public install/check/doc/language command surface remains compatible', () => {
