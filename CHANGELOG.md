@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.0.0
+
+Release date: 2026-04-27
+
+Highlights:
+- Ship the breaking rename from OpenSpec to OpsX on the public surface: npm package `@xenonbyte/opsx`, CLI `opsx`, and distributed skill bundle `skills/opsx`
+- Do not ship an `openspec` executable alias in `@xenonbyte/opsx@3.0.0`; any compatibility bridge belongs to a separate `@xenonbyte/openspec@2.x` follow-up
+- Keep Phase 1 messaging honest: full `.opsx/` workspace/global migration is deferred to Phase 2, and durable workflow state-machine behavior is deferred to later phases
+
 ## v2.0.1
 
 Release date: 2026-04-06
