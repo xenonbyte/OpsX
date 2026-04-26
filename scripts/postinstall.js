@@ -2,16 +2,17 @@
 const { PACKAGE_VERSION } = require('../lib/constants');
 
 console.log(`
-OpenSpec v${PACKAGE_VERSION} installed successfully.
+OpsX v${PACKAGE_VERSION} installed successfully.
 
 Next steps:
 1. Install assets for one or more tools:
-   openspec install --platform claude,codex,gemini
+   opsx install --platform claude,codex,gemini
 
 2. For Codex, prefer:
-   $openspec help me start an OpenSpec workflow
+   $opsx <request>
 
-3. Optional: create \`openspec/config.yaml\` if you want project-local overrides.
+3. Check command help:
+   opsx --help
 
 Documentation:
 - README.md

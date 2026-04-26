@@ -1,9 +1,9 @@
 {
-  "name": "@xenonbyte/openspec",
-  "version": "2.0.1",
-  "description": "AI-native spec-driven workflow system for Claude, Codex, and Gemini",
+  "name": "@xenonbyte/opsx",
+  "version": "3.0.0",
+  "description": "AI-native operational spec execution workflow for Claude, Codex, and Gemini",
   "bin": {
-    "openspec": "bin/openspec.js"
+    "opsx": "bin/opsx.js"
   },
   "scripts": {
     "postinstall": "node scripts/postinstall.js",
@@ -37,12 +37,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xenonbyte/openspec.git"
+    "url": "git+https://github.com/xenonbyte/opsx.git"
   },
   "bugs": {
-    "url": "https://github.com/xenonbyte/openspec/issues"
+    "url": "https://github.com/xenonbyte/opsx/issues"
   },
-  "homepage": "https://github.com/xenonbyte/openspec#readme",
+  "homepage": "https://github.com/xenonbyte/opsx#readme",
   "engines": {
     "node": ">=14.14.0"
   },

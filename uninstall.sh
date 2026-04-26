@@ -1,4 +1,4 @@
 #!/bin/bash
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-node "$SCRIPT_DIR/bin/openspec.js" uninstall "$@"
+node "$SCRIPT_DIR/bin/opsx.js" uninstall "$@"
