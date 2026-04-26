@@ -15,7 +15,7 @@ Use these when the active workflow action is explicit.
 ## propose
 
 - Create a change name.
-- Create `.openspec.yaml`.
+- Create `change.yaml`.
 - Generate proposal, specs, design, and tasks.
 - Hand off to `apply`.
 
@@ -67,7 +67,7 @@ Use these when the active workflow action is explicit.
 
 ## sync
 
-- Merge delta specs into `openspec/specs/`.
+- Merge delta specs into `.opsx/specs/`.
 - Preserve unrelated content.
 - Report conflicts.
 

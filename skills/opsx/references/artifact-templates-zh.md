@@ -1,6 +1,6 @@
 # 工件模板
 
-在读取 `openspec/config.yaml` 并解析对应工件 `rules` 之后，按本文件编写工件。
+在读取 `.opsx/config.yaml` 并解析对应工件 `rules` 之后，按本文件编写工件。
 
 ## proposal.md
 

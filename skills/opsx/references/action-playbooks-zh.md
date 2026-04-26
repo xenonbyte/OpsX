@@ -15,7 +15,7 @@
 ## propose
 
 - 生成 change 名称。
-- 创建 `.openspec.yaml`。
+- 创建 `change.yaml`。
 - 一次生成 proposal、specs、design、tasks。
 - 完成后交接到 `apply`。
 
@@ -67,7 +67,7 @@
 
 ## sync
 
-- 将 delta specs 合并进 `openspec/specs/`。
+- 将 delta specs 合并进 `.opsx/specs/`。
 - 保留无关内容不变。
 - 输出冲突点。
 

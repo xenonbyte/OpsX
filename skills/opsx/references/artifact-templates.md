@@ -1,6 +1,6 @@
 # Artifact Templates
 
-Apply these rules after resolving project context and per-artifact rules from `openspec/config.yaml`.
+Apply these rules after resolving project context and per-artifact rules from `.opsx/config.yaml`.
 
 ## proposal.md
 

@@ -1,18 +1,18 @@
 ---
-name: openspec
-description: Run OpenSpec spec-driven development without the OpenSpec CLI by creating and maintaining `openspec/changes/*` artifacts, implementing tasks, verifying against requirements, syncing deltas, and archiving changes. Use when users ask for `/openspec`, `/opsx:*`, Codex `/prompts:openspec`, Codex `/prompts:opsx-*`, or explicit `$openspec` workflow help.
+name: opsx
+description: Run OpsX spec-driven development without the OpsX CLI by creating and maintaining `.opsx/changes/*` artifacts, implementing tasks, verifying against requirements, syncing deltas, and archiving changes. Use when users ask for `/opsx-*`, explicit `$opsx-*` actions, or Codex `$opsx <request>` workflow help.
 ---
 
-# OpenSpec Workflow
+# OpsX Workflow
 
-Use OpenSpec as a schema-driven workflow system. Keep one change per folder and keep artifacts aligned.
+Use OpsX as a schema-driven workflow system. Keep one change per folder and keep artifacts aligned.
 
 ## Resolve Config
 
 Read config in this order before replying:
-1. `openspec/changes/<name>/.openspec.yaml` when a specific change is active
-2. `openspec/config.yaml` if present
-3. `~/.openspec/.opsx-config.yaml`
+1. `.opsx/changes/<name>/change.yaml` when a specific change is active
+2. `.opsx/config.yaml` if present
+3. `~/.opsx/config.yaml`
 
 Use the resolved config for:
 - `schema`
@@ -26,29 +26,33 @@ Keep file paths, artifact names, and command tokens in English.
 
 ## Invocation Model
 
-Canonical workflow names are `openspec` and `opsx`.
+Canonical workflow name is `opsx`.
 
-- Claude/Gemini preferred: `/openspec <request>` and `/opsx:*`
-- Codex preferred: `$openspec <request>`
-- Codex explicit routes: `/prompts:openspec` and `/prompts:opsx-*`
+- Claude/Gemini preferred: `/opsx-*`
+- Codex preferred: `$opsx <request>`
+- Codex explicit routes: `$opsx-*`
 
-On Codex, treat `/prompts:*` as routing commands, not a reliable inline-argument transport.
+On Codex, treat explicit action routes as command selection hints, not a reliable inline-argument transport.
 
 ## Work Directly On Files
 
-Operate without the OpenSpec CLI. Use the repository files under `openspec/`.
+Operate without the OpsX CLI. Use the repository files under `.opsx/`.
 
 Typical structure:
 
 ```text
-openspec/
+.opsx/
 ├── config.yaml
+├── active.yaml
 ├── changes/
 │   └── <change-name>/
-│       ├── .openspec.yaml
+│       ├── change.yaml
 │       ├── proposal.md
 │       ├── specs/<capability>/spec.md
 │       ├── design.md
+│       ├── state.yaml
+│       ├── context.md
+│       ├── drift.md
 │       └── tasks.md
 └── specs/
 ```
@@ -100,7 +104,7 @@ If `language: en`:
 
 1. Identify the active change name.
 2. Inspect artifact presence and dependency readiness from the active schema.
-3. Apply project context, per-artifact rules, and `securityReview` policy from `openspec/config.yaml`.
+3. Apply project context, per-artifact rules, and `securityReview` policy from `.opsx/config.yaml`.
 4. Read dependency artifacts before writing a new artifact.
 5. Run `spec checkpoint` before entering `tasks`, and `task checkpoint` before entering `apply`.
 6. During `apply`, run `execution checkpoint` after each top-level task group.
