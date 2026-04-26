@@ -1,0 +1,15 @@
+{
+  "project": {
+    "code": "OPSX",
+    "title": "OpsX"
+  },
+  "workflow": {
+    "research": true,
+    "text_mode": true
+  },
+  "milestone": {
+    "version": "v3.0",
+    "name": "OpsX migration and state-machine workflow",
+    "phase_numbering": "reset"
+  }
+}

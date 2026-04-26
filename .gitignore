@@ -36,3 +36,7 @@ coverage/
 !openspec/
 !openspec/changes/
 !openspec/changes/**
+
+# Keep GSD planning artifacts trackable even if globally ignored.
+!.planning/
+!.planning/**

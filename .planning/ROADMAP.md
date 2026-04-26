@@ -1,0 +1,140 @@
+# Roadmap: OpsX v3.0 Migration and State-Machine Workflow
+
+**Created:** 2026-04-27
+**Milestone:** v3.0 OpsX migration and state-machine workflow
+**Phase numbering:** Reset to Phase 1 because this repository had no existing `.planning/ROADMAP.md`.
+
+## Overview
+
+This roadmap turns the current OpenSpec `2.0.1` repository into OpsX `3.0.0`. It follows the user's recommended implementation split: first make naming and paths unambiguous, then rewrite command/skill surfaces, then add recoverable workflow state, spec review, TDD-light, and final quality gates.
+
+| Phase | Name | Goal | Requirements |
+|-------|------|------|--------------|
+| 1 | OpsX Naming and CLI Surface | Rename package, binary, constants, docs, and release metadata to OpsX | NAME-01, NAME-02, NAME-03, NAME-04, NAME-05 |
+| 2 | `.opsx/` Workspace and Migration | Move project/global workflow state to OpsX paths with a safe migration command | DIR-01, DIR-02, DIR-03, DIR-04, DIR-05, DIR-06, DIR-07 |
+| 3 | Skill and Command Surface Rewrite | Make `/opsx-*`, `$opsx-*`, and `skills/opsx` the public workflow surface | CMD-01, CMD-02, CMD-03, CMD-04, CMD-05 |
+| 4 | Change State Machine and Drift Control | Add durable per-change state, context capsules, drift ledger, hashes, and one-group apply flow | STATE-01, STATE-02, STATE-03, STATE-04, STATE-05, STATE-06, STATE-07, STATE-08 |
+| 5 | Spec-Split Checkpoint | Review split specs before design for coverage, duplication, conflict, hidden requirements, and scope drift | SPEC-01, SPEC-02, SPEC-03, SPEC-04 |
+| 6 | TDD-Light Workflow | Add RED/GREEN/REFACTOR/VERIFY task planning and checkpoint enforcement | TDD-01, TDD-02, TDD-03, TDD-04 |
+| 7 | Verify, Sync, Archive, and Batch Gates | Enforce implementation quality gates and independent multi-change orchestration | QUAL-01, QUAL-02, QUAL-03, QUAL-04 |
+| 8 | Stability, JSON, and Release Coverage | Harden path/glob/JSON behavior and cover the v3.0 migration with tests | QUAL-05, QUAL-06, TEST-01, TEST-02, TEST-03, TEST-04 |
+
+## Phase Details
+
+### Phase 1: OpsX Naming and CLI Surface
+
+**Goal:** Make the package identity, CLI binary, runtime constants, docs, and release metadata consistently OpsX.
+
+**Requirements:** NAME-01, NAME-02, NAME-03, NAME-04, NAME-05
+
+**Success criteria:**
+1. `package.json` uses `@xenonbyte/opsx`, binary `opsx`, repository `xenonbyte/opsx`, and version `3.0.0`.
+2. `bin/opsx.js` works for `--help`, `--version`, and existing non-migration CLI actions.
+3. README, README-zh, CHANGELOG, docs, scripts, and templates use OpsX naming except for explicit migration/history notes.
+4. `rg "OpenSpec|openspec|\\.openspec|\\$openspec|/openspec|/prompts:openspec|@xenonbyte/openspec|~/.openspec"` returns only accepted migration/history references.
+
+### Phase 2: `.opsx/` Workspace and Migration
+
+**Goal:** Make `.opsx/` and `~/.opsx/` the canonical workflow directories and provide safe migration from the old layout.
+
+**Requirements:** DIR-01, DIR-02, DIR-03, DIR-04, DIR-05, DIR-06, DIR-07
+
+**Success criteria:**
+1. Runtime constants use `.opsx`, `~/.opsx`, and `config.yaml`.
+2. `opsx migrate --dry-run` prints the old-to-new mapping without modifying the repository.
+3. `opsx migrate` moves `openspec/config.yaml`, `changes`, `specs`, `archive`, and `.openspec.yaml` metadata into the `.opsx/` layout.
+4. Migration creates missing `active.yaml`, `state.yaml`, `context.md`, and `drift.md` defaults without overwriting existing `.opsx/` content by default.
+5. Documentation explains tracked versus ignored `.opsx/` paths.
+
+### Phase 3: Skill and Command Surface Rewrite
+
+**Goal:** Rewrite all generated commands, prompts, and skill metadata so the user-facing workflow is `/opsx-*`, `$opsx-*`, and `skills/opsx`.
+
+**Requirements:** CMD-01, CMD-02, CMD-03, CMD-04, CMD-05
+
+**Success criteria:**
+1. `skills/opsx/SKILL.md` has `name: opsx` and describes `.opsx/changes/*`.
+2. Claude command generation produces `/opsx-*` hyphen routes for every supported action.
+3. Codex command generation produces `$opsx-*` as public primary routes and stops presenting `/prompts:*` as the main UX.
+4. Command prompts read `.opsx/config.yaml`, `.opsx/active.yaml`, and active change `state.yaml` before acting.
+5. Status/onboard/resume commands handle an empty project or missing active change gracefully.
+
+### Phase 4: Change State Machine and Drift Control
+
+**Goal:** Persist workflow progress per change so commands can resume from disk after context compaction or a fresh agent session.
+
+**Requirements:** STATE-01, STATE-02, STATE-03, STATE-04, STATE-05, STATE-06, STATE-07, STATE-08
+
+**Success criteria:**
+1. New modules store/load active change state, validate transitions, compute artifact hashes, update context capsules, and record verification events.
+2. `opsx-new` creates the complete change skeleton and updates `.opsx/active.yaml`.
+3. `opsx-propose`, `opsx-ff`, `opsx-continue`, `opsx-apply`, `opsx-status`, and `opsx-resume` update or read `state.yaml` consistently.
+4. Artifact hash drift causes a visible warning and reload from disk before any further action.
+5. `opsx-apply` completes one top-level task group per default run and updates `context.md`, `drift.md`, and `verificationLog`.
+
+### Phase 5: Spec-Split Checkpoint
+
+**Goal:** Catch split-spec errors before design and task artifacts depend on them.
+
+**Requirements:** SPEC-01, SPEC-02, SPEC-03, SPEC-04
+
+**Success criteria:**
+1. `schemas/spec-driven/schema.json` includes `spec-split-checkpoint` after specs and before design.
+2. Spec validator detects duplicate requirement IDs, likely duplicate behavior, conflicting language, missing scenarios, empty specs, proposal coverage gaps, scope expansion, and fenced-code hidden requirements.
+3. Multi-spec or higher-risk changes can use read-only reviewer behavior without creating extra review artifacts.
+4. Checkpoint findings update existing proposal/spec/design/task artifacts rather than producing standalone review files.
+
+### Phase 6: TDD-Light Workflow
+
+**Goal:** Make behavior-change tasks include explicit RED/GREEN/REFACTOR/VERIFY planning without imposing strict TDD on every change.
+
+**Requirements:** TDD-01, TDD-02, TDD-03, TDD-04
+
+**Success criteria:**
+1. `.opsx/config.yaml` supports `rules.tdd.mode` and requirement/exemption lists.
+2. Task templates and skill references include Test Plan and RED/GREEN/REFACTOR/VERIFY examples.
+3. `task-checkpoint` warns in light mode and blocks in strict mode for missing test or verification structure.
+4. Execution checkpoints record command/result, diff summary, and drift after each top-level group.
+
+### Phase 7: Verify, Sync, Archive, and Batch Gates
+
+**Goal:** Prevent incomplete or drifted changes from being marked done or archived.
+
+**Requirements:** QUAL-01, QUAL-02, QUAL-03, QUAL-04
+
+**Success criteria:**
+1. `opsx-verify` compares proposal, specs, design, tasks, code diff, tests, TDD records, execution checkpoints, drift, and allowed/forbidden paths.
+2. `opsx-sync` merges change specs into `.opsx/specs/**` and detects omitted or conflicting requirements.
+3. `opsx-archive` refuses unverified, unsynced, incomplete, or unresolved-drift changes.
+4. Batch apply and bulk archive process each change with isolated state/context and report skipped changes with reasons.
+
+### Phase 8: Stability, JSON, and Release Coverage
+
+**Goal:** Harden edge cases and make the v3.0 release testable before publication.
+
+**Requirements:** QUAL-05, QUAL-06, TEST-01, TEST-02, TEST-03, TEST-04
+
+**Success criteria:**
+1. Path utilities canonicalize artifact paths and escape glob-special paths.
+2. Glob artifact output parsing works for generated artifact sets.
+3. `opsx status --json` emits parseable JSON on stdout with progress or diagnostics kept out of stdout.
+4. Test scripts cover metadata, command generation, migration, state machine, TDD checkpointing, spec review, path guards, archive blocking, and status JSON.
+5. Final verification runs the expanded test suite, CLI help/version/check/doc/status smoke tests, and package dry-run.
+
+## Dependency Notes
+
+- Phase 2 depends on Phase 1 constants and CLI identity.
+- Phase 3 depends on Phase 1 naming and Phase 2 path conventions.
+- Phase 4 depends on Phase 2 workspace layout and Phase 3 command preflight text.
+- Phase 5 and Phase 6 depend on Phase 4 state/checkpoint recording.
+- Phase 7 depends on state, drift, TDD records, and spec review outputs.
+- Phase 8 depends on all prior phases and is the release hardening pass.
+
+## Coverage
+
+- v3.0 requirements: 43 total
+- Mapped to phases: 43
+- Unmapped: 0
+
+---
+*Roadmap created: 2026-04-27*
