@@ -99,7 +99,7 @@
 |-------------|-------|--------|
 | NAME-01 | Phase 1 | Pending |
 | NAME-02 | Phase 1 | Pending |
-| NAME-03 | Phase 1 | Pending |
+| NAME-03 | Phase 1 | Completed |
 | NAME-04 | Phase 1 | Pending |
 | NAME-05 | Phase 1 | Pending |
 | DIR-01 | Phase 2 | Pending |
