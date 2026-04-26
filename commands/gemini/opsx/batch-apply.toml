@@ -8,7 +8,7 @@ description: Apply multiple ready changes in a controlled sequence.
 Use the `opsx` skill for this request.
 
 Workflow action: `batch-apply`
-Primary workflow entry: `$opsx <request>`
+Primary workflow entry: `/opsx-<action>`
 Explicit action route: `/opsx-batch-apply`
 
 Execution rules:

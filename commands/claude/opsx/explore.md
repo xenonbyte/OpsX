@@ -6,7 +6,7 @@ description: Investigate ideas, constraints, and tradeoffs before committing to 
 Use the `opsx` skill for this request.
 
 Workflow action: `explore`
-Primary workflow entry: `$opsx <request>`
+Primary workflow entry: `/opsx-<action>`
 Explicit action route: `/opsx-explore`
 
 Execution rules:

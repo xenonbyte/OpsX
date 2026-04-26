@@ -8,7 +8,7 @@ description: Generate all planning artifacts in dependency order.
 Use the `opsx` skill for this request.
 
 Workflow action: `ff`
-Primary workflow entry: `$opsx <request>`
+Primary workflow entry: `/opsx-<action>`
 Explicit action route: `/opsx-ff`
 
 Execution rules:

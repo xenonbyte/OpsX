@@ -8,7 +8,7 @@ description: Merge delta specs from a change into the main spec set.
 Use the `opsx` skill for this request.
 
 Workflow action: `sync`
-Primary workflow entry: `$opsx <request>`
+Primary workflow entry: `/opsx-<action>`
 Explicit action route: `/opsx-sync`
 
 Execution rules:

@@ -6,7 +6,7 @@ description: Create an empty change container and metadata.
 Use the `opsx` skill for this request.
 
 Workflow action: `new`
-Primary workflow entry: `$opsx <request>`
+Primary workflow entry: `/opsx-<action>`
 Explicit action route: `/opsx-new`
 
 Execution rules:

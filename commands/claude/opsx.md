@@ -6,7 +6,7 @@ description: OpsX workflow command index for Claude
 Use the `opsx` skill for this request.
 
 Platform: Claude
-Primary workflow entry: `$opsx <request>`
+Primary workflow entry: `/opsx-<action>`
 
 Available routes:
 - `/opsx-propose` - Create a change and generate planning artifacts in one step.

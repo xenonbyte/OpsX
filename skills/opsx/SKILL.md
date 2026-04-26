@@ -9,7 +9,7 @@ Use OpsX as a schema-driven workflow system. Keep one change per folder and keep
 
 ## Resolve Config
 
-Read config in this order before replying:
+Read config in this target order before replying:
 1. `.opsx/changes/<name>/change.yaml` when a specific change is active
 2. `.opsx/config.yaml` if present
 3. `~/.opsx/config.yaml`
@@ -37,6 +37,9 @@ On Codex, treat explicit action routes as command selection hints, not a reliabl
 ## Work Directly On Files
 
 Operate without the OpsX CLI. Use the repository files under `.opsx/`.
+This skill describes the target OpsX workspace layout; Phase 1 package builds
+may still rely on deferred runtime path migration until `opsx migrate` is
+implemented in Phase 2.
 
 Typical structure:
 

@@ -8,7 +8,7 @@ description: Create the next ready artifact based on dependencies.
 Use the `opsx` skill for this request.
 
 Workflow action: `continue`
-Primary workflow entry: `$opsx <request>`
+Primary workflow entry: `/opsx-<action>`
 Explicit action route: `/opsx-continue`
 
 Execution rules:

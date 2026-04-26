@@ -803,8 +803,12 @@ function runTests() {
       gemini: buildPlatformBundle('gemini')
     };
     assert(generatedBundles.claude['opsx.md'].includes('OpsX'));
+    assert(generatedBundles.claude['opsx.md'].includes('Primary workflow entry: `/opsx-<action>`'));
+    assert(!generatedBundles.claude['opsx.md'].includes('Primary workflow entry: `$opsx <request>`'));
     assert(generatedBundles.codex['prompts/opsx.md'].includes('$opsx <request>'));
     assert(generatedBundles.gemini['opsx.toml'].includes('OpsX Workflow'));
+    assert(generatedBundles.gemini['opsx.toml'].includes('Primary workflow entry: `/opsx-<action>`'));
+    assert(!generatedBundles.gemini['opsx.toml'].includes('Primary workflow entry: `$opsx <request>`'));
     Object.entries(generatedBundles).forEach(([platform, bundle]) => {
       Object.keys(bundle).forEach((relativePath) => {
         assert(!relativePath.includes('openspec'), `${platform} bundle contains legacy path: ${relativePath}`);
@@ -866,6 +870,9 @@ function runTests() {
 
     install({ platform: 'claude,codex,gemini', homeDir: tempHome, language: 'en' });
     uninstall({ platform: 'gemini', homeDir: tempHome });
+
+    assert(fs.existsSync(path.join(tempHome, '.openspec', 'skills', 'opsx', 'SKILL.md')));
+    assert(fs.existsSync(path.join(tempHome, '.openspec', 'commands', 'opsx.md')));
 
     const checkOutput = runCheck({ homeDir: tempHome, cwd: fixtureRoot });
     assert(checkOutput.includes('Found 2 manifest(s)'));

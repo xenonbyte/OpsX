@@ -49,7 +49,9 @@ $opsx-status
 
 ## Project Config
 
-Project-level workflow defaults live in `.opsx/config.yaml`.
+OpsX's target project-level workflow defaults live in `.opsx/config.yaml`.
+Phase 1 renames the public package, CLI, skill, and command surface first; the
+workspace path migration is completed by `opsx migrate` in Phase 2.
 
 Precedence:
 - change metadata

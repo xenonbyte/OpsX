@@ -8,7 +8,7 @@ description: Walk a user through the minimum OpsX workflow path.
 Use the `opsx` skill for this request.
 
 Workflow action: `onboard`
-Primary workflow entry: `$opsx <request>`
+Primary workflow entry: `/opsx-<action>`
 Explicit action route: `/opsx-onboard`
 
 Execution rules:

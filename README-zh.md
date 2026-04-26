@@ -49,7 +49,8 @@ $opsx-status
 
 ## 项目配置
 
-项目级工作流默认配置位于 `.opsx/config.yaml`。
+OpsX 的目标项目级工作流默认配置位于 `.opsx/config.yaml`。
+Phase 1 先统一公开包名、CLI、skill 和命令入口；工作目录迁移由 Phase 2 的 `opsx migrate` 完成。
 
 优先级：
 - change metadata

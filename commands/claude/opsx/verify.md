@@ -6,7 +6,7 @@ description: Check completeness, correctness, and coherence against artifacts.
 Use the `opsx` skill for this request.
 
 Workflow action: `verify`
-Primary workflow entry: `$opsx <request>`
+Primary workflow entry: `/opsx-<action>`
 Explicit action route: `/opsx-verify`
 
 Execution rules:

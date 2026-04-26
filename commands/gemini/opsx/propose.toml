@@ -8,7 +8,7 @@ description: Create a change and generate planning artifacts in one step.
 Use the `opsx` skill for this request.
 
 Workflow action: `propose`
-Primary workflow entry: `$opsx <request>`
+Primary workflow entry: `/opsx-<action>`
 Explicit action route: `/opsx-propose`
 
 Execution rules:

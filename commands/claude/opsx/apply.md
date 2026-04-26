@@ -6,7 +6,7 @@ description: Implement tasks from a change and update task state.
 Use the `opsx` skill for this request.
 
 Workflow action: `apply`
-Primary workflow entry: `$opsx <request>`
+Primary workflow entry: `/opsx-<action>`
 Explicit action route: `/opsx-apply`
 
 Execution rules:
