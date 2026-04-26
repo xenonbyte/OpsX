@@ -10,7 +10,7 @@
 - [x] **NAME-01**: User can install the breaking release as `@xenonbyte/opsx`.
 - [x] **NAME-02**: User can invoke the CLI as `opsx` with `--help`, `--version`, `install`, `uninstall`, `check`, `doc`, `language`, `migrate`, and `status`.
 - [x] **NAME-03**: User-facing docs, package metadata, templates, generated command text, and runtime messages consistently use `OpsX`, `opsx`, and `@xenonbyte/opsx`.
-- [ ] **NAME-04**: Historical OpenSpec references remain only where they explain source lineage, migration, or changelog history.
+- [x] **NAME-04**: Historical OpenSpec references remain only where they explain source lineage, migration, or changelog history.
 - [ ] **NAME-05**: Release metadata clearly communicates `3.0.0` as a breaking OpsX rename and workflow-state upgrade.
 
 ### Workspace and Migration
@@ -100,7 +100,7 @@
 | NAME-01 | Phase 1 | Pending |
 | NAME-02 | Phase 1 | Pending |
 | NAME-03 | Phase 1 | Completed |
-| NAME-04 | Phase 1 | Pending |
+| NAME-04 | Phase 1 | Completed |
 | NAME-05 | Phase 1 | Pending |
 | DIR-01 | Phase 2 | Pending |
 | DIR-02 | Phase 2 | Pending |
