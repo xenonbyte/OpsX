@@ -1,17 +1,18 @@
 ---
 description: Generate all planning artifacts in dependency order.
 ---
-# OpenSpec route: Fast-forward
+# OpsX route: Fast-forward
 
-Use the `openspec` skill for this request.
+Use the `opsx` skill for this request.
 
 Workflow action: `ff`
-Primary workflow entry: `/openspec <request>`
-Explicit action route: `/opsx:ff`
+Primary workflow entry: `$opsx <request>`
+Explicit action route: `/opsx-ff`
 
 Execution rules:
-- Follow the `ff` playbook from the `openspec` skill and its referenced files.
-- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Follow the `ff` playbook from the `opsx` skill and its referenced files.
+- CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
+- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
 - Use request details already present in the conversation.
 - Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.
@@ -22,4 +23,3 @@ Execution rules:
 - If the required change name, description, or selection is missing, ask for the minimum clarification needed.
 - Keep fast-forward output limited to planning artifacts.
 - When files are mutated, report changed files, current state, next step, and blockers.
-

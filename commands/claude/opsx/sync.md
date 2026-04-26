@@ -1,17 +1,18 @@
 ---
 description: Merge delta specs from a change into the main spec set.
 ---
-# OpenSpec route: Sync
+# OpsX route: Sync
 
-Use the `openspec` skill for this request.
+Use the `opsx` skill for this request.
 
 Workflow action: `sync`
-Primary workflow entry: `/openspec <request>`
-Explicit action route: `/opsx:sync`
+Primary workflow entry: `$opsx <request>`
+Explicit action route: `/opsx-sync`
 
 Execution rules:
-- Follow the `sync` playbook from the `openspec` skill and its referenced files.
-- Read `openspec/config.yaml` if present, then `~/.openspec/.opsx-config.yaml`.
+- Follow the `sync` playbook from the `opsx` skill and its referenced files.
+- CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
+- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
 - Use request details already present in the conversation.
 - Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.
@@ -22,4 +23,3 @@ Execution rules:
 - If the required change name, description, or selection is missing, ask for the minimum clarification needed.
 - Merge only the requested delta specs and report conflicts explicitly.
 - When files are mutated, report changed files, current state, next step, and blockers.
-

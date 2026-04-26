@@ -1,34 +1,34 @@
 ---
-description: OpenSpec workflow command index for Claude
+description: OpsX workflow command index for Claude
 ---
-# OpenSpec Workflow
+# OpsX Workflow
 
-Use the `openspec` skill for this request.
+Use the `opsx` skill for this request.
 
 Platform: Claude
-Primary workflow entry: `/openspec <request>`
+Primary workflow entry: `$opsx <request>`
 
 Available routes:
-- `/opsx:propose` - Create a change and generate planning artifacts in one step.
-- `/opsx:explore` - Investigate ideas, constraints, and tradeoffs before committing to a change.
-- `/opsx:apply` - Implement tasks from a change and update task state.
-- `/opsx:archive` - Archive a completed change and sync specs if needed.
-- `/opsx:new` - Create an empty change container and metadata.
-- `/opsx:continue` - Create the next ready artifact based on dependencies.
-- `/opsx:ff` - Generate all planning artifacts in dependency order.
-- `/opsx:verify` - Check completeness, correctness, and coherence against artifacts.
-- `/opsx:sync` - Merge delta specs from a change into the main spec set.
-- `/opsx:bulk-archive` - Archive multiple completed changes together.
-- `/opsx:batch-apply` - Apply multiple ready changes in a controlled sequence.
-- `/opsx:resume` - Restore context around active changes and recommend the next move.
-- `/opsx:status` - Show change progress, readiness, and blockers.
-- `/opsx:onboard` - Walk a user through the minimum OpenSpec workflow path.
+- `/opsx-propose` - Create a change and generate planning artifacts in one step.
+- `/opsx-explore` - Investigate ideas, constraints, and tradeoffs before committing to a change.
+- `/opsx-apply` - Implement tasks from a change and update task state.
+- `/opsx-archive` - Archive a completed change and sync specs if needed.
+- `/opsx-new` - Create an empty change container and metadata.
+- `/opsx-continue` - Create the next ready artifact based on dependencies.
+- `/opsx-ff` - Generate all planning artifacts in dependency order.
+- `/opsx-verify` - Check completeness, correctness, and coherence against artifacts.
+- `/opsx-sync` - Merge delta specs from a change into the main spec set.
+- `/opsx-bulk-archive` - Archive multiple completed changes together.
+- `/opsx-batch-apply` - Apply multiple ready changes in a controlled sequence.
+- `/opsx-resume` - Restore context around active changes and recommend the next move.
+- `/opsx-status` - Show change progress, readiness, and blockers.
+- `/opsx-onboard` - Walk a user through the minimum OpsX workflow path.
 
 Notes:
-- `openspec/config.yaml` controls schema, language, context, and rules.
+- CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
 - `Inline command arguments are acceptable, but the workflow should still confirm missing or ambiguous details.`
+- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
 - Security-review states: `required`, `recommended`, `waived`, `completed`
 - Checkpoints: `spec checkpoint` before `tasks`, `task checkpoint` before `apply`, and `execution checkpoint` after each top-level task group.
 - Checkpoint outcomes: `PASS`, `WARN`, `BLOCK`
 - Keep workflow semantics shared across Claude, Codex, and Gemini.
-

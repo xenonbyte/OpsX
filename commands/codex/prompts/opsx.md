@@ -1,34 +1,34 @@
 ---
-description: OpenSpec workflow command index for Codex
+description: OpsX entrypoint for Codex. Prefer the opsx skill for natural-language workflow requests.
 ---
-# OpenSpec Workflow
+# OpsX
 
-Use the `openspec` skill for this request.
+Use the `opsx` skill for this request.
 
-Platform: Codex
-Primary workflow entry: `$openspec <request>`
+Codex usage model:
+- Preferred: `$opsx <request>`
+- Explicit routing: `$opsx-*`
 
 Available routes:
-- `/prompts:opsx-propose` - Create a change and generate planning artifacts in one step.
-- `/prompts:opsx-explore` - Investigate ideas, constraints, and tradeoffs before committing to a change.
-- `/prompts:opsx-apply` - Implement tasks from a change and update task state.
-- `/prompts:opsx-archive` - Archive a completed change and sync specs if needed.
-- `/prompts:opsx-new` - Create an empty change container and metadata.
-- `/prompts:opsx-continue` - Create the next ready artifact based on dependencies.
-- `/prompts:opsx-ff` - Generate all planning artifacts in dependency order.
-- `/prompts:opsx-verify` - Check completeness, correctness, and coherence against artifacts.
-- `/prompts:opsx-sync` - Merge delta specs from a change into the main spec set.
-- `/prompts:opsx-bulk-archive` - Archive multiple completed changes together.
-- `/prompts:opsx-batch-apply` - Apply multiple ready changes in a controlled sequence.
-- `/prompts:opsx-resume` - Restore context around active changes and recommend the next move.
-- `/prompts:opsx-status` - Show change progress, readiness, and blockers.
-- `/prompts:opsx-onboard` - Walk a user through the minimum OpenSpec workflow path.
+- `$opsx-propose` - Create a change and generate planning artifacts in one step.
+- `$opsx-explore` - Investigate ideas, constraints, and tradeoffs before committing to a change.
+- `$opsx-apply` - Implement tasks from a change and update task state.
+- `$opsx-archive` - Archive a completed change and sync specs if needed.
+- `$opsx-new` - Create an empty change container and metadata.
+- `$opsx-continue` - Create the next ready artifact based on dependencies.
+- `$opsx-ff` - Generate all planning artifacts in dependency order.
+- `$opsx-verify` - Check completeness, correctness, and coherence against artifacts.
+- `$opsx-sync` - Merge delta specs from a change into the main spec set.
+- `$opsx-bulk-archive` - Archive multiple completed changes together.
+- `$opsx-batch-apply` - Apply multiple ready changes in a controlled sequence.
+- `$opsx-resume` - Restore context around active changes and recommend the next move.
+- `$opsx-status` - Show change progress, readiness, and blockers.
+- `$opsx-onboard` - Walk a user through the minimum OpsX workflow path.
 
-Notes:
-- `openspec/config.yaml` controls schema, language, context, and rules.
-- `Treat `/prompts:*` as action selectors in Codex. If details are still needed, provide them in the next message.`
+Important:
+- Treat `$opsx-*` as action selectors in Codex.
+- If details are still needed after command selection, provide them in the next message.
+- CLI quick checks: `opsx check`, `opsx doc`, `opsx language <en|zh>`.
+- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
 - Security-review states: `required`, `recommended`, `waived`, `completed`
 - Checkpoints: `spec checkpoint` before `tasks`, `task checkpoint` before `apply`, and `execution checkpoint` after each top-level task group.
-- Checkpoint outcomes: `PASS`, `WARN`, `BLOCK`
-- Keep workflow semantics shared across Claude, Codex, and Gemini.
-
