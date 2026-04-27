@@ -12,7 +12,7 @@
 - 2026-04-27 [CODE] Revised Phase 1 plans so `opsx check|doc|language` are the primary CLI surface and the over-wide plans are now split into `01-02` skill/plumbing, `01-03` generator/assets, `01-04` runtime regressions, `01-05` docs/templates, and `01-06` changelog/allowlist gates.
 - 2026-04-27 [CODE] Finalized Phase 1 plan checker issues by grouping `01-03` command asset file scope and adding `lib/config.js`, `lib/constants.js`, `lib/install.js`, and `lib/runtime-guidance.js` to the explicit `01-06` deferred-runtime allowlist contract.
 - 2026-04-27 [CODE] Executed Phase 1 across 6 plans, fixed code-review findings, normalized SUMMARY filenames, and verified 5/5 Phase 1 requirements.
-- 2026-04-27 [CODE] Re-ran Phase 1 code review after fixing the `skills/opsx/**` classification issue; latest review now reports 2 install/uninstall warnings and 1 docs info item.
+- 2026-04-27 [CODE] Re-ran Phase 1 code review after fixing the `skills/opsx/**` classification issue, then fixed both remaining install/uninstall warnings; only the Info-level `opsx --language <en|zh>` docs consistency item remains unless `--all` is requested.
 - 2026-04-27 [CODE] Created `.planning/PROJECT.md` with OpsX v3.0 goals, validated OpenSpec context, active requirements, out-of-scope boundaries, constraints, and decisions.
 - 2026-04-27 [CODE] Created `.planning/REQUIREMENTS.md` with 43 mapped v3.0 requirements across naming, workspace migration, commands/skills, state machine, spec review, TDD-light, quality gates, and tests.
 - 2026-04-27 [CODE] Created `.planning/ROADMAP.md` with 8 phases mapped to all requirements.
@@ -56,5 +56,5 @@
 - 2026-04-27 [TOOL] Final `gsd-plan-checker` result for Phase 1 was `CHECKER PASS`.
 - 2026-04-27 [TOOL] `gsd-sdk query state.planned-phase --phase "1" --name "OpsX Naming and CLI Surface" --plans "6"` updated `.planning/STATE.md`.
 - 2026-04-27 [TOOL] Phase 1 verification report status is `passed`; runtime suite passed 23/23, legacy allowlist passed, and `npm pack --dry-run` produced `@xenonbyte/opsx@3.0.0`.
-- 2026-04-27 [TOOL] Latest Phase 1 code review report is `status: issues_found` with 0 critical, 2 warnings, and 1 info; warnings are manifest cleanup path trust and mixed invalid platform values, info is `opsx --language <en|zh>` docs consistency.
+- 2026-04-27 [TOOL] Latest Phase 1 `01-REVIEW-FIX.md` reports `status: all_fixed` for 2 in-scope warnings; commits `ed5513d` and `84034f7` fixed manifest cleanup path trust and mixed invalid platform values. `IN-01` remains skipped by default scope.
 - 2026-04-27 [CODE] Next executable step: `$gsd-discuss-phase 2` for Phase 2: `.opsx/` Workspace and Migration.
