@@ -8,8 +8,10 @@
 - 2026-04-27 [CODE] `AGENTS.md` preserves repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
 - 2026-04-27 [CODE] Phase 4 is planned and verified; next GSD action is `$gsd-execute-phase 4`.
 - 2026-04-27 [CODE] Phase 4 planning is complete; `04-01-PLAN.md` through `04-09-PLAN.md` now define Wave 0 validation, state persistence, transition routing, drift/apply services, and bounded generated refresh slices.
+- 2026-04-27 [CODE] Phase 4 Plan 02 is complete: `createChangeSkeleton()` now writes full new-change scaffolds, sets `.opsx/active.yaml`, and keeps `state.yaml` at `INIT`.
 
 ## Done (recent)
+- 2026-04-27 [CODE] Executed Phase 4 Plan 02 with atomic TDD commits (`6a9eb6e`, `e9d73aa`, `345dcce`, `499c130`) and green `npm run test:workflow-runtime` (39/39).
 - 2026-04-27 [CODE] Captured Phase 4 discussion decisions in `04-CONTEXT.md` and `04-DISCUSSION-LOG.md`.
 - 2026-04-27 [CODE] Wrote `04-RESEARCH.md` for Phase 4 with state-machine, YAML, drift, and test-planning guidance.
 - 2026-04-27 [CODE] Wrote Phase 4 plans `04-01-PLAN.md` through `04-09-PLAN.md` and updated `ROADMAP.md` with a 9-plan, 7-wave execution breakdown.
@@ -29,6 +31,8 @@
 - /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-CONTEXT.md
 - /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-RESEARCH.md
 - /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-DISCUSSION-LOG.md
+- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-02-PLAN.md
+- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-02-SUMMARY.md
 - /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-01-PLAN.md
 - /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-05-PLAN.md
 - /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-09-PLAN.md
@@ -53,6 +57,8 @@
 - 2026-04-27 [CODE] D015 ACTIVE: Phase 4 plans pin `yaml@2.8.3`, do not add `xstate`, and instead schedule a local transition-table module in `lib/change-state.js` to keep the implementation bounded and library-first.
 
 ## Receipts
+- 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 39/39 after `04-02` Task 2 GREEN.
+- 2026-04-27 [TOOL] `gsd-sdk query state.advance-plan` moved Phase 4 cursor from Plan 2 to Plan 3.
 - 2026-04-27 [TOOL] Committed Phase 4 context as `94ca803 docs(04): capture phase context`.
 - 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 31/31 while preparing Phase 4 research.
 - 2026-04-27 [TOOL] `gsd-sdk query init.plan-phase 04` confirmed `phase_dir=.planning/phases/04-change-state-machine-and-drift-control`, `commit_docs=true`, and no existing Phase 4 plans before planning.

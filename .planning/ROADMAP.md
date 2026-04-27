@@ -102,7 +102,7 @@ Plans:
 
 Plans:
 - [x] `04-01-PLAN.md` — Pin `yaml@2.8.3`, add the Phase 4 state-store contract, and lock Wave 0 tests for placeholder/sparse/drift semantics.
-- [ ] `04-02-PLAN.md` — Build the narrow `opsx-new` skeleton writer and active-change persistence without implying accepted planning state.
+- [x] `04-02-PLAN.md` — Build the narrow `opsx-new` skeleton writer and active-change persistence without implying accepted planning state.
 - [ ] `04-03-PLAN.md` — Add the strict local transition table plus read-only status/resume/continue selectors.
 - [ ] `04-04-PLAN.md` — Implement artifact hashing, bounded context/drift sidecars, and one-group apply persistence helpers.
 - [ ] `04-05-PLAN.md` — Update source-of-truth workflow/skill guidance for Phase 4 and stage a temporary source-output gate for generated refreshes.
