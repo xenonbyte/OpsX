@@ -22,7 +22,8 @@ Execution rules:
 - Route fallback guidance:
 - If `.opsx/config.yaml` is missing, stop and redirect to `$opsx-onboard`.
 - If `.opsx/active.yaml` is missing or points to a missing change, stop and ask the user to run `$opsx-new` or `$opsx-propose`.
-- Do not invent an active change, state file, or task state when required artifacts are absent.
+- Read persisted `stage` and route only to the next valid action without re-planning unrelated work.
+- When `stage === APPLYING_GROUP`, continue the persisted `active.taskGroup` via apply guidance.
 - Use request details already present in the conversation.
 - Do not assume text typed after a `$opsx-*` command is reliably available as an inline argument in Codex.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.

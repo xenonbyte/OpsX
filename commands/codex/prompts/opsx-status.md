@@ -23,7 +23,8 @@ Execution rules:
 - Workspace not initialized: `.opsx/config.yaml` is missing.
 - No active change is selected in `.opsx/active.yaml`.
 - Do not auto-create `.opsx/active.yaml` or change state from `status`.
-- Report whether the workspace exists and recommend the next concrete command.
+- Warn on artifact hash drift, reload from disk, and do not refresh stored hashes from read-only routes.
+- Report whether the workspace exists, include drift warnings, and recommend the next concrete command.
 - Use request details already present in the conversation.
 - Do not assume text typed after a `$opsx-*` command is reliably available as an inline argument in Codex.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.
