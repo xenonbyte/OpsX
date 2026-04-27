@@ -32,10 +32,24 @@ coverage/
 # Local npm cache artifacts
 .npm-cache/
 
-# Keep OpenSpec change artifacts trackable even if globally ignored.
-!openspec/
-!openspec/changes/
-!openspec/changes/**
+# Keep canonical OpsX workflow artifacts trackable.
+!.opsx/
+!.opsx/config.yaml
+!.opsx/active.yaml
+!.opsx/changes/
+!.opsx/changes/**
+!.opsx/specs/
+!.opsx/specs/**
+!.opsx/archive/
+!.opsx/archive/**
+
+# Ignore OpsX runtime scratch directories.
+.opsx/cache/
+.opsx/cache/**
+.opsx/tmp/
+.opsx/tmp/**
+.opsx/logs/
+.opsx/logs/**
 
 # Keep GSD planning artifacts trackable even if globally ignored.
 !.planning/

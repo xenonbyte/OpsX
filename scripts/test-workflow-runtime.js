@@ -143,6 +143,27 @@ function runOpsxCli(args, options = {}) {
   };
 }
 
+function runGitCheckIgnore(repoRoot, relativePath, options = {}) {
+  const args = ['-c', 'core.excludesFile=/dev/null', 'check-ignore'];
+  if (options.verbose !== false) {
+    args.push('-v');
+  }
+  args.push(relativePath);
+  const result = spawnSync(
+    'git',
+    args,
+    {
+      cwd: repoRoot,
+      encoding: 'utf8'
+    }
+  );
+  return {
+    status: result.status,
+    stdout: result.stdout || '',
+    stderr: result.stderr || ''
+  };
+}
+
 function runTests() {
   const tests = [];
   const fixtureRoot = createFixtureRepo();
@@ -924,6 +945,58 @@ function runTests() {
     assert(statusOutput.stdout.includes('Durable change-state lifecycle remains scheduled for Phase 4.'));
     assert(statusOutput.stdout.includes('Run `opsx migrate --dry-run` to preview migration.'));
     assert(!statusOutput.stdout.includes('Phase 1 status placeholder.'));
+  });
+
+  test('repository .gitignore tracks canonical .opsx artifacts and ignores runtime scratch paths', () => {
+    const gitFixture = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-gitignore-fixture-'));
+    cleanupTargets.push(gitFixture);
+
+    const initResult = spawnSync('git', ['init'], { cwd: gitFixture, encoding: 'utf8' });
+    assert.strictEqual(initResult.status, 0, initResult.stderr);
+
+    fs.copyFileSync(path.join(REPO_ROOT, '.gitignore'), path.join(gitFixture, '.gitignore'));
+    writeText(path.join(gitFixture, '.opsx', 'config.yaml'), 'schema: spec-driven\nlanguage: en\n');
+    writeText(path.join(gitFixture, '.opsx', 'active.yaml'), 'version: 1\nactiveChange: ""\n');
+    writeText(path.join(gitFixture, '.opsx', 'changes', 'demo', 'proposal.md'), '# Proposal\n');
+    writeText(path.join(gitFixture, '.opsx', 'specs', 'demo', 'spec.md'), '# Spec\n');
+    writeText(path.join(gitFixture, '.opsx', 'archive', 'demo.md'), '# Archive\n');
+    writeText(path.join(gitFixture, '.opsx', 'cache', 'demo.tmp'), 'cache\n');
+    writeText(path.join(gitFixture, '.opsx', 'tmp', 'demo.tmp'), 'tmp\n');
+    writeText(path.join(gitFixture, '.opsx', 'logs', 'demo.log'), 'logs\n');
+
+    [
+      { file: '.opsx/config.yaml', rule: '!.opsx/config.yaml' },
+      { file: '.opsx/active.yaml', rule: '!.opsx/active.yaml' },
+      { file: '.opsx/changes/demo/proposal.md', rule: '!.opsx/changes/**' },
+      { file: '.opsx/specs/demo/spec.md', rule: '!.opsx/specs/**' },
+      { file: '.opsx/archive/demo.md', rule: '!.opsx/archive/**' }
+    ].forEach(({ file, rule }) => {
+      const check = runGitCheckIgnore(gitFixture, file, { verbose: false });
+      assert.strictEqual(
+        check.status,
+        1,
+        `Expected ${file} to be trackable, got: ${check.stdout || check.stderr}`
+      );
+
+      const verboseCheck = runGitCheckIgnore(gitFixture, file);
+      assert(
+        verboseCheck.stdout.includes(rule),
+        `Expected ${file} to resolve to rule ${rule}, got: ${verboseCheck.stdout || verboseCheck.stderr}`
+      );
+    });
+
+    [
+      { file: '.opsx/cache/demo.tmp', rules: ['.opsx/cache/', '.opsx/cache/**'] },
+      { file: '.opsx/tmp/demo.tmp', rules: ['.opsx/tmp/', '.opsx/tmp/**'] },
+      { file: '.opsx/logs/demo.log', rules: ['.opsx/logs/', '.opsx/logs/**'] }
+    ].forEach(({ file, rules }) => {
+      const check = runGitCheckIgnore(gitFixture, file);
+      assert.strictEqual(check.status, 0, `Expected ${file} to be ignored, got: ${check.stderr || check.stdout}`);
+      assert(
+        rules.some((rule) => check.stdout.includes(rule)),
+        `Expected ${file} to be ignored by one of ${rules.join(', ')}, got: ${check.stdout || check.stderr}`
+      );
+    });
   });
 
   test('runtime suite locks renamed skill targets, generated bundles, and checked-in command entries', () => {
