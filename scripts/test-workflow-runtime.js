@@ -6,6 +6,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { createHash } = require('node:crypto');
+const YAML = require('yaml');
 const { copyDir, ensureDir, removePath, writeText } = require('../lib/fs-utils');
 const { REPO_ROOT, PACKAGE_VERSION } = require('../lib/constants');
 const {
@@ -470,6 +471,57 @@ function runTests() {
     const atomicPath = path.join(fixtureRoot, '.opsx', 'changes', 'atomic-write.txt');
     writeTextAtomic(atomicPath, 'phase4-atomic-write\n');
     assert.strictEqual(fs.readFileSync(atomicPath, 'utf8'), 'phase4-atomic-write\n');
+  });
+
+  test('createChangeSkeleton writes full new-change artifacts and keeps INIT lifecycle state', () => {
+    const { createChangeSkeleton } = require('../lib/workspace');
+    const { loadActiveChangePointer, loadChangeState } = require('../lib/change-store');
+    const changeName = 'skeleton-init-state';
+    const createdAt = '2026-04-27T00:00:00.000Z';
+    const changeDir = path.join(fixtureRoot, '.opsx', 'changes', changeName);
+    const filesToAssert = [
+      'change.yaml',
+      'proposal.md',
+      'design.md',
+      'tasks.md',
+      'specs/README.md',
+      'state.yaml',
+      'context.md',
+      'drift.md'
+    ];
+
+    createChangeSkeleton({
+      repoRoot: fixtureRoot,
+      changeName,
+      createdAt
+    });
+
+    filesToAssert.forEach((relativePath) => {
+      assert(fs.existsSync(path.join(changeDir, relativePath)), `Expected ${relativePath} to exist.`);
+    });
+    assert(fs.statSync(path.join(changeDir, 'specs')).isDirectory());
+
+    const changeMetadata = YAML.parse(fs.readFileSync(path.join(changeDir, 'change.yaml'), 'utf8'));
+    assert.deepStrictEqual(changeMetadata, {
+      name: changeName,
+      schema: 'spec-driven',
+      createdAt,
+      securitySensitive: false,
+      securityWaiver: {
+        approved: false,
+        reason: ''
+      }
+    });
+
+    const tasksText = fs.readFileSync(path.join(changeDir, 'tasks.md'), 'utf8');
+    assert(tasksText.includes('- [ ] 1.1 Replace placeholders with real task groups after planning checkpoints.'));
+
+    const activePointer = loadActiveChangePointer(fixtureRoot);
+    assert.strictEqual(activePointer.activeChange, changeName);
+
+    const state = loadChangeState(changeDir);
+    assert.strictEqual(state.stage, 'INIT');
+    assert.strictEqual(state.nextAction, 'Create proposal.md for this change.');
   });
 
   test('placeholder artifacts do not imply accepted planning stages', () => {
