@@ -29,7 +29,13 @@ Available routes:
 Notes:
 - CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
 - `Inline command arguments are acceptable, but the workflow should still confirm missing or ambiguous details.`
-- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
+- Preflight before acting:
+- Read `.opsx/config.yaml` if present to confirm schema, language, and workspace rules.
+- Read `.opsx/active.yaml` if present to locate the active change pointer.
+- When an active change exists, read `.opsx/changes/<active-change>/state.yaml` before acting.
+- When an active change exists, read `.opsx/changes/<active-change>/context.md` before acting.
+- When an active change exists, read current artifacts (`proposal.md`, `specs/`, `design.md`, optional `security-review.md`, and `tasks.md`) before mutating files.
+- If workspace files are missing, report missing paths and recommend the next explicit route instead of inventing state.
 - Security-review states: `required`, `recommended`, `waived`, `completed`
 - Checkpoints: `spec checkpoint` before `tasks`, `task checkpoint` before `apply`, and `execution checkpoint` after each top-level task group.
 - Checkpoint outcomes: `PASS`, `WARN`, `BLOCK`
