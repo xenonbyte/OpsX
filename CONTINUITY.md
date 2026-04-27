@@ -6,9 +6,10 @@
 - 2026-04-27 [CODE] Public current UX must not expose legacy OpenSpec routes/paths, `/prompts:*`, `/opsx:*`, standalone `$opsx`, or `$opsx <request>`.
 - 2026-04-27 [CODE] `commands/codex/prompts/opsx.md` remains only as an internal generated route catalog; public Codex entrypoints are explicit `$opsx-*`.
 - 2026-04-27 [CODE] `AGENTS.md` preserves repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
-- 2026-04-27 [CODE] Next GSD action is `$gsd-discuss-phase 4` for Change State Machine and Drift Control.
+- 2026-04-27 [CODE] Phase 4 context is gathered; next GSD action is `$gsd-plan-phase 4`.
 
 ## Done (recent)
+- 2026-04-27 [CODE] Captured Phase 4 discussion decisions in `04-CONTEXT.md` and `04-DISCUSSION-LOG.md`.
 - 2026-04-27 [CODE] Executed all Phase 3 plans `03-01` through `03-11`.
 - 2026-04-27 [CODE] Added final runtime/public-surface gate: `npm run test:workflow-runtime` now passes 31/31.
 - 2026-04-27 [CODE] Fixed review findings by making generated fallback routes platform-aware and qualifying shared playbook routes.
@@ -22,6 +23,8 @@
 - /Users/xubo/x-skills/openspec/.planning/STATE.md
 - /Users/xubo/x-skills/openspec/.planning/PROJECT.md
 - /Users/xubo/x-skills/openspec/CONTINUITY.md
+- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-CONTEXT.md
+- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-DISCUSSION-LOG.md
 - /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-REVIEW.md
 - /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-VERIFICATION.md
 
@@ -37,8 +40,11 @@
 - 2026-04-27 [CODE] D009 ACTIVE: Keep `commands/codex/prompts/opsx.md` only as an internal generated route catalog; public Codex entrypoints remain explicit `$opsx-*`.
 - 2026-04-27 [CODE] D010 ACTIVE: In `AGENTS.md`, preserve repo-local `openspec/` authoring-path guidance and change only stale route bullets to current OpsX routes.
 - 2026-04-27 [CODE] D011 ACTIVE: Shared playbooks may mention `$opsx-*` only when the same line labels Codex and gives the Claude/Gemini `/opsx-*` equivalent.
+- 2026-04-27 [CODE] D012 ACTIVE: Phase 4 is library-first state-machine infrastructure; do not build a full Node workflow execution engine.
+- 2026-04-27 [CODE] D013 ACTIVE: Phase 4 uses strict mutation transitions, readable status/resume, warn-and-reload hash drift, and one-top-level-task-group apply guidance.
 
 ## Receipts
+- 2026-04-27 [TOOL] Committed Phase 4 context as `94ca803 docs(04): capture phase context`.
 - 2026-04-27 [TOOL] Final Phase 3 verification commands passed: `npm run test:workflow-runtime` 31/31, `node scripts/check-phase1-legacy-allowlist.js`, `node bin/opsx.js --help`, `gsd-sdk query verify.schema-drift 03`, and wrong-platform route greps.
 - 2026-04-27 [TOOL] `03-REVIEW.md` final status `clean`; `03-VERIFICATION.md` final status `passed`.
 - 2026-04-27 [CODE] Commits `9690fac`, `c719ba1`, `2d17425`, and `950e2f4` closed Phase 3 review remediation, clean review, and verification report.

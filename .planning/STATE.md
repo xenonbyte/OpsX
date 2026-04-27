@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
-status: ready_to_plan
-stopped_at: Phase 3 verified and completed
-last_updated: "2026-04-27T12:11:06Z"
+status: planning
+stopped_at: Phase 4 context gathered
+last_updated: "2026-04-27T13:57:21.243Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
@@ -32,7 +32,7 @@ Last activity: 2026-04-27
 
 ## Next Action
 
-Run `$gsd-discuss-phase 4` to gather context for the change state machine and drift-control phase.
+Run `$gsd-plan-phase 4` to plan the change state machine and drift-control phase from the gathered context.
 
 ## Accumulated Context
 
@@ -43,6 +43,7 @@ Run `$gsd-discuss-phase 4` to gather context for the change state machine and dr
 - 2026-04-27: Phase 3 context locked explicit `$opsx-*` Codex routing, strict prompt preflight wording, centralized generation, hard legacy cleanup, and non-mutating empty-state behavior for `onboard`, `status`, and `resume`.
 - 2026-04-27: Phase 3 revised planning now uses 11 plans across 5 waves: Wave 0 planning/gates, Wave 1 source-of-truth metadata/tests, Wave 2 six bounded generated refresh slices, Wave 3 skills/docs alignment, Wave 4 help + final verification.
 - 2026-04-27: Phase 3 execution completed; verifier passed 5/5 must-haves and code review is clean with 0 findings.
+- 2026-04-27: Phase 4 context gathered; decisions lock a library-first state-machine implementation, strict mutation transitions, warn-and-reload hash drift, and one-top-level-task-group apply guidance.
 
 ## Decisions
 
@@ -69,6 +70,8 @@ Run `$gsd-discuss-phase 4` to gather context for the change state machine and dr
 - Phase 03 Plan 11 enforces explicit-only Codex/Claude-Gemini route guidance across CLI help, postinstall, template, and AGENTS surfaces.
 - Phase 03 Plan 11 promotes checked-in commands/** parity to a hard runtime gate against buildPlatformBundle() output.
 - Phase 03 code-review remediation made generated fallback routes platform-aware and added shared playbook route-label guards.
+- [Phase 04]: Keep Phase 4 library-first; avoid building a full Node workflow execution engine.
+- [Phase 04]: Use strict mutation transitions, readable status/resume, warn-and-reload hash drift, and one-top-level-task-group apply guidance.
 
 ## Blockers
 
@@ -100,6 +103,6 @@ Run `$gsd-discuss-phase 4` to gather context for the change state machine and dr
 
 ## Session
 
-Last session: 2026-04-27T11:40:38.196Z
-Stopped At: Phase 3 verified and completed
-Resume File: None
+Last session: 2026-04-27T13:57:21.243Z
+Stopped At: Phase 4 context gathered
+Resume File: .planning/phases/04-change-state-machine-and-drift-control/04-CONTEXT.md
