@@ -79,6 +79,56 @@ function createChange(fixtureRoot, changeName, files = {}) {
   return changeDir;
 }
 
+function createLegacyMigrationRepoFixture(options = {}) {
+  const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-migrate-repo-'));
+  const changeName = options.changeName || 'demo';
+  ensureDir(path.join(fixtureRoot, 'openspec', 'changes', changeName));
+  writeText(path.join(fixtureRoot, 'openspec', 'config.yaml'), [
+    'schema: spec-driven',
+    'language: en'
+  ].join('\n'));
+  writeText(path.join(fixtureRoot, 'openspec', 'changes', changeName, '.openspec.yaml'), [
+    `name: ${changeName}`,
+    'schema: spec-driven',
+    'createdAt: 2026-01-01T00:00:00.000Z'
+  ].join('\n'));
+  writeText(path.join(fixtureRoot, 'openspec', 'changes', changeName, 'proposal.md'), [
+    '## Why',
+    'Legacy migration fixture proposal.'
+  ].join('\n'));
+  writeText(path.join(fixtureRoot, 'openspec', 'specs', 'demo', 'spec.md'), [
+    '## ADDED Requirements',
+    '### Requirement: Demo migration',
+    'The system SHALL migrate demo fixtures.'
+  ].join('\n'));
+  writeText(path.join(fixtureRoot, 'openspec', 'archive', 'demo.md'), [
+    '# Archive demo',
+    'Legacy archive fixture.'
+  ].join('\n'));
+  return {
+    fixtureRoot,
+    changeName
+  };
+}
+
+function createLegacySharedHomeFixture(homeDir, options = {}) {
+  const platform = options.platform || 'codex';
+  const legacySharedHome = path.join(homeDir, '.openspec');
+  writeText(path.join(legacySharedHome, '.opsx-config.yaml'), [
+    'version: "2.0.0"',
+    'schema: "spec-driven"',
+    'language: "en"',
+    `platform: "${platform}"`
+  ].join('\n'));
+  writeText(path.join(legacySharedHome, 'manifests', `${platform}.manifest`), '/tmp/legacy-manifest-entry\n');
+  writeText(path.join(legacySharedHome, 'skills', 'openspec', 'SKILL.md'), '# Legacy shared skill\n');
+  writeText(path.join(legacySharedHome, 'commands', 'openspec.md'), '# Legacy command entry\n');
+  return {
+    legacySharedHome,
+    platform
+  };
+}
+
 function runOpsxCli(args, options = {}) {
   const env = Object.assign({}, process.env, options.env || {});
   const result = spawnSync(process.execPath, [path.join(REPO_ROOT, 'bin', 'opsx.js'), ...args], {
@@ -765,12 +815,11 @@ function runTests() {
     assert(languageAlias.stdout.includes('Language switched to English.'));
   });
 
-  test('opsx migrate and status route through truthful Phase 2 migration status', () => {
-    const statusFixture = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-status-fixture-'));
+  test('opsx migrate --dry-run reports deterministic legacy repo/home mapping with zero writes', () => {
+    const { fixtureRoot: statusFixture } = createLegacyMigrationRepoFixture({ changeName: 'demo' });
     const statusHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-status-home-'));
     cleanupTargets.push(statusFixture, statusHome);
-    ensureDir(path.join(statusFixture, 'openspec'));
-    writeText(path.join(statusFixture, 'openspec', 'config.yaml'), 'schema: spec-driven\nlanguage: en\n');
+    createLegacySharedHomeFixture(statusHome, { platform: 'codex' });
 
     const cliOptions = {
       cwd: statusFixture,
@@ -779,10 +828,96 @@ function runTests() {
 
     const migrateOutput = runOpsxCli(['migrate', '--dry-run'], cliOptions);
     assert.strictEqual(migrateOutput.status, 0, migrateOutput.stderr);
-    assert(migrateOutput.stdout.includes('OpsX migration plan (dry-run)'));
-    assert(migrateOutput.stdout.includes('MOVE openspec/config.yaml -> .opsx/config.yaml'));
 
-    const statusOutput = runOpsxCli(['status'], cliOptions);
+    [
+      'MOVE openspec/config.yaml -> .opsx/config.yaml',
+      'MOVE openspec/changes/demo/.openspec.yaml -> .opsx/changes/demo/change.yaml',
+      'MOVE ~/.openspec/.opsx-config.yaml -> ~/.opsx/config.yaml',
+      'MOVE ~/.openspec/skills/openspec -> ~/.opsx/skills/opsx',
+      'MOVE ~/.openspec/commands/openspec.md -> ~/.opsx/commands/opsx.md',
+      'CREATE .opsx/active.yaml'
+    ].forEach((expectedLine) => {
+      assert(
+        migrateOutput.stdout.includes(expectedLine),
+        `Expected dry-run output line: ${expectedLine}`
+      );
+    });
+
+    assert(!fs.existsSync(path.join(statusFixture, '.opsx')), 'Dry-run must not create .opsx directory.');
+    assert(!fs.existsSync(path.join(statusHome, '.opsx')), 'Dry-run must not create ~/.opsx directory.');
+  });
+
+  test('opsx migrate executes legacy repo/home moves and creates required scaffolds', () => {
+    const changeName = 'demo';
+    const { fixtureRoot: executeFixture } = createLegacyMigrationRepoFixture({ changeName });
+    const executeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-execute-home-'));
+    cleanupTargets.push(executeFixture, executeHome);
+    const sharedHomeFixture = createLegacySharedHomeFixture(executeHome, { platform: 'codex' });
+
+    const cliOptions = {
+      cwd: executeFixture,
+      env: { HOME: executeHome }
+    };
+
+    const migrateOutput = runOpsxCli(['migrate'], cliOptions);
+    assert.strictEqual(migrateOutput.status, 0, migrateOutput.stderr);
+    assert(migrateOutput.stdout.includes('OpsX migration complete.'));
+
+    assert(fs.existsSync(path.join(executeFixture, '.opsx', 'config.yaml')));
+    assert(fs.existsSync(path.join(executeFixture, '.opsx', 'active.yaml')));
+    assert(fs.existsSync(path.join(executeFixture, '.opsx', 'changes', changeName, 'change.yaml')));
+    assert(fs.existsSync(path.join(executeFixture, '.opsx', 'changes', changeName, 'state.yaml')));
+    assert(fs.existsSync(path.join(executeFixture, '.opsx', 'changes', changeName, 'context.md')));
+    assert(fs.existsSync(path.join(executeFixture, '.opsx', 'changes', changeName, 'drift.md')));
+
+    assert(fs.existsSync(path.join(executeHome, '.opsx', 'config.yaml')));
+    assert(fs.existsSync(path.join(executeHome, '.opsx', 'manifests', `${sharedHomeFixture.platform}.manifest`)));
+    assert(fs.existsSync(path.join(executeHome, '.opsx', 'skills', 'opsx', 'SKILL.md')));
+    assert(fs.existsSync(path.join(executeHome, '.opsx', 'commands', 'opsx.md')));
+
+    assert(!fs.existsSync(path.join(executeFixture, 'openspec', 'changes', changeName, '.openspec.yaml')));
+  });
+
+  test('opsx migrate aborts by default when canonical .opsx exists and keeps legacy tree untouched', () => {
+    const changeName = 'demo';
+    const { fixtureRoot: abortFixture } = createLegacyMigrationRepoFixture({ changeName });
+    const abortHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-abort-home-'));
+    cleanupTargets.push(abortFixture, abortHome);
+    createLegacySharedHomeFixture(abortHome, { platform: 'codex' });
+
+    const legacyConfigPath = path.join(abortFixture, 'openspec', 'config.yaml');
+    const legacyMetadataPath = path.join(abortFixture, 'openspec', 'changes', changeName, '.openspec.yaml');
+    const legacyConfigBefore = fs.readFileSync(legacyConfigPath, 'utf8');
+    const legacyMetadataBefore = fs.readFileSync(legacyMetadataPath, 'utf8');
+
+    ensureDir(path.join(abortFixture, '.opsx'));
+    writeText(path.join(abortFixture, '.opsx', 'config.yaml'), 'schema: spec-driven\nlanguage: en\n');
+
+    const abortOutput = runOpsxCli(['migrate'], {
+      cwd: abortFixture,
+      env: { HOME: abortHome }
+    });
+    assert.notStrictEqual(abortOutput.status, 0, 'Expected migrate command to fail when .opsx already exists.');
+    assert(
+      `${abortOutput.stdout}\n${abortOutput.stderr}`.includes('already exists'),
+      `Expected abort output to mention existing canonical path, got: ${abortOutput.stderr || abortOutput.stdout}`
+    );
+
+    assert(fs.existsSync(legacyConfigPath), 'Legacy project config should remain after abort.');
+    assert(fs.existsSync(legacyMetadataPath), 'Legacy metadata should remain after abort.');
+    assert.strictEqual(fs.readFileSync(legacyConfigPath, 'utf8'), legacyConfigBefore);
+    assert.strictEqual(fs.readFileSync(legacyMetadataPath, 'utf8'), legacyMetadataBefore);
+  });
+
+  test('opsx status reports truthful Phase 2 migration guidance', () => {
+    const { fixtureRoot: statusFixture } = createLegacyMigrationRepoFixture({ changeName: 'status-only' });
+    const statusHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-status-home-guidance-'));
+    cleanupTargets.push(statusFixture, statusHome);
+
+    const statusOutput = runOpsxCli(['status'], {
+      cwd: statusFixture,
+      env: { HOME: statusHome }
+    });
     assert.strictEqual(statusOutput.status, 0, statusOutput.stderr);
     assert(statusOutput.stdout.includes(`OpsX v${PACKAGE_VERSION}`));
     assert(statusOutput.stdout.includes('Current phase: Phase 2 (.opsx/ Workspace and Migration)'));
