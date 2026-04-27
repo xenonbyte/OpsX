@@ -69,12 +69,12 @@ Plans:
 **Plans:** 11 plans (5 waves)
 
 Plans:
-- [ ] `03-01-PLAN.md` — Rewrite the hard-clean-break planning contract and establish Phase 3 validation inventories without weakening migration internals.
-- [ ] `03-02-PLAN.md` — Move explicit-only route semantics and strict preflight into workflow metadata/templates and add Wave 1 source-output assertions.
-- [ ] `03-03-PLAN.md` — Refresh the first bounded Claude generated-bundle slice from the new source of truth.
-- [ ] `03-04-PLAN.md` — Refresh the second bounded Claude generated-bundle slice, including `onboard`/`resume`/`status`.
-- [ ] `03-05-PLAN.md` — Refresh the first bounded Codex prompt slice and keep `commands/codex/prompts/opsx.md` internal-only.
-- [ ] `03-06-PLAN.md` — Refresh the second bounded Codex prompt slice, including `onboard`/`resume`/`status`.
+- [x] `03-01-PLAN.md` — Rewrite the hard-clean-break planning contract and establish Phase 3 validation inventories without weakening migration internals.
+- [x] `03-02-PLAN.md` — Move explicit-only route semantics and strict preflight into workflow metadata/templates and add Wave 1 source-output assertions.
+- [x] `03-03-PLAN.md` — Refresh the first bounded Claude generated-bundle slice from the new source of truth.
+- [x] `03-04-PLAN.md` — Refresh the second bounded Claude generated-bundle slice, including `onboard`/`resume`/`status`.
+- [x] `03-05-PLAN.md` — Refresh the first bounded Codex prompt slice and keep `commands/codex/prompts/opsx.md` internal-only.
+- [x] `03-06-PLAN.md` — Refresh the second bounded Codex prompt slice, including `onboard`/`resume`/`status`.
 - [ ] `03-07-PLAN.md` — Refresh the first bounded Gemini generated-bundle slice from the new source of truth.
 - [ ] `03-08-PLAN.md` — Refresh the second bounded Gemini generated-bundle slice, including `onboard`/`resume`/`status`.
 - [ ] `03-09-PLAN.md` — Rewrite `skills/opsx` and bilingual playbooks to the explicit-only route model.
