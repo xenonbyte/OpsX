@@ -427,6 +427,65 @@ function runTests() {
     assert.strictEqual(fs.readFileSync(atomicPath, 'utf8'), 'phase4-atomic-write\n');
   });
 
+  test('placeholder artifacts do not imply accepted planning stages', () => {
+    const { loadChangeState } = require('../lib/change-store');
+    const changeName = 'placeholder-artifacts';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Placeholder proposal\n',
+      'design.md': '# Placeholder design\n',
+      'tasks.md': '## 1. Placeholder\n- [ ] 1.1 Pending\n',
+      'specs/README.md': '# Placeholder specs\n'
+    });
+
+    const state = loadChangeState(changeDir);
+    assert.strictEqual(state.stage, 'INIT');
+  });
+
+  test('sparse Phase 2 state normalizes to Phase 4 arrays and checkpoint slots', () => {
+    const { normalizeChangeState } = require('../lib/change-store');
+    const normalized = normalizeChangeState({
+      change: 'legacy-sparse',
+      warnings: 'single warning',
+      blockers: 'single blocker',
+      verificationLog: 'legacy verification string',
+      checkpoints: {
+        spec: {
+          status: 'PASS'
+        }
+      }
+    });
+
+    assert.deepStrictEqual(normalized.warnings, ['single warning']);
+    assert.deepStrictEqual(normalized.blockers, ['single blocker']);
+    assert.deepStrictEqual(normalized.verificationLog, ['legacy verification string']);
+    ['spec', 'task', 'execution'].forEach((checkpointId) => {
+      assert(Object.prototype.hasOwnProperty.call(normalized.checkpoints, checkpointId));
+    });
+    assert.strictEqual(normalized.active.taskGroup, null);
+  });
+
+  test('read-only drift detection warns without refreshing stored hashes', () => {
+    const { loadChangeState, writeChangeState } = require('../lib/change-store');
+    const changeName = 'read-only-drift';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Initial proposal\n'
+    });
+    const seeded = writeChangeState(changeDir, {
+      change: changeName,
+      hashes: {
+        proposal: 'seeded-proposal-hash'
+      }
+    });
+
+    writeText(path.join(changeDir, 'proposal.md'), '# Updated proposal with drift\n');
+
+    const inspection = inspectReadOnlyStateForDrift(changeDir);
+    assert(inspection.warnings.some((warning) => warning.includes('proposal.md')));
+
+    const persisted = loadChangeState(changeDir);
+    assert.strictEqual(persisted.hashes.proposal, seeded.hashes.proposal);
+  });
+
   test('runtime derives progression and blocked states from partial artifacts', () => {
     const changeName = 'kernel-progression';
     createChange(fixtureRoot, changeName, {
