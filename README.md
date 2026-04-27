@@ -31,7 +31,7 @@ opsx --version
 Compatibility aliases (secondary):
 - `opsx --check`
 - `opsx --doc`
-- `opsx --language`
+- `opsx --language <en|zh>`
 
 ## Codex Usage
 

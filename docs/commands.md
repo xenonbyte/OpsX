@@ -60,7 +60,7 @@ opsx --version
 Compatibility aliases (secondary):
 - `opsx --check`
 - `opsx --doc`
-- `opsx --language`
+- `opsx --language <en|zh>`
 
 Behavior notes:
 - `install` / `uninstall` require `--platform` and support comma-separated multi-platform values.

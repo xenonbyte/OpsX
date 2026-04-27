@@ -31,7 +31,7 @@ opsx --version
 兼容别名（次要）：
 - `opsx --check`
 - `opsx --doc`
-- `opsx --language`
+- `opsx --language <en|zh>`
 
 ## Codex 使用
 
