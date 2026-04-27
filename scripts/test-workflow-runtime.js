@@ -766,6 +766,131 @@ function runTests() {
     assert(/- \d{4}-\d{2}-\d{2}/.test(driftText));
   });
 
+  test('hash drift warns without refreshing stored hashes on status', () => {
+    const { loadChangeState, writeChangeState } = require('../lib/change-store');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const changeName = 'status-hash-drift-warning';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Initial proposal\n',
+      'design.md': '# Initial design\n',
+      'tasks.md': '## 1. Initial group\n- [ ] 1.1 Initial task\n',
+      'specs/runtime/spec.md': '## ADDED Requirements\n### Requirement: Runtime\n'
+    });
+    const baselineHashes = hashTrackedArtifacts(changeDir);
+
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'TASKS_READY',
+      hashes: baselineHashes
+    });
+    writeText(path.join(changeDir, 'proposal.md'), '# Updated proposal with drift\n');
+
+    const status = buildStatus({ repoRoot: fixtureRoot, changeName });
+    assert(status.warnings.some((warning) => warning.includes('Hash drift detected for proposal.md')));
+
+    const persisted = loadChangeState(changeDir);
+    assert.strictEqual(persisted.hashes['proposal.md'], baselineHashes['proposal.md']);
+  });
+
+  test('context capsule mirrors normalized state and last verification', () => {
+    const { recordTaskGroupExecution, writeChangeState } = require('../lib/change-store');
+    const changeName = 'context-capsule-mirror';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Runtime setup',
+        '- [x] 1.1 Setup workspace',
+        '',
+        '## 2. Runtime integration',
+        '- [ ] 2.1 Build integration'
+      ].join('\n'),
+      'specs/runtime/spec.md': '## ADDED Requirements\n### Requirement: Runtime\n'
+    });
+
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'APPLYING_GROUP',
+      active: {
+        taskGroup: '1. Runtime setup',
+        nextTaskGroup: '2. Runtime integration'
+      },
+      warnings: ['Existing warning'],
+      blockers: ['Waiting for review']
+    });
+
+    const persisted = recordTaskGroupExecution(changeDir, {
+      taskGroup: '1. Runtime setup',
+      nextTaskGroup: '2. Runtime integration',
+      verificationCommand: 'npm run test:workflow-runtime',
+      verificationResult: 'PASS',
+      changedFiles: ['lib/change-store.js', 'lib/runtime-guidance.js'],
+      checkpointStatus: 'PASS'
+    });
+
+    assert.strictEqual(persisted.active.taskGroup, '2. Runtime integration');
+    assert(Array.isArray(persisted.verificationLog));
+    assert.strictEqual(persisted.verificationLog.length, 1);
+    assert.deepStrictEqual(Object.keys(persisted.verificationLog[0]), [
+      'at',
+      'taskGroup',
+      'verificationCommand',
+      'verificationResult',
+      'changedFiles',
+      'checkpointStatus'
+    ]);
+
+    const contextText = fs.readFileSync(path.join(changeDir, 'context.md'), 'utf8');
+    assert(contextText.includes('# Context Capsule'));
+    assert(contextText.includes('## Stage'));
+    assert(contextText.includes('APPLYING_GROUP'));
+    assert(contextText.includes('## Last Verification'));
+    assert(contextText.includes('npm run test:workflow-runtime'));
+    assert(contextText.includes('1. Runtime setup'));
+  });
+
+  test('drift ledger preserves stable headings and timestamped entries', () => {
+    const { recordTaskGroupExecution, writeChangeState } = require('../lib/change-store');
+    const changeName = 'drift-ledger-stability';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': '## 1. Runtime setup\n- [ ] 1.1 Setup runtime\n',
+      'specs/runtime/spec.md': '## ADDED Requirements\n### Requirement: Runtime\n'
+    });
+
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'TASKS_READY'
+    });
+
+    recordTaskGroupExecution(changeDir, {
+      taskGroup: '1. Runtime setup',
+      nextTaskGroup: null,
+      verificationCommand: 'npm run test:workflow-runtime',
+      verificationResult: 'PASS',
+      changedFiles: ['lib/change-store.js'],
+      checkpointStatus: 'PASS',
+      hashDriftWarnings: ['Hash drift detected for tasks.md'],
+      allowedPaths: ['lib/**'],
+      forbiddenPaths: ['secrets/*.pem']
+    });
+
+    const driftText = fs.readFileSync(path.join(changeDir, 'drift.md'), 'utf8');
+    [
+      '## New Assumptions',
+      '## Scope Changes',
+      '## Out-of-Bound File Changes',
+      '## Discovered Requirements',
+      '## User Approval Needed'
+    ].forEach((heading) => {
+      assert(driftText.includes(heading), `Expected drift heading ${heading}`);
+    });
+    assert(/- \d{4}-\d{2}-\d{2}T/.test(driftText));
+    assert(driftText.includes('secrets/*.pem'));
+    assert(driftText.includes('lib/**'));
+  });
+
   test('status and resume read partial state without auto-creating files', () => {
     const changeName = 'partial-state-read-only';
     const changeDir = createChange(fixtureRoot, changeName, {
@@ -1384,6 +1509,37 @@ function runTests() {
     const blockedApply = buildApplyInstructions({ repoRoot: fixtureRoot, changeName: blockedChange });
     assert.strictEqual(blockedApply.ready, false);
     assert(blockedApply.prerequisites.some((entry) => entry.includes('tasks artifact is not completed')));
+  });
+
+  test('apply instructions advance exactly one top-level task group', () => {
+    const { writeChangeState, setActiveTaskGroup } = require('../lib/change-store');
+    const changeName = 'apply-one-group-state';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'specs/runtime/spec.md': '## ADDED Requirements\n### Requirement: Runtime\n',
+      'tasks.md': [
+        '## 1. Setup',
+        '- [x] 1.1 Seed workspace',
+        '',
+        '## 2. Runtime integration',
+        '- [ ] 2.1 Build runtime integration',
+        '',
+        '## 3. Verification',
+        '- [ ] 3.1 Add verification checks'
+      ].join('\n')
+    });
+
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'APPLYING_GROUP'
+    });
+    setActiveTaskGroup(changeDir, '2. Runtime integration', '3. Verification');
+
+    const apply = buildApplyInstructions({ repoRoot: fixtureRoot, changeName });
+    assert.strictEqual(apply.nextTaskGroup, '3. Verification');
+    assert.strictEqual(apply.remainingTaskGroups.length, 1);
+    assert.strictEqual(apply.remainingTaskGroups[0].title, '3. Verification');
   });
 
   test('invalid inputs are rejected for unsafe change names, missing changes, and unknown artifacts', () => {
