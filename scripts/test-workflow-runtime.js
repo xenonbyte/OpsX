@@ -664,6 +664,108 @@ function runTests() {
     assert.strictEqual(persisted.hashes.proposal, seeded.hashes.proposal);
   });
 
+  test('change-artifacts hashes tracked Phase 4 artifacts deterministically', () => {
+    const { hashTrackedArtifacts, detectArtifactHashDrift } = require('../lib/change-artifacts');
+    const changeName = 'tracked-artifact-hash';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'security-review.md': '# Security review\n',
+      'tasks.md': '## 1. Group\n- [ ] 1.1 Work\n',
+      'specs/core/spec.md': '## ADDED Requirements\n### Requirement: Core\n',
+      'specs/edge/spec.md': '## ADDED Requirements\n### Requirement: Edge\n',
+      'specs/README.md': 'Ignored non-spec artifact\n'
+    });
+
+    const first = hashTrackedArtifacts(changeDir);
+    const second = hashTrackedArtifacts(changeDir);
+    assert.deepStrictEqual(first, second);
+    assert.deepStrictEqual(Object.keys(first), [
+      'design.md',
+      'proposal.md',
+      'security-review.md',
+      'specs/core/spec.md',
+      'specs/edge/spec.md',
+      'tasks.md'
+    ]);
+
+    const drift = detectArtifactHashDrift(
+      Object.assign({}, first, {
+        'design.md': 'stale-design-hash'
+      }),
+      first
+    );
+    assert.deepStrictEqual(drift.driftedPaths, ['design.md']);
+    assert.strictEqual(drift.warnings.length, 1);
+    assert(drift.warnings[0].includes('design.md'));
+  });
+
+  test('change-capsule renders bounded context sections and appends stable drift headings', () => {
+    const { renderContextCapsule, appendDriftLedger } = require('../lib/change-capsule');
+    const { buildInitialDrift } = require('../lib/workspace');
+    const changeName = 'capsule-drift-ledger';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n'
+    });
+    const driftPath = path.join(changeDir, 'drift.md');
+    writeText(driftPath, `${buildInitialDrift()}\n`);
+
+    const capsule = renderContextCapsule({
+      stage: 'APPLYING_GROUP',
+      active: {
+        taskGroup: '2. Runtime integration',
+        nextTaskGroup: '3. Verification'
+      },
+      warnings: ['Hash drift detected for tasks.md'],
+      blockers: ['Awaiting task checkpoint approval'],
+      verificationLog: [{
+        at: '2026-04-27T01:02:03.000Z',
+        taskGroup: '1. Setup',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        changedFiles: ['lib/runtime-guidance.js'],
+        checkpointStatus: 'PASS'
+      }],
+      hashes: {
+        'proposal.md': 'abc123'
+      }
+    }, {
+      hashStatus: 'drift warning',
+      hashDriftWarnings: ['Hash drift detected for tasks.md']
+    });
+    [
+      '# Context Capsule',
+      '## Stage',
+      '## Active Task Group',
+      '## Warnings',
+      '## Blockers',
+      '## Last Verification',
+      '## Hash Status'
+    ].forEach((heading) => {
+      assert(capsule.includes(heading), `Expected context capsule heading ${heading}`);
+    });
+
+    appendDriftLedger(driftPath, [
+      { section: 'newAssumptions', text: 'Assumed runtime fixtures remain deterministic.' },
+      { section: 'scopeChanges', text: 'Expanded apply guidance to one top-level task group.' },
+      { section: 'outOfBoundFileChanges', text: 'Touched scripts/test-workflow-runtime.js' },
+      { section: 'discoveredRequirements', text: 'Need persisted hash drift warnings in apply/status.' },
+      { section: 'userApprovalNeeded', text: 'Awaiting acceptance for security-review scope bump.' }
+    ]);
+
+    const driftText = fs.readFileSync(driftPath, 'utf8');
+    [
+      '## New Assumptions',
+      '## Scope Changes',
+      '## Out-of-Bound File Changes',
+      '## Discovered Requirements',
+      '## User Approval Needed'
+    ].forEach((heading) => {
+      assert(driftText.includes(heading), `Expected drift heading ${heading}`);
+    });
+    assert(/- \d{4}-\d{2}-\d{2}/.test(driftText));
+  });
+
   test('status and resume read partial state without auto-creating files', () => {
     const changeName = 'partial-state-read-only';
     const changeDir = createChange(fixtureRoot, changeName, {
