@@ -937,6 +937,55 @@ function runTests() {
     assert.strictEqual(fs.readFileSync(legacyMetadataPath, 'utf8'), legacyMetadataBefore);
   });
 
+  test('opsx migrate aborts before moves when canonical shared-home parents are files', () => {
+    [
+      {
+        name: 'shared-root',
+        createConflict(homeDir) {
+          writeText(path.join(homeDir, '.opsx'), 'not a directory\n');
+        }
+      },
+      {
+        name: 'skills-parent',
+        createConflict(homeDir) {
+          ensureDir(path.join(homeDir, '.opsx'));
+          writeText(path.join(homeDir, '.opsx', 'skills'), 'not a directory\n');
+        }
+      }
+    ].forEach(({ name, createConflict }) => {
+      const changeName = `demo-${name}`;
+      const { fixtureRoot: conflictFixture } = createLegacyMigrationRepoFixture({ changeName });
+      const conflictHome = fs.mkdtempSync(path.join(os.tmpdir(), `opsx-${name}-home-`));
+      cleanupTargets.push(conflictFixture, conflictHome);
+      createLegacySharedHomeFixture(conflictHome, { platform: 'codex' });
+
+      const legacyRepoConfigPath = path.join(conflictFixture, 'openspec', 'config.yaml');
+      const legacyHomeConfigPath = path.join(conflictHome, '.openspec', '.opsx-config.yaml');
+      const legacyRepoConfigBefore = fs.readFileSync(legacyRepoConfigPath, 'utf8');
+      const legacyHomeConfigBefore = fs.readFileSync(legacyHomeConfigPath, 'utf8');
+
+      createConflict(conflictHome);
+
+      const abortOutput = runOpsxCli(['migrate'], {
+        cwd: conflictFixture,
+        env: { HOME: conflictHome }
+      });
+
+      assert.notStrictEqual(abortOutput.status, 0, `Expected ${name} conflict to abort migration.`);
+      assert(
+        `${abortOutput.stdout}\n${abortOutput.stderr}`.includes('Canonical destination parent is not a directory'),
+        `Expected ${name} abort output to mention destination parent conflict, got: ${abortOutput.stderr || abortOutput.stdout}`
+      );
+
+      assert(fs.existsSync(legacyRepoConfigPath), `${name}: legacy repo config should remain after abort.`);
+      assert(fs.existsSync(legacyHomeConfigPath), `${name}: legacy shared config should remain after abort.`);
+      assert.strictEqual(fs.readFileSync(legacyRepoConfigPath, 'utf8'), legacyRepoConfigBefore);
+      assert.strictEqual(fs.readFileSync(legacyHomeConfigPath, 'utf8'), legacyHomeConfigBefore);
+      assert(!fs.existsSync(path.join(conflictFixture, '.opsx', 'config.yaml')), `${name}: repo move must not run before abort.`);
+      assert(!fs.existsSync(path.join(conflictHome, '.opsx', 'config.yaml')), `${name}: home config move must not run before abort.`);
+    });
+  });
+
   test('opsx status reports truthful Phase 2 migration guidance', () => {
     const { fixtureRoot: statusFixture } = createLegacyMigrationRepoFixture({ changeName: 'status-only' });
     const statusHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-status-home-guidance-'));
