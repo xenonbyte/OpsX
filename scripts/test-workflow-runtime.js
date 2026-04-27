@@ -866,6 +866,13 @@ function runTests() {
 
     assert(!fs.existsSync(path.join(statusFixture, '.opsx')), 'Dry-run must not create .opsx directory.');
     assert(!fs.existsSync(path.join(statusHome, '.opsx')), 'Dry-run must not create ~/.opsx directory.');
+
+    const dryRunWithExtraToken = runOpsxCli(['migrate', '--dry-run', 'extra'], cliOptions);
+    assert.strictEqual(dryRunWithExtraToken.status, 0, dryRunWithExtraToken.stderr);
+    assert(dryRunWithExtraToken.stdout.includes('OpsX migration plan (dry-run)'));
+    assert(!dryRunWithExtraToken.stdout.includes('OpsX migration complete.'));
+    assert(!fs.existsSync(path.join(statusFixture, '.opsx')), 'Dry-run with extra token must not create .opsx directory.');
+    assert(!fs.existsSync(path.join(statusHome, '.opsx')), 'Dry-run with extra token must not create ~/.opsx directory.');
   });
 
   test('opsx migrate executes legacy repo/home moves and creates required scaffolds', () => {
