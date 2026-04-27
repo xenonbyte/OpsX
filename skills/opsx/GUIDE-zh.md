@@ -4,7 +4,7 @@
 
 1. `opsx install --platform codex`
 2. `opsx check`
-3. 在 Codex 中使用 `$opsx create an OpsX change for <work>`
+3. 在 Codex 中先运行 `$opsx-onboard`，再继续使用 `$opsx-new` 或 `$opsx-propose`
 
 ## 配置
 
@@ -28,5 +28,5 @@
 - `--check` 会同时展示已安装 manifest 与“最后一次选择的平台”配置字段。
 - `--doc` 优先读取包内 guide，再回退到已安装共享副本。
 - 命令包会在 `install` 时自动生成，不需要额外的构建/校验命令。
-- 在 Codex 中优先使用 `$opsx <request>`；需要显式路由时使用 `$opsx-*`。
+- 在 Codex 中使用 `$opsx-*` routes。
 - 在 Claude/Gemini 中，使用 `/opsx-*` 作为主要命令入口。

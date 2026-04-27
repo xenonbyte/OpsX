@@ -4,7 +4,7 @@
 
 1. `opsx install --platform codex`
 2. `opsx check`
-3. In Codex, use `$opsx create an OpsX change for <work>`
+3. In Codex, run `$opsx-onboard`, then continue with `$opsx-new` or `$opsx-propose`
 
 ## Config
 
@@ -28,5 +28,5 @@ Use `.opsx/config.yaml` for `schema`, `language`, `context`, per-artifact `rules
 - `--check` reports installed manifests and treats config `platform` as last selected platform.
 - `--doc` prefers package-local guide content over installed shared copies.
 - Command bundles are generated during `install`; no extra build/validation command is required.
-- In Codex, prefer `$opsx <request>` and `$opsx-*` for explicit routing.
+- Use `$opsx-*` routes in Codex.
 - In Claude/Gemini, use `/opsx-*` commands as the primary route surface.

@@ -1,6 +1,6 @@
 ---
 name: opsx
-description: Run OpsX spec-driven development without the OpsX CLI by creating and maintaining `.opsx/changes/*` artifacts, implementing tasks, verifying against requirements, syncing deltas, and archiving changes. Use when users ask for `/opsx-*`, explicit `$opsx-*` actions, or Codex `$opsx <request>` workflow help.
+description: Run OpsX spec-driven development without the OpsX CLI by creating and maintaining `.opsx/changes/*` artifacts, implementing tasks, verifying against requirements, syncing deltas, and archiving changes. Use when users ask for `/opsx-*` or explicit `$opsx-*` workflow actions.
 ---
 
 # OpsX Workflow
@@ -28,18 +28,14 @@ Keep file paths, artifact names, and command tokens in English.
 
 Canonical workflow name is `opsx`.
 
-- Claude/Gemini preferred: `/opsx-*`
-- Codex preferred: `$opsx <request>`
-- Codex explicit routes: `$opsx-*`
+- Claude/Gemini public routes: `/opsx-*`
+- Codex public routes: `$opsx-*`
 
-On Codex, treat explicit action routes as command selection hints, not a reliable inline-argument transport.
+On Codex, treat explicit action routes as command selection hints, not a reliable inline-argument transport. Use request details already present in the conversation.
 
 ## Work Directly On Files
 
 Operate without the OpsX CLI. Use the repository files under `.opsx/`.
-This skill describes the target OpsX workspace layout; Phase 1 package builds
-may still rely on deferred runtime path migration until `opsx migrate` is
-implemented in Phase 2.
 
 Typical structure:
 
@@ -64,6 +60,17 @@ Typical structure:
 
 Read `schemas/<schema>/schema.json` to determine artifacts and dependencies.
 For the default `spec-driven` schema, the artifacts are proposal, specs, design, optional `security-review`, and tasks.
+
+## Phase 3 Preflight
+
+Before acting, read workspace state in this order when files exist:
+1. `.opsx/config.yaml`
+2. `.opsx/active.yaml`
+3. `.opsx/changes/<active-change>/state.yaml` when an active change exists
+4. `.opsx/changes/<active-change>/context.md` when an active change exists
+5. Current artifacts (`proposal.md`, `specs/`, `design.md`, optional `security-review.md`, and `tasks.md`) when an active change exists
+
+If required files are missing, report the missing workspace/active-change state honestly and follow route-specific fallback guidance. Do not auto-create workspace or active-change files from status-style routes.
 
 ## Security Review Triggering
 
@@ -105,14 +112,16 @@ If `language: en`:
 
 ## Default Execution Loop
 
-1. Identify the active change name.
-2. Inspect artifact presence and dependency readiness from the active schema.
-3. Apply project context, per-artifact rules, and `securityReview` policy from `.opsx/config.yaml`.
-4. Read dependency artifacts before writing a new artifact.
-5. Run `spec checkpoint` before entering `tasks`, and `task checkpoint` before entering `apply`.
-6. During `apply`, run `execution checkpoint` after each top-level task group.
-7. Create or update files using the schema and template rules.
-8. Report changed files, current state, next step, and blockers.
+1. Identify the workflow action and target change.
+2. Resolve config from change metadata, project config, then global config.
+3. Run the strict preflight reads (`.opsx/config.yaml`, `.opsx/active.yaml`, active `state.yaml`, active `context.md`, and current artifacts when present).
+4. Inspect artifact presence and dependency readiness from the active schema.
+5. Apply project context, per-artifact rules, and `securityReview` policy before writing.
+6. Read dependency artifacts before writing a new artifact.
+7. Run `spec checkpoint` before entering `tasks`, and `task checkpoint` before entering `apply`.
+8. During `apply`, run `execution checkpoint` after each top-level task group.
+9. Create or update files using the schema and template rules.
+10. Report changed files, current state, next step, and blockers.
 
 ## Guardrails
 
