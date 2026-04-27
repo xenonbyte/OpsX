@@ -1253,9 +1253,21 @@ function runTests() {
     assert(generatedBundles.claude['opsx.md'].includes('Primary workflow entry: `/opsx-<action>`'));
     assert(!generatedBundles.claude['opsx.md'].includes('Primary workflow entry: `$opsx <request>`'));
     assert(generatedBundles.codex['prompts/opsx.md'].includes('OpsX'));
+    assert(!generatedBundles.codex['prompts/opsx.md'].includes('Preferred:'), 'Codex route catalog must not advertise a preferred standalone entry.');
+    assert(!generatedBundles.codex['prompts/opsx.md'].includes('$opsx <request>'), 'Codex route catalog must not advertise `$opsx <request>`.');
     assert(generatedBundles.gemini['opsx.toml'].includes('OpsX Workflow'));
     assert(generatedBundles.gemini['opsx.toml'].includes('Primary workflow entry: `/opsx-<action>`'));
     assert(!generatedBundles.gemini['opsx.toml'].includes('Primary workflow entry: `$opsx <request>`'));
+    Object.entries(generatedBundles).forEach(([platform, bundle]) => {
+      Object.entries(bundle)
+        .filter(([relativePath]) => relativePath.includes('onboard') || relativePath.includes('resume') || relativePath.includes('status'))
+        .forEach(([relativePath, content]) => {
+          assert(content.includes('.opsx/config.yaml'), `${platform}:${relativePath} must mention .opsx/config.yaml preflight`);
+          assert(content.includes('.opsx/active.yaml'), `${platform}:${relativePath} must mention .opsx/active.yaml preflight`);
+          assert(content.includes('state.yaml'), `${platform}:${relativePath} must mention state.yaml preflight`);
+          assert(content.includes('context.md'), `${platform}:${relativePath} must mention context.md preflight`);
+        });
+    });
     Object.entries(generatedBundles).forEach(([platform, bundle]) => {
       Object.keys(bundle).forEach((relativePath) => {
         assert(!relativePath.includes('openspec'), `${platform} bundle contains legacy path: ${relativePath}`);
@@ -1277,9 +1289,9 @@ function runTests() {
       Object.keys(PLATFORM_BUNDLE_TARGETS).forEach((platform) => {
         const coverage = fallbackCoverage[actionId][platform];
         assert(generatedBundles[platform][coverage.promptPath], `Missing generated ${platform} prompt for ${actionId}`);
-        assert.strictEqual(typeof coverage.emptyWorkspace, 'boolean');
-        assert.strictEqual(typeof coverage.missingActiveChange, 'boolean');
-        assert.strictEqual(typeof coverage.noAutoCreateState, 'boolean');
+        assert.strictEqual(coverage.emptyWorkspace, true, `${platform}:${actionId} must include empty-workspace fallback`);
+        assert.strictEqual(coverage.missingActiveChange, true, `${platform}:${actionId} must include missing-active-change fallback`);
+        assert.strictEqual(coverage.noAutoCreateState, true, `${platform}:${actionId} must include no-auto-create fallback`);
       });
     });
 
