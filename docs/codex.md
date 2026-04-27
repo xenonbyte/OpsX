@@ -1,24 +1,27 @@
 # OpsX for Codex
 
-## Preferred Entrypoint
+## Public Routes (Explicit Only)
 
-Use the skill directly:
-
-```text
-$opsx <request>
-```
-
-## Explicit Routing
-
-Use these when you want a fixed workflow action:
+Use explicit routes for workflow actions:
 
 ```text
+$opsx-onboard
 $opsx-propose
-$opsx-apply
 $opsx-status
+$opsx-apply
 ```
 
-If the selected route still needs a change name or description, provide it in the next message.
+Additional routes follow the same pattern (for example: `$opsx-explore`,
+`$opsx-new`, `$opsx-continue`, `$opsx-ff`, `$opsx-verify`, `$opsx-sync`,
+`$opsx-archive`, `$opsx-batch-apply`, `$opsx-bulk-archive`).
+
+If the selected route still needs a change name or description, provide it in
+the next message.
+
+## Internal Route Catalog
+
+`commands/codex/prompts/opsx.md` is an internal generated catalog. Public Codex
+usage remains explicit `$opsx-*` routes.
 
 Install note:
 - Use `opsx install --platform codex` (or comma-separated multi-platform values).
@@ -26,7 +29,8 @@ Install note:
 
 ## Why this model
 
-Codex is more reliable when natural-language intent goes through the skill entrypoint. Explicit action routes remain available for deterministic execution.
+Explicit action routing keeps Codex execution deterministic and aligned with the
+generated command bundle contract.
 
 ## Workflow Semantics
 

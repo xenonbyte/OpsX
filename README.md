@@ -2,8 +2,6 @@
 
 OpsX is an AI-native operational spec execution workflow for Claude, Codex, and Gemini.
 
-OpsX was originally adapted from Fission-AI/OpenSpec.
-
 ## Quick Start
 
 ```bash
@@ -35,17 +33,16 @@ Compatibility aliases (secondary):
 
 ## Codex Usage
 
-Preferred entrypoint:
+Use explicit action routes:
 ```text
-$opsx <request>
+$opsx-onboard
+$opsx-propose
+$opsx-status
+$opsx-apply
 ```
 
-Explicit action routes:
-```text
-$opsx-propose
-$opsx-apply
-$opsx-status
-```
+Additional workflow routes follow the same explicit pattern (for example:
+`$opsx-explore`, `$opsx-continue`, `$opsx-verify`, `$opsx-archive`).
 
 ## Project Config
 

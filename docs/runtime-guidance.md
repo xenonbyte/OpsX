@@ -25,10 +25,11 @@
 - `readyForWrite` is true only when dependencies are satisfied and a concrete output path exists.
 
 ## Compatibility Notes
-- Runtime artifact resolution now uses canonical OpsX paths:
+- Runtime artifact resolution reads current OpsX workspace artifacts only:
   - project config: `.opsx/config.yaml`
+  - active change pointer: `.opsx/active.yaml`
   - per-change metadata: `.opsx/changes/<name>/change.yaml`
-- Legacy `openspec/` and `~/.openspec/` paths are treated as migration candidates only (for `opsx migrate --dry-run` / `opsx migrate`), not as canonical runtime read targets.
+- Migration commands (`opsx migrate --dry-run` / `opsx migrate`) may still translate older pre-v3.0 workspace layouts, but those layouts are not part of current runtime guidance.
 - Existing public CLI usage remains unchanged:
   - `opsx install`
   - `opsx uninstall`

@@ -2,8 +2,6 @@
 
 OpsX 是一套面向 Claude、Codex、Gemini 的 AI 原生 operational spec execution 工作流。
 
-OpsX was originally adapted from Fission-AI/OpenSpec.
-
 ## 快速开始
 
 ```bash
@@ -35,17 +33,16 @@ opsx --version
 
 ## Codex 使用
 
-推荐入口：
+使用显式 action 路由：
 ```text
-$opsx <request>
+$opsx-onboard
+$opsx-propose
+$opsx-status
+$opsx-apply
 ```
 
-显式 action 路由：
-```text
-$opsx-propose
-$opsx-apply
-$opsx-status
-```
+其余工作流命令也遵循同一显式模式（例如：
+`$opsx-explore`、`$opsx-continue`、`$opsx-verify`、`$opsx-archive`）。
 
 ## 项目配置
 

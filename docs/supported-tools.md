@@ -7,8 +7,8 @@
 
 ## Codex
 
-- preferred: `$opsx <request>`
-- explicit routes: `$opsx-<action>`
+- explicit routes only: `$opsx-<action>`
+- examples: `$opsx-onboard`, `$opsx-propose`, `$opsx-status`, `$opsx-apply`
 - generated files live under `commands/codex/`
 
 ## Gemini

@@ -3,8 +3,13 @@
 ## Agent Entrypoints
 
 - Claude/Gemini: `/opsx-<action>`
-- Codex (recommended): `$opsx <request>`
-- Codex (explicit routes): `$opsx-<action>`
+- Codex: `$opsx-<action>` (explicit routes only)
+
+Codex explicit route examples:
+- `$opsx-onboard`
+- `$opsx-propose`
+- `$opsx-status`
+- `$opsx-apply`
 
 ## Workflow Action Routes
 
