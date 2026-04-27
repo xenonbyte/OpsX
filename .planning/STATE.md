@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-08-PLAN.md
-last_updated: "2026-04-27T11:09:38.081Z"
+stopped_at: Completed 03-09-PLAN.md
+last_updated: "2026-04-27T11:18:09.327Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 21
-  completed_plans: 18
-  percent: 86
+  completed_plans: 19
+  percent: 90
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 3 (Skill and Command Surface Rewrite) — EXECUTING
-Plan: 8 of 11
+Plan: 9 of 11
 Status: Ready to execute
 Last activity: 2026-04-27
 
@@ -61,6 +61,8 @@ Run `$gsd-execute-phase 3` to execute the revised 11-plan / 5-wave Phase 3 plan 
 - Phase 03 Plan 06 kept scope strictly mechanical: regenerate only the seven plan-listed Codex leaves from buildPlatformBundle('codex') with no source-template edits.
 - Phase 03 Plan 07 kept scope strictly mechanical by regenerating only the eight plan-listed Gemini files from buildPlatformBundle('gemini').
 - Phase 03 Plan 08 kept scope strictly mechanical: refresh only the seven plan-listed Gemini action leaves with no source/template/help/docs/skills edits.
+- Phase 03 Plan 09 locked distributed skill/guides to explicit Codex $opsx-* public routes only.
+- Phase 03 Plan 09 aligned bilingual playbooks with non-mutating empty-state guidance for onboard/status/resume/batch-apply/bulk-archive.
 
 ## Blockers
 
@@ -87,9 +89,10 @@ Run `$gsd-execute-phase 3` to execute the revised 11-plan / 5-wave Phase 3 plan 
 | Phase 03 P06 | 4m | 1 tasks | 7 files |
 | Phase 03 P07 | 1m 21s | 1 tasks | 8 files |
 | Phase 03 P08 | 7m | 1 tasks | 7 files |
+| Phase 03 P09 | 3m 32s | 1 tasks | 5 files |
 
 ## Session
 
-Last session: 2026-04-27T11:09:38.078Z
-Stopped At: Completed 03-08-PLAN.md
+Last session: 2026-04-27T11:18:09.324Z
+Stopped At: Completed 03-09-PLAN.md
 Resume File: None

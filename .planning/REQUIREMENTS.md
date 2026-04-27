@@ -27,7 +27,7 @@
 
 - [x] **CMD-01**: Claude Code users can use `/opsx-explore`, `/opsx-new`, `/opsx-propose`, `/opsx-continue`, `/opsx-ff`, `/opsx-apply`, `/opsx-verify`, `/opsx-status`, `/opsx-resume`, `/opsx-sync`, `/opsx-archive`, `/opsx-batch-apply`, `/opsx-bulk-archive`, and `/opsx-onboard`.
 - [x] **CMD-02**: Codex users can use the corresponding `$opsx-*` commands as the public primary entrypoints.
-- [ ] **CMD-03**: The distributed skill lives at `skills/opsx/` with frontmatter `name: opsx` and reads `.opsx/` and `~/.opsx/` config in the correct precedence order.
+- [x] **CMD-03**: The distributed skill lives at `skills/opsx/` with frontmatter `name: opsx` and reads `.opsx/` and `~/.opsx/` config in the correct precedence order.
 - [x] **CMD-04**: Generated prompts treat `/openspec`, `$openspec`, `/prompts:openspec`, `/opsx:*`, `/prompts:opsx-*`, standalone `$opsx`, and `$opsx <request>` as banned public workflow entrypoints.
 - [x] **CMD-05**: `opsx-onboard`, `opsx-status`, and `opsx-resume` behave correctly even when no active change exists.
 
