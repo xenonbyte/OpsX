@@ -46,8 +46,8 @@ function createFixtureRepo() {
   const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'openspec-runtime-'));
   copyDir(path.join(REPO_ROOT, 'schemas'), path.join(fixtureRoot, 'schemas'));
   copyDir(path.join(REPO_ROOT, 'skills'), path.join(fixtureRoot, 'skills'));
-  ensureDir(path.join(fixtureRoot, 'openspec', 'changes'));
-  writeText(path.join(fixtureRoot, 'openspec', 'config.yaml'), [
+  ensureDir(path.join(fixtureRoot, '.opsx', 'changes'));
+  writeText(path.join(fixtureRoot, '.opsx', 'config.yaml'), [
     'schema: spec-driven',
     'language: en',
     'context: Runtime fixture project',
@@ -63,17 +63,18 @@ function createFixtureRepo() {
 }
 
 function createChange(fixtureRoot, changeName, files = {}) {
-  const changeDir = path.join(fixtureRoot, 'openspec', 'changes', changeName);
+  const changeDir = path.join(fixtureRoot, '.opsx', 'changes', changeName);
   ensureDir(changeDir);
-  if (!files['.openspec.yaml']) {
-    writeText(path.join(changeDir, '.openspec.yaml'), [
+  if (!files['change.yaml'] && !files['.openspec.yaml']) {
+    writeText(path.join(changeDir, 'change.yaml'), [
       `name: ${changeName}`,
       'schema: spec-driven',
       `createdAt: ${new Date('2026-01-01T00:00:00.000Z').toISOString()}`
     ].join('\n'));
   }
   Object.keys(files).forEach((relativePath) => {
-    writeText(path.join(changeDir, relativePath), files[relativePath]);
+    const normalizedPath = relativePath === '.openspec.yaml' ? 'change.yaml' : relativePath;
+    writeText(path.join(changeDir, normalizedPath), files[relativePath]);
   });
   return changeDir;
 }
@@ -594,20 +595,20 @@ function runTests() {
   test('artifact templates resolve from package even when project repo has no skills folder', () => {
     const minimalRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'openspec-no-skills-'));
     cleanupTargets.push(minimalRoot);
-    ensureDir(path.join(minimalRoot, 'openspec', 'changes', 'template-source', 'specs', 'core'));
-    writeText(path.join(minimalRoot, 'openspec', 'config.yaml'), 'schema: spec-driven\nlanguage: en\n');
-    writeText(path.join(minimalRoot, 'openspec', 'changes', 'template-source', '.openspec.yaml'), [
+    ensureDir(path.join(minimalRoot, '.opsx', 'changes', 'template-source', 'specs', 'core'));
+    writeText(path.join(minimalRoot, '.opsx', 'config.yaml'), 'schema: spec-driven\nlanguage: en\n');
+    writeText(path.join(minimalRoot, '.opsx', 'changes', 'template-source', 'change.yaml'), [
       'name: template-source',
       'schema: spec-driven',
       `createdAt: ${new Date('2026-01-03T00:00:00.000Z').toISOString()}`
     ].join('\n'));
-    writeText(path.join(minimalRoot, 'openspec', 'changes', 'template-source', 'proposal.md'), '## Why\nTemplate source.');
-    writeText(path.join(minimalRoot, 'openspec', 'changes', 'template-source', 'specs', 'core', 'spec.md'), [
+    writeText(path.join(minimalRoot, '.opsx', 'changes', 'template-source', 'proposal.md'), '## Why\nTemplate source.');
+    writeText(path.join(minimalRoot, '.opsx', 'changes', 'template-source', 'specs', 'core', 'spec.md'), [
       '## ADDED Requirements',
       '### Requirement: Template',
       'The system SHALL load templates from package references.'
     ].join('\n'));
-    writeText(path.join(minimalRoot, 'openspec', 'changes', 'template-source', 'design.md'), [
+    writeText(path.join(minimalRoot, '.opsx', 'changes', 'template-source', 'design.md'), [
       '## Context',
       'Template source change.',
       '## Migration Plan',
@@ -715,6 +716,7 @@ function runTests() {
     assert(helpOutput.stdout.includes('opsx check'));
     assert(helpOutput.stdout.includes('opsx doc'));
     assert(helpOutput.stdout.includes('opsx language <en|zh>'));
+    assert(helpOutput.stdout.includes('opsx migrate --dry-run'));
     assert(helpOutput.stdout.includes('opsx migrate'));
     assert(helpOutput.stdout.includes('opsx status'));
     assert(helpOutput.stdout.includes('opsx --help'));
@@ -763,16 +765,30 @@ function runTests() {
     assert(languageAlias.stdout.includes('Language switched to English.'));
   });
 
-  test('opsx migrate and status return truthful Phase 1 placeholder messaging', () => {
-    const migrateOutput = runOpsxCli(['migrate']);
-    assert.strictEqual(migrateOutput.status, 0, migrateOutput.stderr);
-    assert(migrateOutput.stdout.includes('Phase 2'));
+  test('opsx migrate and status route through truthful Phase 2 migration status', () => {
+    const statusFixture = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-status-fixture-'));
+    const statusHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-status-home-'));
+    cleanupTargets.push(statusFixture, statusHome);
+    ensureDir(path.join(statusFixture, 'openspec'));
+    writeText(path.join(statusFixture, 'openspec', 'config.yaml'), 'schema: spec-driven\nlanguage: en\n');
 
-    const statusOutput = runOpsxCli(['status']);
+    const cliOptions = {
+      cwd: statusFixture,
+      env: { HOME: statusHome }
+    };
+
+    const migrateOutput = runOpsxCli(['migrate', '--dry-run'], cliOptions);
+    assert.strictEqual(migrateOutput.status, 0, migrateOutput.stderr);
+    assert(migrateOutput.stdout.includes('OpsX migration plan (dry-run)'));
+    assert(migrateOutput.stdout.includes('MOVE openspec/config.yaml -> .opsx/config.yaml'));
+
+    const statusOutput = runOpsxCli(['status'], cliOptions);
     assert.strictEqual(statusOutput.status, 0, statusOutput.stderr);
     assert(statusOutput.stdout.includes(`OpsX v${PACKAGE_VERSION}`));
-    assert(statusOutput.stdout.includes('Phase 1'));
-    assert(statusOutput.stdout.includes('Phase 4'));
+    assert(statusOutput.stdout.includes('Current phase: Phase 2 (.opsx/ Workspace and Migration)'));
+    assert(statusOutput.stdout.includes('Durable change-state lifecycle remains scheduled for Phase 4.'));
+    assert(statusOutput.stdout.includes('Run `opsx migrate --dry-run` to preview migration.'));
+    assert(!statusOutput.stdout.includes('Phase 1 status placeholder.'));
   });
 
   test('runtime suite locks renamed skill targets, generated bundles, and checked-in command entries', () => {
