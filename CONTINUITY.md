@@ -9,7 +9,7 @@
 - 2026-04-27 [CODE] Public current UX must not expose legacy OpenSpec routes/paths, `/prompts:*`, `/opsx:*`, standalone `$opsx`, or `$opsx <request>`.
 - 2026-04-27 [CODE] `commands/codex/prompts/opsx.md` remains only as an internal generated route catalog; public Codex entrypoints are explicit `$opsx-*`.
 - 2026-04-27 [CODE] `AGENTS.md` preserves repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
-- 2026-04-28 [CODE] Current GSD position: Phase 5 (`spec-split-checkpoint`) context is captured; next step is `$gsd-plan-phase 5`.
+- 2026-04-28 [CODE] Current GSD position: Phase 5 (`spec-split-checkpoint`) is planned into 7 plans across 5 waves; next step is `$gsd-execute-phase 5`.
 
 ## Done (recent)
 - 2026-04-27 [CODE] Executed all Phase 4 plans `04-01` through `04-09`; summaries exist for every plan.
@@ -18,6 +18,7 @@
 - 2026-04-27 [TOOL] Phase 4 verifier wrote `04-VERIFICATION.md` with `status: passed`, `score: 5/5`, and `requirements_verified: 8/8`.
 - 2026-04-27 [CODE] Updated `.planning/STATE.md`, `.planning/ROADMAP.md`, `.planning/PROJECT.md`, and `CONTINUITY.md` for Phase 4 completion and Phase 5 readiness.
 - 2026-04-28 [CODE] Captured Phase 5 context and discussion log in `.planning/phases/05-spec-split-checkpoint/`.
+- 2026-04-28 [CODE] Created `05-01-PLAN.md` through `05-07-PLAN.md` and updated `ROADMAP.md` for Phase 5 execution.
 - 2026-04-27 [CODE] Executed all Phase 3 plans `03-01` through `03-11`; final review and verification passed.
 
 ## Working set
@@ -27,7 +28,13 @@
 - /Users/xubo/x-skills/openspec/.planning/PROJECT.md
 - /Users/xubo/x-skills/openspec/CONTINUITY.md
 - /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-CONTEXT.md
-- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-DISCUSSION-LOG.md
+- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-01-PLAN.md
+- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-02-PLAN.md
+- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-03-PLAN.md
+- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-04-PLAN.md
+- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-05-PLAN.md
+- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-06-PLAN.md
+- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-07-PLAN.md
 - /Users/xubo/x-skills/openspec/schemas/spec-driven/schema.json
 - /Users/xubo/x-skills/openspec/lib/workflow.js
 - /Users/xubo/x-skills/openspec/lib/change-store.js
@@ -52,6 +59,7 @@
 
 ## Receipts
 - 2026-04-28 [TOOL] Phase 5 context committed as `08235de`; STATE session record committed as `8aa329d`.
+- 2026-04-28 [TOOL] `frontmatter.validate` and `verify.plan-structure` passed for `.planning/phases/05-spec-split-checkpoint/05-01-PLAN.md` through `05-07-PLAN.md`.
 - 2026-04-27T17:04Z [TOOL] Verification pass confirmed Phase 4 goal achievement: `npm run test:workflow-runtime` passed 49/49, `04-REVIEW.md` remained clean, and `04-VERIFICATION.md` captures the passed report.
 - 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-09` after removing temporary parity exemptions and restoring full `commands/**` checked-in parity.
 - 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-08` and Gemini parity check returned `GEMINI_PARITY_OK`.

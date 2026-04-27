@@ -128,6 +128,17 @@ Plans:
 
 **Requirements:** SPEC-01, SPEC-02, SPEC-03, SPEC-04
 
+**Plans:** 7 plans (5 waves)
+
+Plans:
+- [ ] `05-01-PLAN.md` — Add the schema/workflow/state catalog for `spec-split-checkpoint` and lock Wave 0 persistence tests.
+- [ ] `05-02-PLAN.md` — Build `lib/spec-validator.js` and deterministic SPEC-02 regression coverage.
+- [ ] `05-03-PLAN.md` — Wire `runSpecSplitCheckpoint()`, bounded reviewer-escalation guidance, and skill/source-of-truth updates.
+- [ ] `05-04-PLAN.md` — Refresh the bounded Claude `propose` / `continue` / `ff` command slice from generator output.
+- [ ] `05-05-PLAN.md` — Refresh the bounded Codex `propose` / `continue` / `ff` prompt slice from generator output.
+- [ ] `05-06-PLAN.md` — Refresh the bounded Gemini `propose` / `continue` / `ff` command slice from generator output.
+- [ ] `05-07-PLAN.md` — Remove temporary parity exemptions and re-lock phase-wide regression plus command parity.
+
 **Success criteria:**
 1. `schemas/spec-driven/schema.json` includes `spec-split-checkpoint` after specs and before design.
 2. Spec validator detects duplicate requirement IDs, likely duplicate behavior, conflicting language, missing scenarios, empty specs, proposal coverage gaps, scope expansion, and fenced-code hidden requirements.
