@@ -438,7 +438,10 @@ function runTests() {
       'loadActiveChangePointer',
       'writeActiveChangePointer',
       'loadChangeState',
-      'writeChangeState'
+      'writeChangeState',
+      'recordCheckpointResult',
+      'setActiveTaskGroup',
+      'recordTaskGroupExecution'
     ].forEach((symbol) => {
       assert.strictEqual(typeof changeStore[symbol], 'function', `Expected ${symbol} export.`);
     });
@@ -921,7 +924,8 @@ function runTests() {
     assert.strictEqual(status.stage, 'SPECS_READY');
     assert.strictEqual(status.nextAction, 'design');
     assert.strictEqual(status.active.taskGroup, null);
-    assert.deepStrictEqual(status.warnings, ['legacy warning from sparse state']);
+    assert(status.warnings.includes('legacy warning from sparse state'));
+    assert(status.warnings.some((warning) => warning.includes('Hash drift detected for proposal.md')));
     assert.deepStrictEqual(status.blockers, ['waiting for review']);
 
     const statusText = buildStatusText({ repoRoot: fixtureRoot, changeName });
