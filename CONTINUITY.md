@@ -1,20 +1,20 @@
 ## Snapshot
 - 2026-04-27 [USER] Goal: Start a new GSD milestone from the supplied OpsX optimization report.
 - 2026-04-27 [CODE] Current milestone: `v3.0 OpsX migration and state-machine workflow`.
-- 2026-04-27 [CODE] Current phase context: Phase 1 `OpsX Naming and CLI Surface` is complete and verified; Phase 2 `.opsx/ Workspace and Migration` is planned, checker-passed, and ready to execute.
+- 2026-04-27 [CODE] Current phase context: Phase 1 and Phase 2 are executed; Phase 2 `.opsx/ Workspace and Migration` is complete and ready for verification handoff.
 - 2026-04-27 [TOOL] Repo had OpenSpec artifacts under `openspec/` but no existing `.planning/` directory.
 - 2026-04-27 [ASSUMPTION] Because interactive question tooling is unavailable in Default mode and the user supplied a complete implementation report, the milestone goals and roadmap approval are treated as covered by the user input.
 - 2026-04-27 [CODE] GSD planning layer now exists under `.planning/`; phase numbering is reset to Phase 1.
 
 ## Done (recent)
+- 2026-04-27 [CODE] Completed Phase 2 Plan `02-04`: README/README-zh/docs/runtime docs now describe shipped `.opsx` behavior; templates include canonical save-path comments (`1318b74`, `19ff8ac`, `8c15054`).
+- 2026-04-27 [CODE] Marked Phase 2 roadmap plan list complete and updated STATE/ROADMAP continuity for verification handoff.
 - 2026-04-27 [CODE] Planned Phase 2 as `02-01`..`02-04`; final checker pass covers DIR-01 through DIR-07 across Wave 0 tests/gitignore, Wave 1 migration core, Wave 2 runtime paths, and Wave 3 docs/templates.
 - 2026-04-27 [CODE] Revised Phase 2 plans `02-01` and `02-02` so Wave 0 fixtures and migration mappings use actual legacy shared-home assets `~/.openspec/commands/openspec.md` and `~/.openspec/skills/openspec/**`.
 - 2026-04-27 [CODE] Completed Phase 1 planning, execution, review-fix, and verification; public OpsX package/CLI/docs surface is shipped and verified.
 - 2026-04-27 [CODE] Captured Phase 2 context, research, patterns, and validation inputs for safe `.opsx/` and `~/.opsx/` migration with dry-run/default-abort semantics.
 - 2026-04-27 [CODE] Created project-level GSD planning artifacts: `.planning/PROJECT.md`, `.planning/REQUIREMENTS.md`, `.planning/ROADMAP.md`, `.planning/STATE.md`, `.planning/MILESTONES.md`, `.planning/config.json`, and `.planning/research/SUMMARY.md`.
 - 2026-04-27 [TOOL] `gsd-sdk query verify.plan-structure` and `frontmatter.validate` both passed for all four Phase 2 plans.
-- 2026-04-27 [TOOL] `gsd-sdk state.update` previously corrupted trailing `.planning/STATE.md` lines; repaired with a focused patch before continuing milestone work.
-- 2026-04-06 [CODE] Previous major work was v2.0.1 OpenSpec runtime/advisory-review patch release preparation and verification.
 
 ## Working set
 - /Users/xubo/x-skills/openspec/.planning/PROJECT.md
@@ -32,7 +32,7 @@
 
 ## Decisions
 - 2026-04-27 [CODE] D001 ACTIVE: Treat v3.0 as a breaking OpsX rename and workflow-state upgrade.
-- 2026-04-27 [CODE] D002 ACTIVE: Use `.opsx/` and `~/.opsx/` as canonical future workflow directories; keep old OpenSpec paths only in migration/history notes.
+- 2026-04-27 [CODE] D002 ACTIVE: Use `.opsx/` and `~/.opsx/` as canonical current workflow directories; keep old OpenSpec paths only in migration/history notes.
 - 2026-04-27 [CODE] D003 ACTIVE: Keep the full OpsX command set; do not add Lite/Advanced profiles.
 - 2026-04-27 [CODE] D004 ACTIVE: Use disk-backed state (`state.yaml`, `context.md`, `drift.md`, artifact hashes) as the anti-drift mechanism.
 - 2026-04-27 [CODE] D005 ACTIVE: Add TDD-light and `spec-split-checkpoint` as quality gates without turning OpsX into a full autonomous agent engine.
@@ -40,6 +40,8 @@
 - 2026-04-27 [CODE] D007 ACTIVE: Phase 1 may perform coarse generated asset/skill path renames for package coherence, while Phase 3 owns detailed command/skill preflight semantics.
 
 ## Receipts
+- 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 29/29 after 02-04 docs/template updates.
+- 2026-04-27 [TOOL] `git log --oneline -3` confirms plan commits: `1318b74` (docs semantics), `19ff8ac` (template save paths), `8c15054` (summary/state/roadmap metadata).
 - 2026-04-27 [TOOL] Final Phase 2 `gsd-plan-checker` result: `VERIFICATION PASSED`; DIR-01 through DIR-07 are covered, dependencies are linear, and residual risk is limited to manual docs wording review for DIR-07.
 - 2026-04-27 [TOOL] Phase 2 revision check passed: `verify.plan-structure` remained valid for `02-01-PLAN.md` and `02-02-PLAN.md`, and a reverse grep confirmed no erroneous `~/.openspec/skills/opsx` or `~/.openspec/commands/opsx.md` legacy-source references remain in Phase 2 plans.
 - 2026-04-27 [TOOL] Phase 2 research verified current local legacy install state under `~/.openspec/` and current repo workspace state under `openspec/`; planning must account for shared-home manifests/skills/config as well as repo-tree migration.
@@ -58,4 +60,4 @@
 - 2026-04-27 [TOOL] `gsd-sdk query state.planned-phase --phase "1" --name "OpsX Naming and CLI Surface" --plans "6"` updated `.planning/STATE.md`.
 - 2026-04-27 [TOOL] Phase 1 verification report status is `passed`; runtime suite passed 23/23, legacy allowlist passed, and `npm pack --dry-run` produced `@xenonbyte/opsx@3.0.0`.
 - 2026-04-27 [TOOL] Latest Phase 1 `01-REVIEW-FIX.md` reports `status: all_fixed` for all review findings; `02f6795` updated language alias docs and `9a8e719` recorded the all-scope fix report. Runtime suite remains 25/25 and legacy allowlist passes.
-- 2026-04-27 [CODE] Next executable step: `$gsd-execute-phase 2` for Phase 2: `.opsx/` Workspace and Migration.
+- 2026-04-27 [CODE] Next executable step: run verification handoff for completed Phase 2 (`$gsd-verify-work 2`) before planning/executing Phase 3.
