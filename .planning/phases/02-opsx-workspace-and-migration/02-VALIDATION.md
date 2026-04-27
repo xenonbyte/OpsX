@@ -50,7 +50,7 @@ created: 2026-04-27
 
 ---
 
-## Wave 0 Requirements
+## Regression Coverage Requirements
 
 - [ ] Add test-fixture helpers for legacy repo state under `openspec/`.
 - [ ] Add test-fixture helpers for legacy shared-home state under `~/.openspec/`.
@@ -86,7 +86,7 @@ All phase behaviors should have automated verification. Manual review is still r
 
 - [x] All planned implementation tasks must include automated verification or Wave 0 dependencies.
 - [x] Sampling continuity: no 3 consecutive implementation tasks may skip automated verification.
-- [x] Wave 0 covers all missing test references identified by research.
+- [x] Regression coverage covers all missing test references identified by research after the migration runtime is wired.
 - [x] No watch-mode flags.
 - [x] Feedback latency target is under 10 seconds.
 - [x] `nyquist_compliant: true` set in frontmatter.
