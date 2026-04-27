@@ -3,13 +3,13 @@
 - 2026-04-27 [CODE] Current milestone: `v3.0 OpsX migration and state-machine workflow`.
 - 2026-04-27 [CODE] Phase 1, Phase 2, Phase 3, and Phase 4 are complete and verified.
 - 2026-04-27T17:04Z [TOOL] Phase 4 verifier passed 5/5 must-haves; `04-VERIFICATION.md` was written with `status: passed`.
-- 2026-04-27 [TOOL] Phase 4 final code review `04-REVIEW.md` is clean after remediation commit `7282e57`.
+- 2026-04-27 [TOOL] Phase 4 final code review `04-REVIEW.md` is clean after refreshed review commit `27d8438`.
 - 2026-04-27 [TOOL] Final Phase 4 checks passed: `npm run test:workflow-runtime` 49/49 and `gsd-sdk query verify.schema-drift 04`.
 - 2026-04-27 [CODE] Phase 3 code review is clean after remediation commits `9690fac` and `c719ba1`.
 - 2026-04-27 [CODE] Public current UX must not expose legacy OpenSpec routes/paths, `/prompts:*`, `/opsx:*`, standalone `$opsx`, or `$opsx <request>`.
 - 2026-04-27 [CODE] `commands/codex/prompts/opsx.md` remains only as an internal generated route catalog; public Codex entrypoints are explicit `$opsx-*`.
 - 2026-04-27 [CODE] `AGENTS.md` preserves repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
-- 2026-04-27 [CODE] Current GSD position: Phase 5 (`spec-split-checkpoint`) is ready for discussion; no Phase 5 context exists yet.
+- 2026-04-28 [CODE] Current GSD position: Phase 5 (`spec-split-checkpoint`) context is captured; next step is `$gsd-plan-phase 5`.
 
 ## Done (recent)
 - 2026-04-27 [CODE] Executed all Phase 4 plans `04-01` through `04-09`; summaries exist for every plan.
@@ -17,6 +17,7 @@
 - 2026-04-27 [CODE] Committed clean Phase 4 review report in `535df3b`.
 - 2026-04-27 [TOOL] Phase 4 verifier wrote `04-VERIFICATION.md` with `status: passed`, `score: 5/5`, and `requirements_verified: 8/8`.
 - 2026-04-27 [CODE] Updated `.planning/STATE.md`, `.planning/ROADMAP.md`, `.planning/PROJECT.md`, and `CONTINUITY.md` for Phase 4 completion and Phase 5 readiness.
+- 2026-04-28 [CODE] Captured Phase 5 context and discussion log in `.planning/phases/05-spec-split-checkpoint/`.
 - 2026-04-27 [CODE] Executed all Phase 3 plans `03-01` through `03-11`; final review and verification passed.
 
 ## Working set
@@ -25,12 +26,11 @@
 - /Users/xubo/x-skills/openspec/.planning/STATE.md
 - /Users/xubo/x-skills/openspec/.planning/PROJECT.md
 - /Users/xubo/x-skills/openspec/CONTINUITY.md
-- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-REVIEW.md
-- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-VERIFICATION.md
-- /Users/xubo/x-skills/openspec/lib/change-state.js
+- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-CONTEXT.md
+- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-DISCUSSION-LOG.md
+- /Users/xubo/x-skills/openspec/schemas/spec-driven/schema.json
+- /Users/xubo/x-skills/openspec/lib/workflow.js
 - /Users/xubo/x-skills/openspec/lib/change-store.js
-- /Users/xubo/x-skills/openspec/lib/workspace.js
-- /Users/xubo/x-skills/openspec/lib/runtime-guidance.js
 - /Users/xubo/x-skills/openspec/scripts/test-workflow-runtime.js
 
 ## Decisions
@@ -51,6 +51,7 @@
 - 2026-04-27 [CODE] D015 ACTIVE: Phase 4 plans pin `yaml@2.8.3`, do not add `xstate`, and instead schedule a local transition-table module in `lib/change-state.js` to keep the implementation bounded and library-first.
 
 ## Receipts
+- 2026-04-28 [TOOL] Phase 5 context committed as `08235de`; STATE session record committed as `8aa329d`.
 - 2026-04-27T17:04Z [TOOL] Verification pass confirmed Phase 4 goal achievement: `npm run test:workflow-runtime` passed 49/49, `04-REVIEW.md` remained clean, and `04-VERIFICATION.md` captures the passed report.
 - 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-09` after removing temporary parity exemptions and restoring full `commands/**` checked-in parity.
 - 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-08` and Gemini parity check returned `GEMINI_PARITY_OK`.
