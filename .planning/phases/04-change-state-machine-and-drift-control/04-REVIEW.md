@@ -1,6 +1,6 @@
 ---
 phase: 04-change-state-machine-and-drift-control
-reviewed: 2026-04-27T17:21:36Z
+reviewed: 2026-04-27T17:46:13Z
 depth: standard
 files_reviewed: 35
 files_reviewed_list:
@@ -49,91 +49,87 @@ status: issues_found
 
 # Phase 04: Code Review Report
 
-**Reviewed:** 2026-04-27T17:21:36Z
+**Reviewed:** 2026-04-27T17:46:13Z
 **Depth:** standard
 **Files Reviewed:** 35
 **Status:** issues_found
 
 ## Summary
 
-Reviewed the listed Phase 04 runtime libraries, generated command prompts for Claude/Codex/Gemini, package metadata, workflow runtime tests, and OpsX skill/playbook files. `package-lock.json` was supplied in the config but filtered out as a lock file per review rules.
+Reviewed the listed Phase 04 runtime libraries, generated Claude/Codex/Gemini workflow files, package metadata, runtime tests, and OpsX skill/playbook files after REVIEW-FIX commits `3cc0084` and `935a656`.
 
-Two correctness issues were found in edge cases not covered by the current runtime suite. The generated workflow prompt files are consistent with the checked-in route guidance, and no hardcoded secrets or dangerous API usage were found in the reviewed source.
+Prior finding verification:
+
+- Prior WR-01 is fixed for the originally reported `BLOCK` execution checkpoint path. `recordTaskGroupExecution()` now preserves the stored hash baseline and active task group for `checkpointStatus: 'BLOCK'`, and `scripts/test-workflow-runtime.js` includes a regression test for that case.
+- Prior WR-02 is fixed for unsafe change names. `createChangeSkeleton()` validates the change name before deriving or writing scaffold paths, and the regression test confirms `../escape`, `foo/bar`, and unsupported-character names fail before files or active pointers are written.
+
+Two new correctness warnings remain in adjacent edge cases. No hardcoded secrets or dangerous API usage were found in the reviewed source/generated workflow files.
 
 Verification run during review:
 
-- `npm run test:workflow-runtime` passed: 49/49 tests.
+- `npm run test:workflow-runtime` passed: 51/51 tests.
+- Static pattern scan for secrets, dangerous APIs, debug artifacts, and empty catch blocks returned no matches.
 
 ## Warnings
 
-### WR-01: Blocked Execution Checkpoints Still Refresh Hashes And Advance The Active Group
+### WR-01: Lowercase Or Alternate Rejected Execution Checkpoints Still Advance State
 
-**File:** `lib/change-store.js:483-495`
+**File:** `lib/change-store.js:467`
 
-**Issue:** `recordTaskGroupExecution()` correctly marks `checkpointResult.accepted` as false for `BLOCK` and `FAILED`, but then unconditionally writes `active.taskGroup: nextTaskGroup` and `hashes: normalizeHashMap(refreshedHashes)`. A blocked execution checkpoint can therefore make rejected artifact contents the new hash baseline and move `continue`/`apply` guidance to the next task group, bypassing the intended "patch existing artifacts before continuing" gate.
+**Issue:** `recordTaskGroupExecution()` builds `checkpointResult.accepted` with an exact case-sensitive comparison against only `BLOCK` and `FAILED`. Because `isAcceptedCheckpointResult()` trusts `accepted === true` before checking the status text, payloads such as `checkpointStatus: 'block'`, `FAIL`, `ERROR`, or `REJECTED` are treated as accepted. A reproduced lowercase `block` checkpoint refreshed the drifted artifact hash, advanced `active.taskGroup` to the next group, and added no blocker.
 
 **Fix:**
 
 ```js
-const acceptedCheckpoint = isAcceptedCheckpointResult(normalizeCheckpointResult(checkpointResult));
-
-const persistedState = writeChangeState(resolvedChangeDir, Object.assign({}, checkpointed, {
-  active: acceptedCheckpoint
-    ? Object.assign({}, checkpointed.active, {
-      taskGroup: nextTaskGroup,
-      nextTaskGroup
-    })
-    : checkpointed.active,
-  verificationLog: [...normalizeAnyArray(checkpointed.verificationLog), verificationEntry],
-  hashes: acceptedCheckpoint ? normalizeHashMap(refreshedHashes) : checkpointed.hashes,
-  warnings: nextWarnings,
-  blockers: acceptedCheckpoint
-    ? checkpointed.blockers
-    : Array.from(new Set([
-      ...normalizeStringArray(checkpointed.blockers),
-      `Execution checkpoint blocked for ${completedTaskGroup}`
-    ])),
-  allowedPaths: allowedPaths.length ? allowedPaths : checkpointed.allowedPaths,
-  forbiddenPaths: forbiddenPaths.length ? forbiddenPaths : checkpointed.forbiddenPaths
-}));
+const checkpointStatus = (toNonEmptyString(payload.checkpointStatus) || 'PENDING').toUpperCase();
+const acceptedCheckpoint = isAcceptedCheckpointResult({ status: checkpointStatus });
+const checkpointResult = {
+  status: checkpointStatus,
+  accepted: acceptedCheckpoint,
+  taskGroup: completedTaskGroup,
+  verificationCommand: verificationEntry.verificationCommand,
+  verificationResult: verificationEntry.verificationResult,
+  changedFiles: verificationEntry.changedFiles
+};
 ```
 
-Add a regression test that calls `recordTaskGroupExecution()` with `checkpointStatus: 'BLOCK'` after changing a tracked artifact and asserts the stored hash stays unchanged and `active.taskGroup` does not advance to the next group.
+Reuse that same `acceptedCheckpoint` after `recordCheckpointResult()` instead of recalculating from a result object whose `accepted` field may override the normalized status. Add regression coverage for lowercase `block` and at least one non-canonical rejected status such as `ERROR`.
 
-### WR-02: New Change Creation Accepts Names That Runtime Status Later Rejects
+### WR-02: Invalid `createdAt` Leaves A Partial New Change Directory
 
-**File:** `lib/workspace.js:180-189`
+**File:** `lib/workspace.js:203`
 
-**Issue:** `createChangeSkeleton()` only checks that `changeName` is non-empty and that the joined path remains under `.opsx/changes`. It still accepts names such as `foo/bar`, creates nested change folders, and writes that value to `.opsx/active.yaml`. The runtime status path later rejects the same name through `ensureSafeChangeName()` with `invalid-change-name`, leaving a newly created change that cannot be resumed through the normal runtime APIs.
+**Issue:** `createChangeSkeleton()` creates `.opsx/changes/<changeName>` before parsing `options.createdAt` at line 215. When `createdAt` is invalid, `new Date(options.createdAt).toISOString()` throws `Invalid time value` after the empty change directory has already been written. This violates the same "reject before writing scaffold files" expectation used for invalid change names and leaves a partial change container behind.
 
 **Fix:**
 
 ```js
-const CHANGE_NAME_PATTERN = /^[a-z0-9][a-z0-9-_]*$/i;
-
-function validateChangeName(value) {
-  const normalized = String(value || '').trim();
-  if (!normalized) throw new Error('changeName is required.');
-  if (normalized.includes('/') || normalized.includes('\\') || normalized.includes('..')) {
-    throw new Error('changeName must not include path separators or traversal markers.');
+function normalizeCreatedAt(value) {
+  if (!value) return new Date().toISOString();
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error('createdAt must be a valid ISO-8601 timestamp.');
   }
-  if (!CHANGE_NAME_PATTERN.test(normalized)) {
-    throw new Error('changeName contains unsupported characters.');
-  }
-  return normalized;
+  return parsed.toISOString();
 }
 
 function createChangeSkeleton(options = {}) {
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
   const changeName = validateChangeName(options.changeName);
-  // ...
+  const schemaName = String(options.schemaName || 'spec-driven').trim() || 'spec-driven';
+  const createdAt = normalizeCreatedAt(options.createdAt);
+  const securitySensitive = options.securitySensitive === true;
+
+  const changesDir = getCanonicalChangesDir(repoRoot);
+  const changeDir = path.join(changesDir, changeName);
+  // Create directories only after all scalar inputs have been validated.
 }
 ```
 
-Add a test next to the existing invalid-input coverage asserting `createChangeSkeleton({ changeName: '../escape' })`, `createChangeSkeleton({ changeName: 'foo/bar' })`, and unsupported characters fail before any files are written.
+Add a regression test asserting `createChangeSkeleton({ changeName: 'date-edge', createdAt: 'not-a-date' })` throws before `.opsx/changes/date-edge` or `.opsx/active.yaml` exists.
 
 ---
 
-_Reviewed: 2026-04-27T17:21:36Z_
+_Reviewed: 2026-04-27T17:46:13Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
