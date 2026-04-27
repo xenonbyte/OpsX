@@ -627,6 +627,31 @@ function runTests() {
     assert.strictEqual(state.stage, 'INIT');
   });
 
+  test('createChangeSkeleton rejects unsafe change names before writing files', () => {
+    const { createChangeSkeleton } = require('../lib/workspace');
+    const invalidFixtureRoot = createFixtureRepo();
+    cleanupTargets.push(invalidFixtureRoot);
+    const changesDir = path.join(invalidFixtureRoot, '.opsx', 'changes');
+    const invalidCases = [
+      ['../escape', /path separators or traversal markers/],
+      ['foo/bar', /path separators or traversal markers/],
+      ['bad name', /unsupported characters/]
+    ];
+
+    invalidCases.forEach(([changeName, expectedMessage]) => {
+      assert.throws(() => {
+        createChangeSkeleton({
+          repoRoot: invalidFixtureRoot,
+          changeName
+        });
+      }, expectedMessage);
+    });
+
+    assert.deepStrictEqual(fs.readdirSync(changesDir), []);
+    assert(!fs.existsSync(path.join(invalidFixtureRoot, '.opsx', 'active.yaml')));
+    assert(!fs.existsSync(path.join(invalidFixtureRoot, '.opsx', 'escape')));
+  });
+
   test('placeholder artifacts do not imply accepted planning stages', () => {
     const { loadChangeState } = require('../lib/change-store');
     const changeName = 'placeholder-artifacts';
