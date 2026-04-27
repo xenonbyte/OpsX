@@ -1,13 +1,11 @@
 ---
-description: OpsX entrypoint for Codex. Prefer the opsx skill for natural-language workflow requests.
+description: OpsX internal Codex route catalog generated from shared workflow metadata.
 ---
-# OpsX
+# OpsX Routes (Codex Internal Catalog)
 
 Use the `opsx` skill for this request.
 
-Codex usage model:
-- Preferred: `$opsx <request>`
-- Explicit routing: `$opsx-*`
+This file is an internal generated route catalog. Public Codex workflow routing uses explicit `$opsx-*` commands only.
 
 Available routes:
 - `$opsx-propose` - Create a change and generate planning artifacts in one step.
@@ -26,9 +24,15 @@ Available routes:
 - `$opsx-onboard` - Walk a user through the minimum OpsX workflow path.
 
 Important:
+- Strict preflight before acting:
+- Read `.opsx/config.yaml` if present to confirm schema, language, and workspace rules.
+- Read `.opsx/active.yaml` if present to locate the active change pointer.
+- When an active change exists, read `.opsx/changes/<active-change>/state.yaml` before acting.
+- When an active change exists, read `.opsx/changes/<active-change>/context.md` before acting.
+- When an active change exists, read current artifacts (`proposal.md`, `specs/`, `design.md`, optional `security-review.md`, and `tasks.md`) before mutating files.
 - Treat `$opsx-*` as action selectors in Codex.
 - If details are still needed after command selection, provide them in the next message.
+- If required artifacts are missing, report missing files and redirect to the next explicit route instead of fabricating state.
 - CLI quick checks: `opsx check`, `opsx doc`, `opsx language <en|zh>`.
-- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
 - Security-review states: `required`, `recommended`, `waived`, `completed`
 - Checkpoints: `spec checkpoint` before `tasks`, `task checkpoint` before `apply`, and `execution checkpoint` after each top-level task group.
