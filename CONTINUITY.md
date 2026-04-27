@@ -1,4 +1,5 @@
 ## Snapshot
+- 2026-04-28 [CODE] Phase 4 Plan 07 is complete: Codex stateful prompt slice refreshed from `buildPlatformBundle('codex')` with one-group apply and read-only drift wording.
 - 2026-04-27 [USER] Goal: Start a new GSD milestone from the supplied OpsX optimization report.
 - 2026-04-27 [CODE] Current milestone: `v3.0 OpsX migration and state-machine workflow`.
 - 2026-04-27 [CODE] Phase 1, Phase 2, and Phase 3 are complete and verified.
@@ -12,6 +13,7 @@
 - 2026-04-27 [CODE] Phase 4 Plan 04 is complete: tracked artifact hash drift, context/drift sidecars, accepted-write persistence helpers, and one-group apply routing are now in runtime code with regression coverage.
 
 ## Done (recent)
+- 2026-04-28 [CODE] Executed Phase 4 Plan 07 with atomic commit `b6dbc29` and green `npm run test:workflow-runtime` plus Codex bundle parity check.
 - 2026-04-27 [CODE] Executed Phase 4 Plan 02 with atomic TDD commits (`6a9eb6e`, `e9d73aa`, `345dcce`, `499c130`) and green `npm run test:workflow-runtime` (39/39).
 - 2026-04-27 [CODE] Captured Phase 4 discussion decisions in `04-CONTEXT.md` and `04-DISCUSSION-LOG.md`.
 - 2026-04-27 [CODE] Wrote `04-RESEARCH.md` for Phase 4 with state-machine, YAML, drift, and test-planning guidance.
@@ -59,6 +61,7 @@
 - 2026-04-27 [CODE] D015 ACTIVE: Phase 4 plans pin `yaml@2.8.3`, do not add `xstate`, and instead schedule a local transition-table module in `lib/change-state.js` to keep the implementation bounded and library-first.
 
 ## Receipts
+- 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-07` and Codex parity check returned `CODEx_PARITY_OK`.
 - 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 39/39 after `04-02` Task 2 GREEN.
 - 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 49/49 after `04-04` Task 2 GREEN.
 - 2026-04-27 [TOOL] `gsd-sdk query state.advance-plan` moved Phase 4 cursor from Plan 2 to Plan 3.
