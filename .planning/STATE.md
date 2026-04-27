@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 3 revised planning complete
-last_updated: "2026-04-27T09:29:36.292Z"
-last_activity: 2026-04-27 -- Phase 3 execution started
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-04-27T09:40:13.422Z"
+last_activity: 2026-04-27
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 21
-  completed_plans: 10
-  percent: 48
+  completed_plans: 11
+  percent: 52
 ---
 
 # State
@@ -26,9 +26,9 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 3 (Skill and Command Surface Rewrite) — EXECUTING
-Plan: 1 of 11
-Status: Executing Phase 3
-Last activity: 2026-04-27 -- Phase 3 execution started
+Plan: 2 of 11
+Status: Ready to execute
+Last activity: 2026-04-27
 
 ## Next Action
 
@@ -50,6 +50,8 @@ Run `$gsd-execute-phase 3` to execute the revised 11-plan / 5-wave Phase 3 plan 
 - [Phase 03]: Hard clean break for legacy OpenSpec surfaces. — Supersedes earlier migration/history allowlists; planning must update requirements and tests accordingly.
 - [Phase 03]: Keep `commands/codex/prompts/opsx.md` only as an internal generated route catalog; never a public standalone Codex entrypoint.
 - [Phase 03]: Preserve repo-local `openspec/` authoring instructions in `AGENTS.md`; replace only stale route guidance with current OpsX routes.
+- Phase 03 Plan 01 rewrote NAME-04/CMD-04 and Phase 3 success criteria to enforce explicit banned public entrypoints.
+- Phase 03 Plan 01 established runtime helper inventories for route bans, bundle parity, and empty-state fallback matching before generated rewrites.
 
 ## Blockers
 
@@ -69,9 +71,10 @@ Run `$gsd-execute-phase 3` to execute the revised 11-plan / 5-wave Phase 3 plan 
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 02 P04 | 3m | 2 tasks | 6 files |
+| Phase 03 P01 | 7m 4s | 2 tasks | 5 files |
 
 ## Session
 
-Last session: 2026-04-27T09:01:50Z
-Stopped At: Phase 3 revised planning complete
-Resume File: .planning/phases/03-skill-and-command-surface-rewrite/03-01-PLAN.md
+Last session: 2026-04-27T09:40:13.418Z
+Stopped At: Completed 03-01-PLAN.md
+Resume File: None

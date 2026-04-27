@@ -25,11 +25,11 @@
 
 ### Commands and Skills
 
-- [ ] **CMD-01**: Claude Code users can use `/opsx-explore`, `/opsx-new`, `/opsx-propose`, `/opsx-continue`, `/opsx-ff`, `/opsx-apply`, `/opsx-verify`, `/opsx-status`, `/opsx-resume`, `/opsx-sync`, `/opsx-archive`, `/opsx-batch-apply`, `/opsx-bulk-archive`, and `/opsx-onboard`.
-- [ ] **CMD-02**: Codex users can use the corresponding `$opsx-*` commands as the public primary entrypoints.
+- [x] **CMD-01**: Claude Code users can use `/opsx-explore`, `/opsx-new`, `/opsx-propose`, `/opsx-continue`, `/opsx-ff`, `/opsx-apply`, `/opsx-verify`, `/opsx-status`, `/opsx-resume`, `/opsx-sync`, `/opsx-archive`, `/opsx-batch-apply`, `/opsx-bulk-archive`, and `/opsx-onboard`.
+- [x] **CMD-02**: Codex users can use the corresponding `$opsx-*` commands as the public primary entrypoints.
 - [ ] **CMD-03**: The distributed skill lives at `skills/opsx/` with frontmatter `name: opsx` and reads `.opsx/` and `~/.opsx/` config in the correct precedence order.
-- [ ] **CMD-04**: Generated prompts treat `/openspec`, `$openspec`, `/prompts:openspec`, `/opsx:*`, `/prompts:opsx-*`, standalone `$opsx`, and `$opsx <request>` as banned public workflow entrypoints.
-- [ ] **CMD-05**: `opsx-onboard`, `opsx-status`, and `opsx-resume` behave correctly even when no active change exists.
+- [x] **CMD-04**: Generated prompts treat `/openspec`, `$openspec`, `/prompts:openspec`, `/opsx:*`, `/prompts:opsx-*`, standalone `$opsx`, and `$opsx <request>` as banned public workflow entrypoints.
+- [x] **CMD-05**: `opsx-onboard`, `opsx-status`, and `opsx-resume` behave correctly even when no active change exists.
 
 ### State Machine and Drift Control
 
@@ -109,11 +109,11 @@
 | DIR-05 | Phase 2 | Completed |
 | DIR-06 | Phase 2 | Completed |
 | DIR-07 | Phase 2 | Completed |
-| CMD-01 | Phase 3 | Pending |
-| CMD-02 | Phase 3 | Pending |
+| CMD-01 | Phase 3 | Completed |
+| CMD-02 | Phase 3 | Completed |
 | CMD-03 | Phase 3 | Pending |
-| CMD-04 | Phase 3 | Pending |
-| CMD-05 | Phase 3 | Pending |
+| CMD-04 | Phase 3 | Completed |
+| CMD-05 | Phase 3 | Completed |
 | STATE-01 | Phase 4 | Pending |
 | STATE-02 | Phase 4 | Pending |
 | STATE-03 | Phase 4 | Pending |
