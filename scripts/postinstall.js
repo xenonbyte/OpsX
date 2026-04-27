@@ -8,8 +8,11 @@ Next steps:
 1. Install assets for one or more tools:
    opsx install --platform claude,codex,gemini
 
-2. For Codex, prefer:
-   $opsx <request>
+2. For Codex, use explicit routes:
+   $opsx-onboard
+   $opsx-propose
+   $opsx-status
+   $opsx-apply
 
 3. Check command help:
    opsx --help
