@@ -1,6 +1,6 @@
 ---
 phase: 04-change-state-machine-and-drift-control
-fixed_at: 2026-04-27T17:31:30Z
+fixed_at: 2026-04-27T17:55:34Z
 review_path: .planning/phases/04-change-state-machine-and-drift-control/04-REVIEW.md
 iteration: 1
 findings_in_scope: 2
@@ -11,7 +11,7 @@ status: all_fixed
 
 # Phase 04: Code Review Fix Report
 
-**Fixed at:** 2026-04-27T17:31:30Z
+**Fixed at:** 2026-04-27T17:55:34Z
 **Source review:** `.planning/phases/04-change-state-machine-and-drift-control/04-REVIEW.md`
 **Iteration:** 1
 
@@ -19,26 +19,26 @@ status: all_fixed
 - Findings in scope: 2
 - Fixed: 2
 - Skipped: 0
-- Verification: `npm run test:workflow-runtime` passed, 51/51 tests
+- Verification: `npm run test:workflow-runtime` passed, 53/53 tests
 
 ## Fixed Issues
 
-### WR-01: Blocked Execution Checkpoints Still Refresh Hashes And Advance The Active Group
+### WR-01: Lowercase Or Alternate Rejected Execution Checkpoints Still Advance State
 
 **Files modified:** `lib/change-store.js`, `scripts/test-workflow-runtime.js`
-**Commit:** 3cc0084
+**Commit:** f99aa58
 **Status:** fixed: requires human verification
-**Applied fix:** Blocked execution checkpoints now keep the existing active task group and stored hash baseline, add a blocker entry, and still record verification/checkpoint metadata. Added regression coverage for `checkpointStatus: 'BLOCK'` after artifact drift.
+**Applied fix:** `recordTaskGroupExecution()` now normalizes checkpoint status to uppercase before recording, computes checkpoint acceptance from that normalized status, and reuses the same acceptance decision when deciding whether to advance the active task group or refresh hashes. Added regression coverage for lowercase `block` and `ERROR` rejected execution checkpoints.
 
-### WR-02: New Change Creation Accepts Names That Runtime Status Later Rejects
+### WR-02: Invalid `createdAt` Leaves A Partial New Change Directory
 
 **Files modified:** `lib/workspace.js`, `scripts/test-workflow-runtime.js`
-**Commit:** 935a656
+**Commit:** 49f3840
 **Status:** fixed: requires human verification
-**Applied fix:** `createChangeSkeleton()` now validates change names before deriving or writing scaffold paths, rejecting traversal, path separators, and unsupported characters. Added regression coverage confirming invalid names fail before files or active pointers are written.
+**Applied fix:** `createChangeSkeleton()` now validates and normalizes `createdAt` before creating `.opsx/changes/<changeName>` or writing active state. Added regression coverage confirming invalid `createdAt` throws before the change directory or `.opsx/active.yaml` exists.
 
 ---
 
-_Fixed: 2026-04-27T17:31:30Z_
+_Fixed: 2026-04-27T17:55:34Z_
 _Fixer: Claude (gsd-code-fixer)_
 _Iteration: 1_
