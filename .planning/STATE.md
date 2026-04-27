@@ -4,14 +4,14 @@ milestone: v3.0
 milestone_name: milestone
 status: planning
 stopped_at: Phase 5 context gathered
-last_updated: "2026-04-27T18:32:54.743Z"
+last_updated: "2026-04-27T19:16:27.246Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
   completed_phases: 4
-  total_plans: 30
+  total_plans: 37
   completed_plans: 30
-  percent: 100
+  percent: 81
 ---
 
 # State
@@ -137,4 +137,4 @@ Last session: --stopped-at
 Stopped At: Phase 5 context gathered
 Resume File: --resume-file
 
-**Planned Phase:** 04 (Change State Machine and Drift Control) — 9 plans — 2026-04-27T14:55:01.015Z
+**Planned Phase:** 05 (spec-split-checkpoint) — 7 plans — 2026-04-27T19:16:27.225Z
