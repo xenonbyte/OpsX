@@ -837,6 +837,32 @@ function runTests() {
     });
   });
 
+  test('manifest cleanup refuses paths outside OpsX install roots', () => {
+    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-home-manifest-'));
+    cleanupTargets.push(tempHome);
+
+    install({ platform: 'claude', homeDir: tempHome, language: 'en' });
+
+    const manifestPath = path.join(tempHome, '.openspec', 'manifests', 'claude.manifest');
+    const installedFile = fs.readFileSync(manifestPath, 'utf8').split('\n').find((entry) => entry && fs.existsSync(entry));
+    const victimPath = path.join(tempHome, 'victim.txt');
+    writeText(victimPath, 'do not remove');
+    writeText(manifestPath, [installedFile, victimPath].join('\n'));
+
+    assert.throws(
+      () => uninstall({ platform: 'claude', homeDir: tempHome }),
+      /Refusing to remove path outside OpsX install roots/
+    );
+    assert(fs.existsSync(installedFile), 'Safe manifest entries should not be removed after a rejected cleanup.');
+    assert(fs.existsSync(victimPath), 'Manifest cleanup must not remove paths outside OpsX install roots.');
+
+    assert.throws(
+      () => install({ platform: 'claude', homeDir: tempHome, language: 'en' }),
+      /Refusing to remove path outside OpsX install roots/
+    );
+    assert(fs.existsSync(victimPath), 'Reinstall cleanup must not remove paths outside OpsX install roots.');
+  });
+
   test('public install/check/doc/language command surface remains compatible', () => {
     const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-home-'));
     cleanupTargets.push(tempHome);
