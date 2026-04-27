@@ -9,6 +9,9 @@
     "postinstall": "node scripts/postinstall.js",
     "test:workflow-runtime": "node scripts/test-workflow-runtime.js"
   },
+  "dependencies": {
+    "yaml": "2.8.3"
+  },
   "files": [
     "bin/",
     "lib/",
