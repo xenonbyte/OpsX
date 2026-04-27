@@ -441,6 +441,38 @@ function runTests() {
     });
   });
 
+  test('change-state exports strict transition and continue APIs', () => {
+    const changeState = require('../lib/change-state');
+    assert(Array.isArray(changeState.STAGE_VALUES));
+    assert(changeState.STAGE_VALUES.includes('APPLYING_GROUP'));
+    assert.strictEqual(changeState.MUTATION_EVENTS.START_TASK_GROUP, 'START_TASK_GROUP');
+    [
+      'applyMutationEvent',
+      'resolveContinueAction',
+      'buildLifecycleBlockResult'
+    ].forEach((symbol) => {
+      assert.strictEqual(typeof changeState[symbol], 'function', `Expected ${symbol} export.`);
+    });
+  });
+
+  test('change-state blocks invalid transitions and routes continue by persisted stage', () => {
+    const { applyMutationEvent, resolveContinueAction } = require('../lib/change-state');
+    const blocked = applyMutationEvent({ stage: 'INIT' }, 'COMPLETE_TASK_GROUP');
+    assert.strictEqual(blocked.status, 'BLOCK');
+    assert.strictEqual(blocked.code, 'invalid-transition');
+    assert(Array.isArray(blocked.patchTargets));
+    assert.strictEqual(resolveContinueAction({ stage: 'INIT' }), 'proposal');
+    assert.strictEqual(resolveContinueAction({ stage: 'PROPOSAL_READY' }), 'specs');
+    assert.strictEqual(resolveContinueAction({ stage: 'SPECS_READY' }), 'design');
+    assert.strictEqual(resolveContinueAction({
+      stage: 'APPLYING_GROUP',
+      active: { taskGroup: '1. Runtime instructions' }
+    }), 'apply');
+    assert.strictEqual(resolveContinueAction({ stage: 'IMPLEMENTED' }), 'verify');
+    assert.strictEqual(resolveContinueAction({ stage: 'VERIFIED' }), 'sync');
+    assert.strictEqual(resolveContinueAction({ stage: 'SYNCED' }), 'archive');
+  });
+
   test('change-store normalizes sparse Phase 2 state to Phase 4 defaults', () => {
     const { normalizeChangeState } = require('../lib/change-store');
     const normalized = normalizeChangeState({
