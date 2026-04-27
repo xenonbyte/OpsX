@@ -871,6 +871,50 @@ function runTests() {
     assert(contextText.includes('1. Runtime setup'));
   });
 
+  test('blocked execution checkpoint preserves artifact hashes and active task group', () => {
+    const { recordTaskGroupExecution, writeChangeState } = require('../lib/change-store');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const changeName = 'blocked-execution-preserves-baseline';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Runtime setup',
+        '- [x] 1.1 Setup workspace',
+        '',
+        '## 2. Runtime integration',
+        '- [ ] 2.1 Build integration'
+      ].join('\n'),
+      'specs/runtime/spec.md': '## ADDED Requirements\n### Requirement: Runtime\n'
+    });
+    const baselineHashes = hashTrackedArtifacts(changeDir);
+
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'APPLYING_GROUP',
+      active: {
+        taskGroup: '1. Runtime setup',
+        nextTaskGroup: '2. Runtime integration'
+      },
+      hashes: baselineHashes
+    });
+    writeText(path.join(changeDir, 'proposal.md'), '# Rejected proposal drift\n');
+
+    const persisted = recordTaskGroupExecution(changeDir, {
+      taskGroup: '1. Runtime setup',
+      nextTaskGroup: '2. Runtime integration',
+      verificationCommand: 'npm run test:workflow-runtime',
+      verificationResult: 'BLOCK',
+      changedFiles: ['proposal.md'],
+      checkpointStatus: 'BLOCK'
+    });
+
+    assert.strictEqual(persisted.hashes['proposal.md'], baselineHashes['proposal.md']);
+    assert.strictEqual(persisted.active.taskGroup, '1. Runtime setup');
+    assert.strictEqual(persisted.active.nextTaskGroup, '2. Runtime integration');
+    assert(persisted.blockers.includes('Execution checkpoint blocked for 1. Runtime setup'));
+  });
+
   test('drift ledger preserves stable headings and timestamped entries', () => {
     const { recordTaskGroupExecution, writeChangeState } = require('../lib/change-store');
     const changeName = 'drift-ledger-stability';
