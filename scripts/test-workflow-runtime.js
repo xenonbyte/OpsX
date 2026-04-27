@@ -863,6 +863,27 @@ function runTests() {
     assert(fs.existsSync(victimPath), 'Reinstall cleanup must not remove paths outside OpsX install roots.');
   });
 
+  test('install and uninstall reject mixed invalid platform values', () => {
+    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-home-invalid-platform-'));
+    cleanupTargets.push(tempHome);
+
+    const manifestPath = path.join(tempHome, '.openspec', 'manifests', 'claude.manifest');
+    assert.throws(
+      () => install({ platform: 'claude,bogus', homeDir: tempHome, language: 'en' }),
+      /Install supports only --platform <claude\|codex\|gemini\[,...\]>; invalid: bogus/
+    );
+    assert(!fs.existsSync(manifestPath), 'Invalid mixed install should not partially install valid platforms.');
+
+    install({ platform: 'claude', homeDir: tempHome, language: 'en' });
+    assert(fs.existsSync(manifestPath));
+
+    assert.throws(
+      () => uninstall({ platform: 'claude,bogus', homeDir: tempHome }),
+      /Uninstall supports only --platform <claude\|codex\|gemini\[,...\]>; invalid: bogus/
+    );
+    assert(fs.existsSync(manifestPath), 'Invalid mixed uninstall should not remove valid platform installs.');
+  });
+
   test('public install/check/doc/language command surface remains compatible', () => {
     const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-home-'));
     cleanupTargets.push(tempHome);
