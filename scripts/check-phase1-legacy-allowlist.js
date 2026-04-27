@@ -11,29 +11,20 @@ const README_LINEAGE_SENTENCE = 'OpsX was originally adapted from Fission-AI/Ope
 const SCAN_TARGETS = [
   'README.md',
   'README-zh.md',
-  'CHANGELOG.md',
-  'package.json',
-  'bin',
-  'lib',
-  'scripts',
-  'commands',
+  'docs',
   'skills/opsx',
   'templates',
-  'docs',
-  'openspec/config.yaml',
-  'schemas/spec-driven/schema.json',
+  'commands',
+  'scripts/postinstall.js',
+  'lib/cli.js',
   'AGENTS.md'
 ];
 
-const DEFERRED_ALLOWLIST_FILES = new Set([
-  'lib/config.js',
-  'lib/constants.js',
-  'lib/install.js',
-  'lib/runtime-guidance.js',
-  'scripts/test-workflow-runtime.js',
-  'openspec/config.yaml',
-  'schemas/spec-driven/schema.json',
-  'AGENTS.md'
+const AGENTS_AUTHORING_ALLOWLIST_LINES = new Set([
+  '# OpenSpec project hand-off',
+  'This repository uses OpenSpec as the workflow source of truth.',
+  '- Read `openspec/config.yaml` for project context and workflow defaults.',
+  '- Keep change artifacts under `openspec/changes/`.'
 ]);
 
 function toPosixPath(filePath) {
@@ -93,19 +84,23 @@ function isLineageSentence(filePath, lineText) {
   );
 }
 
+function isAgentsAuthoringLine(filePath, lineText) {
+  return filePath === 'AGENTS.md' && AGENTS_AUTHORING_ALLOWLIST_LINES.has(lineText.trim());
+}
+
 function isAllowedMatch(filePath, lineText) {
-  if (filePath === 'CHANGELOG.md') return true;
-  if (DEFERRED_ALLOWLIST_FILES.has(filePath)) return true;
+  if (isAgentsAuthoringLine(filePath, lineText)) return true;
   return isLineageSentence(filePath, lineText);
 }
 
 function classifySurface(filePath) {
-  if (filePath === 'package.json' || filePath.startsWith('bin/')) return 'forbidden public surface';
-  if (filePath === 'lib/cli.js') return 'forbidden public surface';
-  if (filePath.startsWith('commands/')) return 'forbidden public surface';
-  if (filePath.startsWith('skills/opsx/')) return 'forbidden public surface';
-  if (filePath.startsWith('docs/')) return 'forbidden public surface';
-  if (filePath.startsWith('templates/')) return 'forbidden public surface';
+  if (filePath === 'README.md' || filePath === 'README-zh.md') return 'forbidden public docs surface';
+  if (filePath === 'AGENTS.md') return 'forbidden project hand-off route surface';
+  if (filePath === 'scripts/postinstall.js' || filePath === 'lib/cli.js') return 'forbidden help surface';
+  if (filePath.startsWith('commands/')) return 'forbidden generated command surface';
+  if (filePath.startsWith('skills/opsx/')) return 'forbidden skill surface';
+  if (filePath.startsWith('docs/')) return 'forbidden docs surface';
+  if (filePath.startsWith('templates/')) return 'forbidden template surface';
   return 'unexpected legacy reference';
 }
 
@@ -147,7 +142,7 @@ function main() {
   }
 
   if (unexpected.length) {
-    console.error('Phase 1 legacy allowlist check FAILED.');
+    console.error('Phase 3 public-surface legacy token check FAILED.');
     console.error(`Scanned ${files.length} files and found ${unexpected.length} unexpected legacy-token hit(s):`);
     for (const hit of unexpected) {
       console.error(`- [${hit.surface}] ${hit.filePath}:${hit.lineNumber} token="${hit.token}"`);
@@ -156,7 +151,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log('Phase 1 legacy allowlist check passed.');
+  console.log('Phase 3 public-surface legacy token check passed.');
   console.log(`Scanned files: ${files.length}`);
   console.log(`Allowlisted legacy-token hits: ${allowedHitCount}`);
 }

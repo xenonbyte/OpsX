@@ -19,7 +19,9 @@ const {
   runExecutionCheckpoint,
   summarizeWorkflowState,
   validatePhaseOneWorkflowContract,
-  validateCheckpointContracts
+  validateCheckpointContracts,
+  getAllActions,
+  getActionSyntax
 } = require('../lib/workflow');
 const {
   install,
@@ -29,6 +31,153 @@ const {
   setLanguage
 } = require('../lib/install');
 const { buildPlatformBundle } = require('../lib/generator');
+
+const BANNED_PUBLIC_ROUTE_STRINGS = Object.freeze([
+  '/openspec',
+  '$openspec',
+  '/prompts:openspec',
+  '/opsx:*',
+  '/prompts:opsx-*',
+  'standalone $opsx',
+  '$opsx <request>'
+]);
+
+const EXPECTED_CODEX_PUBLIC_ROUTES = Object.freeze([
+  '$opsx-explore',
+  '$opsx-new',
+  '$opsx-propose',
+  '$opsx-continue',
+  '$opsx-ff',
+  '$opsx-apply',
+  '$opsx-verify',
+  '$opsx-status',
+  '$opsx-resume',
+  '$opsx-sync',
+  '$opsx-archive',
+  '$opsx-batch-apply',
+  '$opsx-bulk-archive',
+  '$opsx-onboard'
+]);
+
+const EMPTY_STATE_FALLBACK_MATCHERS = Object.freeze({
+  onboard: Object.freeze({
+    emptyWorkspace: 'Workspace not initialized: `.opsx/config.yaml` is missing.',
+    missingActiveChange: 'No active change is selected in `.opsx/active.yaml`.',
+    noAutoCreateState: 'Do not auto-create `.opsx/active.yaml` or change state from `onboard`.'
+  }),
+  status: Object.freeze({
+    emptyWorkspace: 'Workspace not initialized: `.opsx/config.yaml` is missing.',
+    missingActiveChange: 'No active change is selected in `.opsx/active.yaml`.',
+    noAutoCreateState: 'Do not auto-create `.opsx/active.yaml` or change state from `status`.'
+  }),
+  resume: Object.freeze({
+    emptyWorkspace: 'Workspace not initialized: `.opsx/config.yaml` is missing.',
+    missingActiveChange: 'No resumable change exists because `.opsx/active.yaml` has no active change.',
+    noAutoCreateState: 'Do not auto-create `.opsx/active.yaml` or change state from `resume`.'
+  })
+});
+
+const PLATFORM_BUNDLE_TARGETS = Object.freeze({
+  claude: Object.freeze({
+    checkedInRoot: path.join(REPO_ROOT, 'commands', 'claude'),
+    entryPath: 'opsx.md',
+    actionPath: (actionId) => `opsx/${actionId}.md`,
+    isTrackedBundlePath: (relativePath) => relativePath === 'opsx.md' || relativePath.startsWith('opsx/')
+  }),
+  codex: Object.freeze({
+    checkedInRoot: path.join(REPO_ROOT, 'commands', 'codex'),
+    entryPath: 'prompts/opsx.md',
+    actionPath: (actionId) => `prompts/opsx-${actionId}.md`,
+    isTrackedBundlePath: (relativePath) => relativePath === 'prompts/opsx.md' || relativePath.startsWith('prompts/opsx-')
+  }),
+  gemini: Object.freeze({
+    checkedInRoot: path.join(REPO_ROOT, 'commands', 'gemini'),
+    entryPath: 'opsx.toml',
+    actionPath: (actionId) => `opsx/${actionId}.toml`,
+    isTrackedBundlePath: (relativePath) => relativePath === 'opsx.toml' || relativePath.startsWith('opsx/')
+  })
+});
+
+function toPosixPath(filePath) {
+  return filePath.split(path.sep).join('/');
+}
+
+function listFilesRecursive(rootDir) {
+  const entries = fs.readdirSync(rootDir, { withFileTypes: true });
+  const files = [];
+
+  for (const entry of entries) {
+    const absolutePath = path.join(rootDir, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...listFilesRecursive(absolutePath));
+      continue;
+    }
+    if (entry.isFile()) {
+      files.push(absolutePath);
+    }
+  }
+
+  return files;
+}
+
+function collectBundleParity(platform, generatedBundle) {
+  const platformTarget = PLATFORM_BUNDLE_TARGETS[platform];
+  const generatedPaths = Object.keys(generatedBundle);
+  const generatedPathSet = new Set(generatedPaths);
+  const missing = [];
+  const mismatched = [];
+
+  generatedPaths.forEach((relativePath) => {
+    const checkedInPath = path.join(platformTarget.checkedInRoot, relativePath);
+    if (!fs.existsSync(checkedInPath)) {
+      missing.push(relativePath);
+      return;
+    }
+    const checkedInContent = fs.readFileSync(checkedInPath, 'utf8');
+    if (checkedInContent !== generatedBundle[relativePath]) {
+      mismatched.push(relativePath);
+    }
+  });
+
+  const trackedCheckedInPaths = listFilesRecursive(platformTarget.checkedInRoot)
+    .map((absolutePath) => toPosixPath(path.relative(platformTarget.checkedInRoot, absolutePath)))
+    .filter((relativePath) => platformTarget.isTrackedBundlePath(relativePath));
+
+  const extra = trackedCheckedInPaths
+    .filter((relativePath) => !generatedPathSet.has(relativePath))
+    .sort((left, right) => left.localeCompare(right));
+
+  return {
+    totalGenerated: generatedPaths.length,
+    totalCheckedIn: trackedCheckedInPaths.length,
+    missing: missing.sort((left, right) => left.localeCompare(right)),
+    mismatched: mismatched.sort((left, right) => left.localeCompare(right)),
+    extra
+  };
+}
+
+function collectFallbackCopyCoverage(generatedBundles) {
+  const coverage = {};
+  const actions = Object.keys(EMPTY_STATE_FALLBACK_MATCHERS);
+
+  actions.forEach((actionId) => {
+    const matchers = EMPTY_STATE_FALLBACK_MATCHERS[actionId];
+    coverage[actionId] = {};
+
+    Object.entries(PLATFORM_BUNDLE_TARGETS).forEach(([platform, platformTarget]) => {
+      const promptPath = platformTarget.actionPath(actionId);
+      const promptContent = generatedBundles[platform][promptPath] || '';
+      coverage[actionId][platform] = {
+        promptPath,
+        emptyWorkspace: promptContent.includes(matchers.emptyWorkspace),
+        missingActiveChange: promptContent.includes(matchers.missingActiveChange),
+        noAutoCreateState: promptContent.includes(matchers.noAutoCreateState)
+      };
+    });
+  });
+
+  return coverage;
+}
 
 function expectRuntimeError(run, code) {
   let caught = null;
@@ -1082,10 +1231,28 @@ function runTests() {
       codex: buildPlatformBundle('codex'),
       gemini: buildPlatformBundle('gemini')
     };
+
+    const codexRoutesFromWorkflow = getAllActions()
+      .map((action) => getActionSyntax('codex', action.id))
+      .sort((left, right) => left.localeCompare(right));
+    const expectedCodexRoutes = [...EXPECTED_CODEX_PUBLIC_ROUTES].sort((left, right) => left.localeCompare(right));
+    assert.deepStrictEqual(codexRoutesFromWorkflow, expectedCodexRoutes);
+    [
+      '/openspec',
+      '$openspec',
+      '/prompts:openspec',
+      '/opsx:*',
+      '/prompts:opsx-*',
+      'standalone $opsx',
+      '$opsx <request>'
+    ].forEach((token) => {
+      assert(BANNED_PUBLIC_ROUTE_STRINGS.includes(token));
+    });
+
     assert(generatedBundles.claude['opsx.md'].includes('OpsX'));
     assert(generatedBundles.claude['opsx.md'].includes('Primary workflow entry: `/opsx-<action>`'));
     assert(!generatedBundles.claude['opsx.md'].includes('Primary workflow entry: `$opsx <request>`'));
-    assert(generatedBundles.codex['prompts/opsx.md'].includes('$opsx <request>'));
+    assert(generatedBundles.codex['prompts/opsx.md'].includes('OpsX'));
     assert(generatedBundles.gemini['opsx.toml'].includes('OpsX Workflow'));
     assert(generatedBundles.gemini['opsx.toml'].includes('Primary workflow entry: `/opsx-<action>`'));
     assert(!generatedBundles.gemini['opsx.toml'].includes('Primary workflow entry: `$opsx <request>`'));
@@ -1095,12 +1262,29 @@ function runTests() {
       });
     });
 
-    const checkedInEntries = [
-      path.join(REPO_ROOT, 'commands', 'claude', 'opsx.md'),
-      path.join(REPO_ROOT, 'commands', 'codex', 'prompts', 'opsx.md'),
-      path.join(REPO_ROOT, 'commands', 'gemini', 'opsx.toml')
-    ];
-    checkedInEntries.forEach((entryPath) => {
+    const bundleParity = Object.fromEntries(
+      Object.entries(generatedBundles).map(([platform, bundle]) => [platform, collectBundleParity(platform, bundle)])
+    );
+    Object.entries(bundleParity).forEach(([platform, parity]) => {
+      assert(parity.totalGenerated > 0, `${platform} generated bundle must not be empty`);
+      assert.strictEqual(parity.missing.length, 0, `${platform} bundle is missing checked-in files: ${parity.missing.join(', ')}`);
+      assert.strictEqual(parity.mismatched.length, 0, `${platform} bundle has content drift: ${parity.mismatched.join(', ')}`);
+      assert.strictEqual(parity.extra.length, 0, `${platform} bundle has stale checked-in files: ${parity.extra.join(', ')}`);
+    });
+
+    const fallbackCoverage = collectFallbackCopyCoverage(generatedBundles);
+    Object.keys(EMPTY_STATE_FALLBACK_MATCHERS).forEach((actionId) => {
+      Object.keys(PLATFORM_BUNDLE_TARGETS).forEach((platform) => {
+        const coverage = fallbackCoverage[actionId][platform];
+        assert(generatedBundles[platform][coverage.promptPath], `Missing generated ${platform} prompt for ${actionId}`);
+        assert.strictEqual(typeof coverage.emptyWorkspace, 'boolean');
+        assert.strictEqual(typeof coverage.missingActiveChange, 'boolean');
+        assert.strictEqual(typeof coverage.noAutoCreateState, 'boolean');
+      });
+    });
+
+    Object.values(PLATFORM_BUNDLE_TARGETS).forEach((target) => {
+      const entryPath = path.join(target.checkedInRoot, target.entryPath);
       assert(fs.existsSync(entryPath), `Missing checked-in command entry: ${entryPath}`);
       const entryContent = fs.readFileSync(entryPath, 'utf8');
       assert(entryContent.includes('OpsX'), `Expected OpsX branding in ${entryPath}`);
