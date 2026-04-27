@@ -15,9 +15,12 @@
 
 ### Workspace and Migration
 
-- [ ] **DIR-01**: Project workflow artifacts live under `.opsx/` with `config.yaml`, `active.yaml`, `changes/`, `specs/`, `archive/`, `cache/`, `tmp/`, and `logs/`.
-- [ ] **DIR-02**: Global OpsX files live under `~/.opsx/` with `config.yaml`, `manifests/`, `skills/opsx/`, and `cache/`.
-- [ ] **DIR-03**: User can run `opsx migrate --dry-run` to preview the full `openspec/` to `.opsx/` migration mapping without writing files.
+- [x] **DIR-01
+**: Project workflow artifacts live under `.opsx/` with `config.yaml`, `active.yaml`, `changes/`, `specs/`, `archive/`, `cache/`, `tmp/`, and `logs/`.
+- [x] **DIR-02
+**: Global OpsX files live under `~/.opsx/` with `config.yaml`, `manifests/`, `skills/opsx/`, and `cache/`.
+- [x] **DIR-03
+**: User can run `opsx migrate --dry-run` to preview the full `openspec/` to `.opsx/` migration mapping without writing files.
 - [ ] **DIR-04**: User can run `opsx migrate` to move project config, changes, specs, archive, and change metadata into the `.opsx/` layout.
 - [ ] **DIR-05**: Migration renames per-change `.openspec.yaml` files to `change.yaml` and creates missing `state.yaml`, `context.md`, `drift.md`, and `.opsx/active.yaml` defaults.
 - [ ] **DIR-06**: Migration aborts by default when `.opsx/` already exists and requires explicit merge intent before combining directories.

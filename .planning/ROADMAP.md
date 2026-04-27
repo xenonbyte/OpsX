@@ -48,7 +48,7 @@ This roadmap turns the current OpenSpec `2.0.1` repository into OpsX `3.0.0`. It
 Plans:
 - [ ] `02-01-PLAN.md` — Add migration fixtures, CLI regression coverage, and canonical `.opsx` gitignore rules after runtime wiring.
 - [x] `02-02-PLAN.md` — Build the reusable migration core in `lib/migrate.js` and `lib/workspace.js`.
-- [ ] `02-03-PLAN.md` — Canonicalize runtime paths and wire real `opsx migrate` / minimal truthful `opsx status`.
+- [x] `02-03-PLAN.md` — Canonicalize runtime paths and wire real `opsx migrate` / minimal truthful `opsx status`.
 - [ ] `02-04-PLAN.md` — Update README/docs/templates to match shipped `.opsx` migration behavior.
 
 **Success criteria:**
