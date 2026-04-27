@@ -1,6 +1,6 @@
 ---
 phase: 01-opsx-naming-and-cli-surface
-reviewed: 2026-04-26T21:00:26Z
+reviewed: 2026-04-27T01:59:28Z
 depth: standard
 files_reviewed: 37
 files_reviewed_list:
@@ -43,24 +43,24 @@ files_reviewed_list:
   - uninstall.sh
 findings:
   critical: 0
-  warning: 1
+  warning: 2
   info: 1
-  total: 2
+  total: 3
 status: issues_found
 ---
 
 # Phase 01: Code Review Report
 
-**Reviewed:** 2026-04-26T21:00:26Z
+**Reviewed:** 2026-04-27T01:59:28Z
 **Depth:** standard
 **Files Reviewed:** 37
 **Status:** issues_found
 
 ## Summary
 
-Reviewed the Phase 1 OpsX naming and CLI surface files at standard depth, including the package/bin surface, CLI dispatch, install/generator plumbing, workflow classification logic, public command adapters, docs, templates, skill bundle, and regression scripts.
+Re-reviewed the Phase 1 OpsX naming and CLI surface after the review-fix commit. The previous warning for `skills/opsx/**` execution-evidence classification is fixed: `changedFiles: ['skills/opsx/SKILL.md']` now derives `behavior.changed: true` and `docsOnly: false`.
 
-The main runtime issue is a Phase 1 rename regression in execution-evidence classification: `skills/opsx/**` changes are currently treated as documentation-only, so checkpoint verification can be skipped for behavior-changing skill updates.
+No critical issues were found. Two warning-level install/uninstall edge cases remain, plus one documentation consistency issue carried over from the prior review.
 
 Verification run:
 - `node scripts/test-workflow-runtime.js` - PASS, 23 tests passed
@@ -69,42 +69,57 @@ Verification run:
 
 ## Warnings
 
-### WR-01: Renamed skill changes are classified as docs-only
+### WR-01: Manifest cleanup can remove paths outside OpsX-owned install roots
 
-**File:** `lib/workflow.js:487`
-**Issue:** `isDocsPath()` excludes command files and the old `skills/openspec/` prefix from docs-only handling, but it does not exclude the renamed `skills/opsx/` bundle. A changed file such as `skills/opsx/SKILL.md` now derives `behavior.changed: false`, `docsOnly: true`, and `verification.requiresTesting: false`, so `execution checkpoint` can skip verification for behavior-changing skill or playbook edits.
+**File:** `lib/install.js:55-58`
+**Issue:** `cleanupFromManifest()` trusts every line in the manifest and passes it directly to `removePath()`. A corrupted or manually edited manifest under `~/.openspec/manifests/*.manifest` can make `opsx uninstall --platform <name>` or a reinstall delete arbitrary filesystem paths that the current user can write. I verified this with a temporary manifest pointing at a temporary victim file; uninstall removed the victim.
 **Fix:**
 ```js
-const OPSX_SKILL_DIR_PREFIX = 'skills/opsx/';
+function isWithinRoot(rootPath, targetPath) {
+  const relative = path.relative(path.resolve(rootPath), path.resolve(targetPath));
+  return relative === '' || (relative && !relative.startsWith('..') && !path.isAbsolute(relative));
+}
 
-function isDocsPath(filePath = '') {
-  const normalized = String(filePath || '').replace(/\\/g, '/').toLowerCase();
-  if (
-    /^commands\//.test(normalized)
-    || normalized.startsWith(OPSX_SKILL_DIR_PREFIX)
-    || normalized.startsWith(LEGACY_SKILL_DIR_PREFIX)
-  ) return false;
-  return (
-    /\.md$/i.test(normalized)
-    || /^docs\//i.test(normalized)
-    || normalized.startsWith(LEGACY_CHANGE_DIR_PREFIX)
-    || /readme/i.test(normalized)
-    || /changelog/i.test(normalized)
-  );
+function cleanupFromManifest(manifestPath, allowedRoots) {
+  if (!fs.existsSync(manifestPath)) return;
+  const entries = fs.readFileSync(manifestPath, 'utf8').split('\n').filter(Boolean);
+  entries.forEach((entry) => {
+    if (!allowedRoots.some((root) => isWithinRoot(root, entry))) {
+      throw new Error(`Refusing to remove path outside OpsX install roots: ${entry}`);
+    }
+    removePath(entry);
+  });
 }
 ```
-Add a regression assertion beside the existing command/prompt classification test for `changedFiles: ['skills/opsx/SKILL.md']`.
+Pass the platform command and skill install directories as `allowedRoots` from both install and uninstall paths, and add a regression test for a manifest entry outside those roots.
+
+### WR-02: Invalid mixed platform values are silently ignored
+
+**File:** `lib/install.js:142-147`, `lib/install.js:150-155`
+**Issue:** `install()` and `uninstall()` filter unsupported platform names and proceed when at least one valid platform remains. For example, `opsx install --platform claude,bogus` installs Claude assets successfully and never tells the user that `bogus` was ignored. This can leave users with a partial install/uninstall after a typo.
+**Fix:**
+```js
+function resolvePlatforms(input, action) {
+  const requested = parsePlatforms(input);
+  const invalid = requested.filter((platform) => !PLATFORM_RULE_FILES[platform]);
+  if (!requested.length || invalid.length) {
+    throw new Error(`${action} supports only --platform <claude|codex|gemini[,...]>${invalid.length ? `; invalid: ${invalid.join(', ')}` : ''}`);
+  }
+  return requested;
+}
+```
+Use `resolvePlatforms()` in both `install()` and `uninstall()`, and cover mixed valid/invalid values in the runtime test script.
 
 ## Info
 
 ### IN-01: Compatibility language alias docs omit the required value
 
-**File:** `README.md:31`, `README-zh.md:31`, `docs/commands.md:60`
+**File:** `README.md:34`, `README-zh.md:34`, `docs/commands.md:63`
 **Issue:** The compatibility alias lists show `opsx --language`, but the CLI requires a language value and fails without `<en|zh>`. The CLI help already documents `opsx --language <en|zh>`, so these docs are inconsistent with runtime behavior.
 **Fix:** Change each compatibility alias bullet to `opsx --language <en|zh>`.
 
 ---
 
-_Reviewed: 2026-04-26T21:00:26Z_
+_Reviewed: 2026-04-27T01:59:28Z_
 _Reviewer: Codex (gsd-code-reviewer)_
 _Depth: standard_
