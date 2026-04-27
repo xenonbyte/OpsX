@@ -787,12 +787,12 @@ function runTests() {
       assert(fs.existsSync(result.platformSkillDir));
     });
 
-    const sharedSkillDir = path.join(tempHome, '.openspec', 'skills', 'opsx');
+    const sharedSkillDir = path.join(tempHome, '.opsx', 'skills', 'opsx');
     assert(fs.existsSync(sharedSkillDir));
     assert(fs.existsSync(path.join(sharedSkillDir, 'SKILL.md')));
-    assert(!fs.existsSync(path.join(tempHome, '.openspec', 'skills', 'openspec', 'SKILL.md')));
+    assert(!fs.existsSync(path.join(tempHome, '.opsx', 'skills', 'openspec', 'SKILL.md')));
 
-    const sharedCommandPath = path.join(tempHome, '.openspec', 'commands', 'opsx.md');
+    const sharedCommandPath = path.join(tempHome, '.opsx', 'commands', 'opsx.md');
     assert(fs.existsSync(sharedCommandPath));
     const sharedCommandContent = fs.readFileSync(sharedCommandPath, 'utf8');
     assert(sharedCommandContent.includes('OpsX'));
@@ -843,7 +843,7 @@ function runTests() {
 
     install({ platform: 'claude', homeDir: tempHome, language: 'en' });
 
-    const manifestPath = path.join(tempHome, '.openspec', 'manifests', 'claude.manifest');
+    const manifestPath = path.join(tempHome, '.opsx', 'manifests', 'claude.manifest');
     const installedFile = fs.readFileSync(manifestPath, 'utf8').split('\n').find((entry) => entry && fs.existsSync(entry));
     const victimPath = path.join(tempHome, 'victim.txt');
     writeText(victimPath, 'do not remove');
@@ -867,7 +867,7 @@ function runTests() {
     const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-home-invalid-platform-'));
     cleanupTargets.push(tempHome);
 
-    const manifestPath = path.join(tempHome, '.openspec', 'manifests', 'claude.manifest');
+    const manifestPath = path.join(tempHome, '.opsx', 'manifests', 'claude.manifest');
     assert.throws(
       () => install({ platform: 'claude,bogus', homeDir: tempHome, language: 'en' }),
       /Install supports only --platform <claude\|codex\|gemini\[,...\]>; invalid: bogus/
@@ -918,8 +918,8 @@ function runTests() {
     install({ platform: 'claude,codex,gemini', homeDir: tempHome, language: 'en' });
     uninstall({ platform: 'gemini', homeDir: tempHome });
 
-    assert(fs.existsSync(path.join(tempHome, '.openspec', 'skills', 'opsx', 'SKILL.md')));
-    assert(fs.existsSync(path.join(tempHome, '.openspec', 'commands', 'opsx.md')));
+    assert(fs.existsSync(path.join(tempHome, '.opsx', 'skills', 'opsx', 'SKILL.md')));
+    assert(fs.existsSync(path.join(tempHome, '.opsx', 'commands', 'opsx.md')));
 
     const checkOutput = runCheck({ homeDir: tempHome, cwd: fixtureRoot });
     assert(checkOutput.includes('Found 2 manifest(s)'));
@@ -933,7 +933,7 @@ function runTests() {
     const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-home-doc-'));
     cleanupTargets.push(tempHome);
 
-    const staleGuideDir = path.join(tempHome, '.openspec', 'skills', 'opsx');
+    const staleGuideDir = path.join(tempHome, '.opsx', 'skills', 'opsx');
     ensureDir(staleGuideDir);
     writeText(path.join(staleGuideDir, 'GUIDE-en.md'), [
       '# Stale OpsX Guide',
@@ -941,7 +941,7 @@ function runTests() {
       '1. `opsx init --platform codex --profile core`',
       '2. `opsx install --platform codex --profile core`'
     ].join('\n'));
-    writeText(path.join(tempHome, '.openspec', '.opsx-config.yaml'), [
+    writeText(path.join(tempHome, '.opsx', 'config.yaml'), [
       'version: "2.0.0"',
       'schema: "spec-driven"',
       'language: "en"',
