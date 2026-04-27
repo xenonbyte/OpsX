@@ -7,10 +7,12 @@
 - 2026-04-27 [CODE] `commands/codex/prompts/opsx.md` remains only as an internal generated route catalog; public Codex entrypoints are explicit `$opsx-*`.
 - 2026-04-27 [CODE] `AGENTS.md` preserves repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
 - 2026-04-27 [CODE] Phase 4 research is complete; next GSD action is `$gsd-plan-phase 4`.
+- 2026-04-27 [CODE] Phase 4 planning is complete; `04-01-PLAN.md` through `04-09-PLAN.md` now define Wave 0 validation, state persistence, transition routing, drift/apply services, and bounded generated refresh slices.
 
 ## Done (recent)
 - 2026-04-27 [CODE] Captured Phase 4 discussion decisions in `04-CONTEXT.md` and `04-DISCUSSION-LOG.md`.
 - 2026-04-27 [CODE] Wrote `04-RESEARCH.md` for Phase 4 with state-machine, YAML, drift, and test-planning guidance.
+- 2026-04-27 [CODE] Wrote Phase 4 plans `04-01-PLAN.md` through `04-09-PLAN.md` and updated `ROADMAP.md` with a 9-plan, 7-wave execution breakdown.
 - 2026-04-27 [CODE] Executed all Phase 3 plans `03-01` through `03-11`.
 - 2026-04-27 [CODE] Added final runtime/public-surface gate: `npm run test:workflow-runtime` now passes 31/31.
 - 2026-04-27 [CODE] Fixed review findings by making generated fallback routes platform-aware and qualifying shared playbook routes.
@@ -27,6 +29,9 @@
 - /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-CONTEXT.md
 - /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-RESEARCH.md
 - /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-DISCUSSION-LOG.md
+- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-01-PLAN.md
+- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-05-PLAN.md
+- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-09-PLAN.md
 - /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-REVIEW.md
 - /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-VERIFICATION.md
 
@@ -45,10 +50,13 @@
 - 2026-04-27 [CODE] D012 ACTIVE: Phase 4 is library-first state-machine infrastructure; do not build a full Node workflow execution engine.
 - 2026-04-27 [CODE] D013 ACTIVE: Phase 4 uses strict mutation transitions, readable status/resume, warn-and-reload hash drift, and one-top-level-task-group apply guidance.
 - 2026-04-27 [CODE] D014 ACTIVE: Phase 4 research recommends `xstate` pure transitions for mutations and `yaml` for persisted state files because the local YAML helper cannot represent the required array-heavy schema.
+- 2026-04-27 [CODE] D015 ACTIVE: Phase 4 plans pin `yaml@2.8.3`, do not add `xstate`, and instead schedule a local transition-table module in `lib/change-state.js` to keep the implementation bounded and library-first.
 
 ## Receipts
 - 2026-04-27 [TOOL] Committed Phase 4 context as `94ca803 docs(04): capture phase context`.
 - 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 31/31 while preparing Phase 4 research.
+- 2026-04-27 [TOOL] `gsd-sdk query init.plan-phase 04` confirmed `phase_dir=.planning/phases/04-change-state-machine-and-drift-control`, `commit_docs=true`, and no existing Phase 4 plans before planning.
+- 2026-04-27 [TOOL] `gsd-sdk query history-digest` confirmed Phase 2 migration scaffolds and Phase 3 generated parity gates are the direct dependencies for Phase 4 planning.
 - 2026-04-27 [TOOL] Final Phase 3 verification commands passed: `npm run test:workflow-runtime` 31/31, `node scripts/check-phase1-legacy-allowlist.js`, `node bin/opsx.js --help`, `gsd-sdk query verify.schema-drift 03`, and wrong-platform route greps.
 - 2026-04-27 [TOOL] `03-REVIEW.md` final status `clean`; `03-VERIFICATION.md` final status `passed`.
 - 2026-04-27 [CODE] Commits `9690fac`, `c719ba1`, `2d17425`, and `950e2f4` closed Phase 3 review remediation, clean review, and verification report.
