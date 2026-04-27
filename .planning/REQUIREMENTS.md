@@ -21,10 +21,14 @@
 **: Global OpsX files live under `~/.opsx/` with `config.yaml`, `manifests/`, `skills/opsx/`, and `cache/`.
 - [x] **DIR-03
 **: User can run `opsx migrate --dry-run` to preview the full `openspec/` to `.opsx/` migration mapping without writing files.
-- [ ] **DIR-04**: User can run `opsx migrate` to move project config, changes, specs, archive, and change metadata into the `.opsx/` layout.
-- [ ] **DIR-05**: Migration renames per-change `.openspec.yaml` files to `change.yaml` and creates missing `state.yaml`, `context.md`, `drift.md`, and `.opsx/active.yaml` defaults.
-- [ ] **DIR-06**: Migration aborts by default when `.opsx/` already exists and requires explicit merge intent before combining directories.
-- [ ] **DIR-07**: Git ignore guidance preserves tracked `.opsx/` workflow artifacts while ignoring `.opsx/cache/`, `.opsx/tmp/`, and `.opsx/logs/`.
+- [x] **DIR-04
+**: User can run `opsx migrate` to move project config, changes, specs, archive, and change metadata into the `.opsx/` layout.
+- [x] **DIR-05
+**: Migration renames per-change `.openspec.yaml` files to `change.yaml` and creates missing `state.yaml`, `context.md`, `drift.md`, and `.opsx/active.yaml` defaults.
+- [x] **DIR-06
+**: Migration aborts by default when `.opsx/` already exists and requires explicit merge intent before combining directories.
+- [x] **DIR-07
+**: Git ignore guidance preserves tracked `.opsx/` workflow artifacts while ignoring `.opsx/cache/`, `.opsx/tmp/`, and `.opsx/logs/`.
 
 ### Commands and Skills
 
