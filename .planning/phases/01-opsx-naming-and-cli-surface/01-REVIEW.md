@@ -1,6 +1,6 @@
 ---
 phase: 01-opsx-naming-and-cli-surface
-reviewed: 2026-04-27T01:59:28Z
+reviewed: 2026-04-27T02:17:34Z
 depth: standard
 files_reviewed: 37
 files_reviewed_list:
@@ -43,72 +43,33 @@ files_reviewed_list:
   - uninstall.sh
 findings:
   critical: 0
-  warning: 2
+  warning: 0
   info: 1
-  total: 3
+  total: 1
 status: issues_found
 ---
 
 # Phase 01: Code Review Report
 
-**Reviewed:** 2026-04-27T01:59:28Z
+**Reviewed:** 2026-04-27T02:17:34Z
 **Depth:** standard
 **Files Reviewed:** 37
 **Status:** issues_found
 
 ## Summary
 
-Re-reviewed the Phase 1 OpsX naming and CLI surface after the review-fix commit. The previous warning for `skills/opsx/**` execution-evidence classification is fixed: `changedFiles: ['skills/opsx/SKILL.md']` now derives `behavior.changed: true` and `docsOnly: false`.
+Re-reviewed the Phase 1 OpsX naming and CLI surface after review-fix commits `ed5513d` and `84034f7`. No critical or warning-level issues remain in the reviewed scope.
 
-No critical issues were found. Two warning-level install/uninstall edge cases remain, plus one documentation consistency issue carried over from the prior review.
+The two requested fix checks are resolved:
+- Manifest cleanup path trust is now guarded: `cleanupFromManifest()` validates every manifest entry against platform install roots before removing anything, and the regression test confirms a corrupted outside-root entry blocks both uninstall and reinstall without deleting files.
+- Mixed invalid platform handling is now strict: `install()` and `uninstall()` reject mixed valid/invalid platform lists before doing partial work, and the regression test confirms `claude,bogus` does not partially install or uninstall.
 
 Verification run:
-- `node scripts/test-workflow-runtime.js` - PASS, 23 tests passed
-- `node scripts/check-phase1-legacy-allowlist.js` - PASS, scanned 88 files with 54 allowlisted legacy-token hits
-- `npm_config_cache=/tmp/opsx-npm-cache npm pack --dry-run` - PASS, package `@xenonbyte/opsx@3.0.0` dry-run tarball includes 88 files
+- `node scripts/test-workflow-runtime.js` - PASS, 25 tests passed
+- `node scripts/check-phase1-legacy-allowlist.js` - PASS, scanned 88 files with 56 allowlisted legacy-token hits
+- `npm --cache /tmp/opsx-npm-cache pack --dry-run` - PASS, package `@xenonbyte/opsx@3.0.0` dry-run tarball includes 88 files
 
-## Warnings
-
-### WR-01: Manifest cleanup can remove paths outside OpsX-owned install roots
-
-**File:** `lib/install.js:55-58`
-**Issue:** `cleanupFromManifest()` trusts every line in the manifest and passes it directly to `removePath()`. A corrupted or manually edited manifest under `~/.openspec/manifests/*.manifest` can make `opsx uninstall --platform <name>` or a reinstall delete arbitrary filesystem paths that the current user can write. I verified this with a temporary manifest pointing at a temporary victim file; uninstall removed the victim.
-**Fix:**
-```js
-function isWithinRoot(rootPath, targetPath) {
-  const relative = path.relative(path.resolve(rootPath), path.resolve(targetPath));
-  return relative === '' || (relative && !relative.startsWith('..') && !path.isAbsolute(relative));
-}
-
-function cleanupFromManifest(manifestPath, allowedRoots) {
-  if (!fs.existsSync(manifestPath)) return;
-  const entries = fs.readFileSync(manifestPath, 'utf8').split('\n').filter(Boolean);
-  entries.forEach((entry) => {
-    if (!allowedRoots.some((root) => isWithinRoot(root, entry))) {
-      throw new Error(`Refusing to remove path outside OpsX install roots: ${entry}`);
-    }
-    removePath(entry);
-  });
-}
-```
-Pass the platform command and skill install directories as `allowedRoots` from both install and uninstall paths, and add a regression test for a manifest entry outside those roots.
-
-### WR-02: Invalid mixed platform values are silently ignored
-
-**File:** `lib/install.js:142-147`, `lib/install.js:150-155`
-**Issue:** `install()` and `uninstall()` filter unsupported platform names and proceed when at least one valid platform remains. For example, `opsx install --platform claude,bogus` installs Claude assets successfully and never tells the user that `bogus` was ignored. This can leave users with a partial install/uninstall after a typo.
-**Fix:**
-```js
-function resolvePlatforms(input, action) {
-  const requested = parsePlatforms(input);
-  const invalid = requested.filter((platform) => !PLATFORM_RULE_FILES[platform]);
-  if (!requested.length || invalid.length) {
-    throw new Error(`${action} supports only --platform <claude|codex|gemini[,...]>${invalid.length ? `; invalid: ${invalid.join(', ')}` : ''}`);
-  }
-  return requested;
-}
-```
-Use `resolvePlatforms()` in both `install()` and `uninstall()`, and cover mixed valid/invalid values in the runtime test script.
+Note: plain `npm pack --dry-run` first failed because the user npm cache under `/Users/xubo/.npm` contains root-owned files. Re-running with a temporary cache avoided that unrelated host-cache issue.
 
 ## Info
 
@@ -120,6 +81,6 @@ Use `resolvePlatforms()` in both `install()` and `uninstall()`, and cover mixed 
 
 ---
 
-_Reviewed: 2026-04-27T01:59:28Z_
+_Reviewed: 2026-04-27T02:17:34Z_
 _Reviewer: Codex (gsd-code-reviewer)_
 _Depth: standard_
