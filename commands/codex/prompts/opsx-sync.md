@@ -6,13 +6,25 @@ description: Merge delta specs from a change into the main spec set.
 Use the `opsx` skill for this request.
 
 Workflow action: `sync`
-Primary workflow entry: `$opsx <request>`
+Primary workflow entry: `$opsx-* (explicit routes only)`
 Explicit action route: `$opsx-sync`
 
 Execution rules:
 - Follow the `sync` playbook from the `opsx` skill and its referenced files.
 - CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
-- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
+- Preflight before acting:
+- Read `.opsx/config.yaml` and `.opsx/active.yaml` when those files exist.
+- When an active change exists, read active `state.yaml`, `context.md`, and current artifacts before mutating files.
+- Read `.opsx/config.yaml` if present to confirm schema, language, and workspace rules.
+- Read `.opsx/active.yaml` if present to locate the active change pointer.
+- When an active change exists, read `.opsx/changes/<active-change>/state.yaml` before acting.
+- When an active change exists, read `.opsx/changes/<active-change>/context.md` before acting.
+- When an active change exists, read current artifacts (`proposal.md`, `specs/`, `design.md`, optional `security-review.md`, and `tasks.md`) before mutating files.
+- If required artifacts are missing, report that honestly and apply route-specific fallback guidance.
+- Route fallback guidance:
+- If `.opsx/config.yaml` is missing, stop and redirect to `$opsx-onboard`.
+- If `.opsx/active.yaml` is missing or points to a missing change, stop and ask the user to run `$opsx-new` or `$opsx-propose`.
+- Do not invent an active change, state file, or task state when required artifacts are absent.
 - Use request details already present in the conversation.
 - Do not assume text typed after a `$opsx-*` command is reliably available as an inline argument in Codex.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.
