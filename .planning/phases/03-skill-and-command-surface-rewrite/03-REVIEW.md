@@ -1,6 +1,6 @@
 ---
 phase: 03-skill-and-command-surface-rewrite
-reviewed: 2026-04-27T11:44:14Z
+reviewed: 2026-04-27T12:02:26Z
 depth: standard
 files_reviewed: 68
 files_reviewed_list:
@@ -74,97 +74,49 @@ files_reviewed_list:
   - templates/project/rule-file.md.tmpl
 findings:
   critical: 0
-  warning: 2
-  info: 1
-  total: 3
-status: issues_found
+  warning: 0
+  info: 0
+  total: 0
+status: clean
 ---
 
 # Phase 03: Code Review Report
 
-**Reviewed:** 2026-04-27T11:44:14Z
+**Reviewed:** 2026-04-27T12:02:26Z
 **Depth:** standard
 **Files Reviewed:** 68
-**Status:** issues_found
+**Status:** clean
 
 ## Summary
 
-Reviewed the Phase 03 public command surface, source generators, templates, skill guidance, and runtime gates. Legacy OpenSpec public-token checks pass, generated bundle parity is covered by the runtime suite, and Codex standalone `$opsx <request>` guidance is not advertised in the reviewed public docs/help surfaces.
+Re-reviewed Phase 03 at current `HEAD` (`c719ba1`) after remediation commits `9690fac` and `c719ba1`.
 
-The main regression is platform-specific route leakage: shared fallback copy uses Codex `$opsx-*` routes in Claude and Gemini generated commands. The runtime gate passes despite this, so it needs a platform-aware assertion.
+All prior findings are fixed. Generated Claude and Gemini fallback guidance now stays on `/opsx-*`, generated Codex prompts stay on `$opsx-*`, the runtime suite includes wrong-platform route assertions for generated bundles, shared skill playbooks qualify every `$opsx-*` line with Codex plus the Claude/Gemini `/opsx-*` equivalent, and generated action prompts no longer duplicate strict preflight bullets.
 
-Verification run during review:
-- `node scripts/check-phase1-legacy-allowlist.js` passed.
-- `npm run test:workflow-runtime` passed, 31/31 tests.
+All reviewed files meet quality standards. No critical, warning, or info issues were found.
 
-## Warnings
+## Verification
 
-### WR-01: Claude/Gemini fallback guidance points users to Codex-only routes
+- `npm run test:workflow-runtime` passed: 31/31 tests.
+- `node scripts/check-phase1-legacy-allowlist.js` passed: scanned 72 files, 4 allowlisted legacy-token hits.
+- `node bin/opsx.js --help` passed and printed OpsX v3.0.0 help with explicit Codex `$opsx-*` usage.
+- `rg -n '\$opsx-' commands/claude commands/gemini` produced no matches, as expected.
+- `rg -n '/opsx-' commands/codex/prompts` produced no matches, as expected.
+- `rg -n '\$opsx-' skills/opsx/references/action-playbooks.md skills/opsx/references/action-playbooks-zh.md` produced only qualified lines; each matching line includes `Codex`, `Claude/Gemini`, and a `/opsx-*` equivalent.
 
-**File:** `/Users/xubo/x-skills/openspec/lib/workflow.js:109`
-**Also affected:** `/Users/xubo/x-skills/openspec/lib/workflow.js:121`, `/Users/xubo/x-skills/openspec/lib/workflow.js:137-143`, `/Users/xubo/x-skills/openspec/commands/claude/opsx/apply.md:25-26`, `/Users/xubo/x-skills/openspec/commands/gemini/opsx/apply.toml:27-28`, `/Users/xubo/x-skills/openspec/skills/opsx/references/action-playbooks.md:20-21`, `/Users/xubo/x-skills/openspec/skills/opsx/references/action-playbooks-zh.md:20-21`
+## Prior Finding Recheck
 
-**Issue:** `getActionFallbackLines()` is platform-agnostic but embeds Codex-only `$opsx-*` commands. Because `buildActionMarkdown('claude'|'gemini', action)` reuses the same fallback text, Claude and Gemini action commands now say their primary route is `/opsx-<action>` while fallback instructions tell users to run `$opsx-onboard`, `$opsx-new`, or `$opsx-propose`. That contradicts the hard clean-break route contract.
+- Generated Claude/Gemini fallback guidance does not point to Codex `$opsx-*`; generated Codex prompts do not point to `/opsx-*`.
+- Runtime tests define wrong-platform route patterns for generated Claude, Codex, and Gemini bundles and assert each generated bundle excludes routes from the other platform family.
+- Shared playbooks contain `$opsx-*` only in platform-labeled lines with the corresponding Claude/Gemini `/opsx-*` route on the same line.
+- `templates/commands/action.md.tmpl` now has one generated strict preflight insertion point, and checked generated action prompts contain one strict preflight block.
 
-**Fix:**
-Make fallback route rendering platform-aware, then regenerate the checked-in command bundles and update shared skill playbooks to avoid unqualified Codex routes.
+## Residual Risks / Test Gaps
 
-```js
-const ROUTES_BY_PLATFORM = {
-  codex: { onboard: '$opsx-onboard', new: '$opsx-new', propose: '$opsx-propose' },
-  claude: { onboard: '/opsx-onboard', new: '/opsx-new', propose: '/opsx-propose' },
-  gemini: { onboard: '/opsx-onboard', new: '/opsx-new', propose: '/opsx-propose' }
-};
-
-function getActionFallbackLines(platform, actionId) {
-  const routes = ROUTES_BY_PLATFORM[platform];
-  if (!routes) throw new Error(`Unsupported platform: ${platform}`);
-  // Build fallback copy with routes.onboard/routes.new/routes.propose.
-}
-```
-
-Then call `getActionFallbackLines(platform, action.id)` from `lib/generator.js`.
-
-### WR-02: Runtime gate has a false negative for platform-specific fallback routes
-
-**File:** `/Users/xubo/x-skills/openspec/scripts/test-workflow-runtime.js:1365-1373`
-
-**Issue:** The fallback coverage test only checks that empty-workspace/missing-active/no-auto-create text exists. It never asserts that Claude/Gemini fallback text avoids `$opsx-*`, or that Codex fallback text avoids `/opsx-*`. The current suite passes 31/31 while the checked-in Claude/Gemini action bundles contain Codex route suggestions, so this gate can miss the exact public-surface regression Phase 03 is meant to prevent.
-
-**Fix:**
-Add route-contract assertions for generated action bundles before parity checks, for example:
-
-```js
-const wrongRoutePatternByPlatform = {
-  claude: /\$opsx-/,
-  gemini: /\$opsx-/,
-  codex: /\/opsx-/
-};
-
-Object.entries(generatedBundles).forEach(([platform, bundle]) => {
-  Object.entries(bundle).forEach(([relativePath, content]) => {
-    assert(
-      !wrongRoutePatternByPlatform[platform].test(content),
-      `${platform}:${relativePath} contains a route for the wrong platform`
-    );
-  });
-});
-```
-
-If shared skill docs intentionally mention both route families, test them separately with explicit platform labels.
-
-## Info
-
-### IN-01: Generated action prompts duplicate strict preflight bullets
-
-**File:** `/Users/xubo/x-skills/openspec/templates/commands/action.md.tmpl:15-18`
-
-**Issue:** The action template hard-codes `.opsx/config.yaml`, `.opsx/active.yaml`, `state.yaml`, and `context.md` preflight bullets, then immediately expands `{{preflight_note}}`, which contains the same guidance from `PHASE_THREE_PREFLIGHT_LINES`. Every generated action file now repeats the same preflight instructions twice, increasing token surface and making future prompt edits more error-prone.
-
-**Fix:** Keep one source of truth. Prefer removing the hard-coded lines 16-17 from `templates/commands/action.md.tmpl` and relying on `{{preflight_note}}`, then regenerate Claude/Codex/Gemini command bundles.
+The review relied on generated-bundle parity plus representative generated-file inspection rather than manually validating every repeated generated command body line-by-line. This is appropriate for the current generator-backed command surface, but future hand edits under `commands/` should keep the parity test in the required verification path.
 
 ---
 
-_Reviewed: 2026-04-27T11:44:14Z_
-_Reviewer: Claude (gsd-code-reviewer)_
+_Reviewed: 2026-04-27T12:02:26Z_
+_Reviewer: Codex (gsd-code-reviewer)_
 _Depth: standard_
