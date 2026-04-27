@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-07-PLAN.md
-last_updated: "2026-04-27T16:13:48.733Z"
+stopped_at: Completed 04-08-PLAN.md
+last_updated: "2026-04-27T16:20:38.162Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 30
-  completed_plans: 28
-  percent: 93
+  completed_plans: 29
+  percent: 97
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 04 (Change State Machine and Drift Control) — EXECUTING
-Plan: 8 of 9
+Plan: 9 of 9
 Status: Ready to execute
 Last activity: 2026-04-27
 
@@ -87,6 +87,8 @@ Run `$gsd-execute-phase 4` to execute the 9 Phase 4 plans.
 - Phase 4 treats allowedPaths/forbiddenPaths as warnings; hard verify/archive blocking remains deferred to Phase 7.
 - Keep 04-06 scope bounded: do not touch commands/claude/opsx.md or any non-listed generated files.
 - Phase 04 Plan 07 keeps Codex refresh mechanically bounded to the listed stateful action slice from buildPlatformBundle('codex').
+- Phase 04 Plan 08 refreshes only the listed Gemini stateful action files from buildPlatformBundle('gemini') with no hand edits.
+- Phase 04 Plan 08 keeps scope mechanically bounded by leaving commands/gemini/opsx.toml and non-listed generated files untouched.
 
 ## Blockers
 
@@ -122,11 +124,12 @@ Run `$gsd-execute-phase 4` to execute the 9 Phase 4 plans.
 | Phase 04 P05 | 3m 33s | 2 tasks | 5 files |
 | Phase 04 P06 | 4m 41s | 1 tasks | 7 files |
 | Phase 04 P07 | 1m 54s | 1 tasks | 7 files |
+| Phase 04 P08 | 4m 44s | 1 tasks | 7 files |
 
 ## Session
 
-Last session: 2026-04-27T16:13:48.723Z
-Stopped At: Completed 04-07-PLAN.md
+Last session: 2026-04-27T16:20:38.157Z
+Stopped At: Completed 04-08-PLAN.md
 Resume File: None
 
 **Planned Phase:** 04 (Change State Machine and Drift Control) — 9 plans — 2026-04-27T14:55:01.015Z

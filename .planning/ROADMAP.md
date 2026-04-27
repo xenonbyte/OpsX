@@ -108,7 +108,7 @@ Plans:
 - [x] `04-05-PLAN.md` — Update source-of-truth workflow/skill guidance for Phase 4 and stage a temporary source-output gate for generated refreshes.
 - [x] `04-06-PLAN.md` — Refresh the bounded Claude stateful action slice from the new Phase 4 source of truth.
 - [x] `04-07-PLAN.md` — Refresh the bounded Codex stateful prompt slice from the new Phase 4 source of truth.
-- [ ] `04-08-PLAN.md` — Refresh the bounded Gemini stateful action slice from the new Phase 4 source of truth.
+- [x] `04-08-PLAN.md` — Refresh the bounded Gemini stateful action slice from the new Phase 4 source of truth.
 - [ ] `04-09-PLAN.md` — Restore full checked-in generated parity after all Phase 4 stateful refresh slices land.
 
 **Success criteria:**
