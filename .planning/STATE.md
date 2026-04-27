@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-04-27T15:37:41.206Z"
+stopped_at: Completed 04-04-PLAN.md
+last_updated: "2026-04-27T15:52:35.988Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 30
-  completed_plans: 24
-  percent: 80
+  completed_plans: 25
+  percent: 83
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 04 (Change State Machine and Drift Control) — EXECUTING
-Plan: 4 of 9
+Plan: 5 of 9
 Status: Ready to execute
 Last activity: 2026-04-27
 
@@ -79,6 +79,9 @@ Run `$gsd-execute-phase 4` to execute the 9 Phase 4 plans.
 - Phase 04 Plan 02 persists new-change INIT lifecycle and active pointer through change-store helpers during skeleton creation.
 - Phase 04 Plan 03 routes continue/status/resume from persisted stage via change-state selectors.
 - CLI status now delegates active-change rendering to runtime-guidance buildStatusText while keeping missing-workspace guidance truthful.
+- Phase 04 Plan 04 refreshes stored hashes only through accepted-write helpers (recordCheckpointResult/recordTaskGroupExecution).
+- Phase 04 Plan 04 keeps status/resume drift inspection read-only: warn+reload without mutating state.yaml hashes.
+- Phase 04 Plan 04 constrains apply guidance to one selected top-level task group via persisted active.nextTaskGroup preference.
 
 ## Blockers
 
@@ -110,11 +113,12 @@ Run `$gsd-execute-phase 4` to execute the 9 Phase 4 plans.
 | Phase 04 P01 | 5m 40s | 2 tasks | 5 files |
 | Phase 04 P02 | 6m 4s | 2 tasks | 2 files |
 | Phase 04 P03 | 7m 46s | 2 tasks | 4 files |
+| Phase 04 P04 | 8m 17s | 2 tasks | 5 files |
 
 ## Session
 
-Last session: 2026-04-27T15:37:41.200Z
-Stopped At: Completed 04-03-PLAN.md
+Last session: 2026-04-27T15:51:47.609Z
+Stopped At: Completed 04-04-PLAN.md
 Resume File: None
 
 **Planned Phase:** 04 (Change State Machine and Drift Control) — 9 plans — 2026-04-27T14:55:01.015Z

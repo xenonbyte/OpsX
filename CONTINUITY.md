@@ -9,6 +9,7 @@
 - 2026-04-27 [CODE] Phase 4 is planned and verified; next GSD action is `$gsd-execute-phase 4`.
 - 2026-04-27 [CODE] Phase 4 planning is complete; `04-01-PLAN.md` through `04-09-PLAN.md` now define Wave 0 validation, state persistence, transition routing, drift/apply services, and bounded generated refresh slices.
 - 2026-04-27 [CODE] Phase 4 Plan 02 is complete: `createChangeSkeleton()` now writes full new-change scaffolds, sets `.opsx/active.yaml`, and keeps `state.yaml` at `INIT`.
+- 2026-04-27 [CODE] Phase 4 Plan 04 is complete: tracked artifact hash drift, context/drift sidecars, accepted-write persistence helpers, and one-group apply routing are now in runtime code with regression coverage.
 
 ## Done (recent)
 - 2026-04-27 [CODE] Executed Phase 4 Plan 02 with atomic TDD commits (`6a9eb6e`, `e9d73aa`, `345dcce`, `499c130`) and green `npm run test:workflow-runtime` (39/39).
@@ -16,6 +17,7 @@
 - 2026-04-27 [CODE] Wrote `04-RESEARCH.md` for Phase 4 with state-machine, YAML, drift, and test-planning guidance.
 - 2026-04-27 [CODE] Wrote Phase 4 plans `04-01-PLAN.md` through `04-09-PLAN.md` and updated `ROADMAP.md` with a 9-plan, 7-wave execution breakdown.
 - 2026-04-27 [CODE] Executed all Phase 3 plans `03-01` through `03-11`.
+- 2026-04-27 [CODE] Executed Phase 4 Plan 04 with atomic TDD commits (`f017c64`, `2dfa8d3`, `a58a5ed`, `dd49ddb`) and green `npm run test:workflow-runtime` (49/49).
 - 2026-04-27 [CODE] Added final runtime/public-surface gate: `npm run test:workflow-runtime` now passes 31/31.
 - 2026-04-27 [CODE] Fixed review findings by making generated fallback routes platform-aware and qualifying shared playbook routes.
 - 2026-04-27 [TOOL] Final Phase 3 code review `03-REVIEW.md` status is `clean` with 0 findings.
@@ -58,6 +60,7 @@
 
 ## Receipts
 - 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 39/39 after `04-02` Task 2 GREEN.
+- 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 49/49 after `04-04` Task 2 GREEN.
 - 2026-04-27 [TOOL] `gsd-sdk query state.advance-plan` moved Phase 4 cursor from Plan 2 to Plan 3.
 - 2026-04-27 [TOOL] Committed Phase 4 context as `94ca803 docs(04): capture phase context`.
 - 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 31/31 while preparing Phase 4 research.

@@ -37,10 +37,10 @@
 - [x] **STATE-02**: Every `/opsx-*` and `$opsx-*` command reads `.opsx/config.yaml`, `.opsx/active.yaml`, the active change `state.yaml`, `context.md`, and current artifacts before acting.
 - [x] **STATE-03**: Commands compute artifact hashes for `proposal.md`, `specs/**`, `design.md`, `security-review.md`, and `tasks.md`, warning and reloading when hashes drift from `state.yaml`.
 - [x] **STATE-04**: `state.yaml` tracks stage, next action, checkpoint states, artifact paths, hashes, active task group, verification log, blockers, warnings, allowed paths, and forbidden paths.
-- [ ] **STATE-05**: `context.md` stays bounded and contains enough current-stage context for a clean-context resume.
-- [ ] **STATE-06**: `drift.md` records new assumptions, detected scope changes, out-of-bound file changes, discovered requirements, and unresolved approval needs.
+- [x] **STATE-05**: `context.md` stays bounded and contains enough current-stage context for a clean-context resume.
+- [x] **STATE-06**: `drift.md` records new assumptions, detected scope changes, out-of-bound file changes, discovered requirements, and unresolved approval needs.
 - [x] **STATE-07**: `opsx-continue` resumes the next valid state-machine action without re-planning unrelated work.
-- [ ] **STATE-08**: `opsx-apply` defaults to exactly one top-level task group per run and records an execution checkpoint afterward.
+- [x] **STATE-08**: `opsx-apply` defaults to exactly one top-level task group per run and records an execution checkpoint afterward.
 
 ### Spec Review
 
@@ -118,10 +118,10 @@
 | STATE-02 | Phase 4 | Completed |
 | STATE-03 | Phase 4 | Completed |
 | STATE-04 | Phase 4 | Completed |
-| STATE-05 | Phase 4 | Pending |
-| STATE-06 | Phase 4 | Pending |
+| STATE-05 | Phase 4 | Completed |
+| STATE-06 | Phase 4 | Completed |
 | STATE-07 | Phase 4 | Completed |
-| STATE-08 | Phase 4 | Pending |
+| STATE-08 | Phase 4 | Completed |
 | SPEC-01 | Phase 5 | Pending |
 | SPEC-02 | Phase 5 | Pending |
 | SPEC-03 | Phase 5 | Pending |
