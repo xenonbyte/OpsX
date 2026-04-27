@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 04-08-PLAN.md
-last_updated: "2026-04-27T16:20:38.162Z"
+status: verifying
+stopped_at: Completed 04-09-PLAN.md
+last_updated: "2026-04-27T16:28:21.177Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 30
-  completed_plans: 29
-  percent: 97
+  completed_plans: 30
+  percent: 100
 ---
 
 # State
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 
 Phase: 04 (Change State Machine and Drift Control) — EXECUTING
 Plan: 9 of 9
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-27
 
 ## Next Action
@@ -89,6 +89,8 @@ Run `$gsd-execute-phase 4` to execute the 9 Phase 4 plans.
 - Phase 04 Plan 07 keeps Codex refresh mechanically bounded to the listed stateful action slice from buildPlatformBundle('codex').
 - Phase 04 Plan 08 refreshes only the listed Gemini stateful action files from buildPlatformBundle('gemini') with no hand edits.
 - Phase 04 Plan 08 keeps scope mechanically bounded by leaving commands/gemini/opsx.toml and non-listed generated files untouched.
+- Phase 04 Plan 09 removed temporary parity exemptions and restored strict repo-wide checked-in command parity against buildPlatformBundle() output.
+- Phase 04 Plan 09 kept source-output assertions for read-only hash-drift wording and one-group apply behavior while re-locking full parity.
 
 ## Blockers
 
@@ -125,11 +127,12 @@ Run `$gsd-execute-phase 4` to execute the 9 Phase 4 plans.
 | Phase 04 P06 | 4m 41s | 1 tasks | 7 files |
 | Phase 04 P07 | 1m 54s | 1 tasks | 7 files |
 | Phase 04 P08 | 4m 44s | 1 tasks | 7 files |
+| Phase 04 P09 | 6m | 1 tasks | 1 files |
 
 ## Session
 
-Last session: 2026-04-27T16:20:38.157Z
-Stopped At: Completed 04-08-PLAN.md
+Last session: 2026-04-27T16:28:21.173Z
+Stopped At: Completed 04-09-PLAN.md
 Resume File: None
 
 **Planned Phase:** 04 (Change State Machine and Drift Control) — 9 plans — 2026-04-27T14:55:01.015Z

@@ -1,4 +1,5 @@
 ## Snapshot
+- 2026-04-28 [CODE] Phase 4 Plan 09 is complete: temporary parity exemptions removed and strict repo-wide checked-in command parity restored in `scripts/test-workflow-runtime.js`.
 - 2026-04-28 [CODE] Phase 4 Plan 08 is complete: Gemini stateful prompt slice refreshed from `buildPlatformBundle('gemini')` with one-group apply and read-only drift wording.
 - 2026-04-28 [CODE] Phase 4 Plan 07 is complete: Codex stateful prompt slice refreshed from `buildPlatformBundle('codex')` with one-group apply and read-only drift wording.
 - 2026-04-27 [USER] Goal: Start a new GSD milestone from the supplied OpsX optimization report.
@@ -14,6 +15,7 @@
 - 2026-04-27 [CODE] Phase 4 Plan 04 is complete: tracked artifact hash drift, context/drift sidecars, accepted-write persistence helpers, and one-group apply routing are now in runtime code with regression coverage.
 
 ## Done (recent)
+- 2026-04-28 [CODE] Executed Phase 4 Plan 09 with atomic commit `5d9af18`, removed temporary Phase 4 parity exemptions, and passed `npm run test:workflow-runtime` (49/49).
 - 2026-04-28 [CODE] Executed Phase 4 Plan 08 with atomic commit `3604738` and green `npm run test:workflow-runtime` plus Gemini bundle parity check.
 - 2026-04-28 [CODE] Executed Phase 4 Plan 07 with atomic commit `b6dbc29` and green `npm run test:workflow-runtime` plus Codex bundle parity check.
 - 2026-04-27 [CODE] Executed Phase 4 Plan 02 with atomic TDD commits (`6a9eb6e`, `e9d73aa`, `345dcce`, `499c130`) and green `npm run test:workflow-runtime` (39/39).
@@ -63,6 +65,7 @@
 - 2026-04-27 [CODE] D015 ACTIVE: Phase 4 plans pin `yaml@2.8.3`, do not add `xstate`, and instead schedule a local transition-table module in `lib/change-state.js` to keep the implementation bounded and library-first.
 
 ## Receipts
+- 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-09` after removing temporary parity exemptions and restoring full `commands/**` checked-in parity.
 - 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-08` and Gemini parity check returned `GEMINI_PARITY_OK`.
 - 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-07` and Codex parity check returned `CODEx_PARITY_OK`.
 - 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 39/39 after `04-02` Task 2 GREEN.
