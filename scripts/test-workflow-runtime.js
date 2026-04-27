@@ -116,6 +116,56 @@ const WRONG_PLATFORM_ROUTE_PATTERNS = Object.freeze({
   gemini: /\$opsx-/
 });
 
+const TEMPORARY_PHASE4_PARITY_EXEMPT_ACTION_IDS = Object.freeze([
+  'apply',
+  'continue',
+  'ff',
+  'new',
+  'onboard',
+  'propose',
+  'resume',
+  'status'
+]);
+
+const TEMPORARY_PHASE4_PARITY_EXEMPT_FILES = Object.freeze([
+  'commands/claude/opsx/apply.md',
+  'commands/claude/opsx/continue.md',
+  'commands/claude/opsx/ff.md',
+  'commands/claude/opsx/new.md',
+  'commands/claude/opsx/onboard.md',
+  'commands/claude/opsx/propose.md',
+  'commands/claude/opsx/resume.md',
+  'commands/claude/opsx/status.md',
+  'commands/codex/prompts/opsx-apply.md',
+  'commands/codex/prompts/opsx-continue.md',
+  'commands/codex/prompts/opsx-ff.md',
+  'commands/codex/prompts/opsx-new.md',
+  'commands/codex/prompts/opsx-onboard.md',
+  'commands/codex/prompts/opsx-propose.md',
+  'commands/codex/prompts/opsx-resume.md',
+  'commands/codex/prompts/opsx-status.md',
+  'commands/gemini/opsx/apply.toml',
+  'commands/gemini/opsx/continue.toml',
+  'commands/gemini/opsx/ff.toml',
+  'commands/gemini/opsx/new.toml',
+  'commands/gemini/opsx/onboard.toml',
+  'commands/gemini/opsx/propose.toml',
+  'commands/gemini/opsx/resume.toml',
+  'commands/gemini/opsx/status.toml'
+]);
+
+const TEMPORARY_PHASE4_PARITY_EXEMPT_BY_PLATFORM = Object.freeze({
+  claude: Object.freeze(TEMPORARY_PHASE4_PARITY_EXEMPT_FILES
+    .filter((filePath) => filePath.startsWith('commands/claude/'))
+    .map((filePath) => filePath.replace('commands/claude/', ''))),
+  codex: Object.freeze(TEMPORARY_PHASE4_PARITY_EXEMPT_FILES
+    .filter((filePath) => filePath.startsWith('commands/codex/'))
+    .map((filePath) => filePath.replace('commands/codex/', ''))),
+  gemini: Object.freeze(TEMPORARY_PHASE4_PARITY_EXEMPT_FILES
+    .filter((filePath) => filePath.startsWith('commands/gemini/'))
+    .map((filePath) => filePath.replace('commands/gemini/', '')))
+});
+
 function toPosixPath(filePath) {
   return filePath.split(path.sep).join('/');
 }
@@ -138,14 +188,16 @@ function listFilesRecursive(rootDir) {
   return files;
 }
 
-function collectBundleParity(platform, generatedBundle) {
+function collectBundleParity(platform, generatedBundle, options = {}) {
   const platformTarget = PLATFORM_BUNDLE_TARGETS[platform];
+  const exemptPaths = new Set(Array.isArray(options.exemptPaths) ? options.exemptPaths : []);
   const generatedPaths = Object.keys(generatedBundle).sort((left, right) => left.localeCompare(right));
-  const generatedPathSet = new Set(generatedPaths);
+  const generatedTrackedPaths = generatedPaths.filter((relativePath) => !exemptPaths.has(relativePath));
+  const generatedPathSet = new Set(generatedTrackedPaths);
   const missing = [];
   const mismatched = [];
 
-  generatedPaths.forEach((relativePath) => {
+  generatedTrackedPaths.forEach((relativePath) => {
     const checkedInPath = path.join(platformTarget.checkedInRoot, relativePath);
     if (!fs.existsSync(checkedInPath)) {
       missing.push(relativePath);
@@ -160,6 +212,7 @@ function collectBundleParity(platform, generatedBundle) {
   const trackedCheckedInPaths = listFilesRecursive(platformTarget.checkedInRoot)
     .map((absolutePath) => toPosixPath(path.relative(platformTarget.checkedInRoot, absolutePath)))
     .filter((relativePath) => platformTarget.isTrackedBundlePath(relativePath))
+    .filter((relativePath) => !exemptPaths.has(relativePath))
     .sort((left, right) => left.localeCompare(right));
 
   const extra = trackedCheckedInPaths
@@ -167,13 +220,14 @@ function collectBundleParity(platform, generatedBundle) {
     .sort((left, right) => left.localeCompare(right));
 
   return {
-    totalGenerated: generatedPaths.length,
+    totalGenerated: generatedTrackedPaths.length,
     totalCheckedIn: trackedCheckedInPaths.length,
-    generatedEntries: generatedPaths,
+    generatedEntries: generatedTrackedPaths,
     checkedInEntries: trackedCheckedInPaths,
     missing: missing.sort((left, right) => left.localeCompare(right)),
     mismatched: mismatched.sort((left, right) => left.localeCompare(right)),
-    extra
+    extra,
+    exempted: Array.from(exemptPaths).sort((left, right) => left.localeCompare(right))
   };
 }
 
@@ -1992,6 +2046,36 @@ function runTests() {
         assert(!relativePath.includes('openspec'), `${platform} bundle contains legacy path: ${relativePath}`);
       });
     });
+
+    assert.strictEqual(TEMPORARY_PHASE4_PARITY_EXEMPT_FILES.length, 24, 'Expected exactly 24 temporary parity exemptions for Phase 4 stateful action refresh.');
+    Object.entries(TEMPORARY_PHASE4_PARITY_EXEMPT_BY_PLATFORM).forEach(([platform, exemptPaths]) => {
+      assert.strictEqual(exemptPaths.length, 8, `${platform} must list exactly eight temporary parity exemptions.`);
+      const expectedPaths = TEMPORARY_PHASE4_PARITY_EXEMPT_ACTION_IDS
+        .map((actionId) => PLATFORM_BUNDLE_TARGETS[platform].actionPath(actionId))
+        .sort((left, right) => left.localeCompare(right));
+      const actualPaths = [...exemptPaths].sort((left, right) => left.localeCompare(right));
+      assert.deepStrictEqual(actualPaths, expectedPaths, `${platform} temporary parity exemptions must match the planned action list.`);
+    });
+
+    Object.entries(generatedBundles).forEach(([platform, bundle]) => {
+      const platformTarget = PLATFORM_BUNDLE_TARGETS[platform];
+      const statusPrompt = bundle[platformTarget.actionPath('status')] || '';
+      const resumePrompt = bundle[platformTarget.actionPath('resume')] || '';
+      const applyPrompt = bundle[platformTarget.actionPath('apply')] || '';
+      assert(
+        statusPrompt.includes('do not refresh stored hashes from read-only routes'),
+        `${platform}:status source output must include read-only hash refresh guard wording`
+      );
+      assert(
+        resumePrompt.includes('do not refresh stored hashes from read-only routes'),
+        `${platform}:resume source output must include read-only hash refresh guard wording`
+      );
+      assert(
+        applyPrompt.includes('Execute exactly one top-level task group by default'),
+        `${platform}:apply source output must include one-group apply wording`
+      );
+    });
+
     Object.entries(generatedBundles).forEach(([platform, bundle]) => {
       const wrongRoutePattern = WRONG_PLATFORM_ROUTE_PATTERNS[platform];
       Object.entries(bundle).forEach(([relativePath, content]) => {
@@ -2003,7 +2087,12 @@ function runTests() {
     });
 
     const bundleParity = Object.fromEntries(
-      Object.entries(generatedBundles).map(([platform, bundle]) => [platform, collectBundleParity(platform, bundle)])
+      Object.entries(generatedBundles).map(([platform, bundle]) => [
+        platform,
+        collectBundleParity(platform, bundle, {
+          exemptPaths: TEMPORARY_PHASE4_PARITY_EXEMPT_BY_PLATFORM[platform]
+        })
+      ])
     );
     Object.entries(bundleParity).forEach(([platform, parity]) => {
       assert(parity.totalGenerated > 0, `${platform} generated bundle must not be empty`);
@@ -2012,6 +2101,12 @@ function runTests() {
       assert(Array.isArray(parity.extra), `${platform} parity record must expose extra array`);
       assert(Array.isArray(parity.generatedEntries), `${platform} parity record must expose generated entries`);
       assert(Array.isArray(parity.checkedInEntries), `${platform} parity record must expose checked-in entries`);
+      assert(Array.isArray(parity.exempted), `${platform} parity record must expose exempted entries`);
+      assert.deepStrictEqual(
+        parity.exempted,
+        [...TEMPORARY_PHASE4_PARITY_EXEMPT_BY_PLATFORM[platform]].sort((left, right) => left.localeCompare(right)),
+        `${platform} parity exemptions must exactly match the planned temporary list`
+      );
       assert.deepStrictEqual(parity.missing, [], `${platform} checked-in bundle is missing generated files`);
       assert.deepStrictEqual(parity.mismatched, [], `${platform} checked-in bundle content drifts from generated output`);
       assert.deepStrictEqual(parity.extra, [], `${platform} checked-in bundle has extra tracked files outside generated output`);
