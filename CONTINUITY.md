@@ -2,6 +2,7 @@
 - 2026-04-27 [USER] Goal: Start a new GSD milestone from the supplied OpsX optimization report.
 - 2026-04-27 [CODE] Current milestone: `v3.0 OpsX migration and state-machine workflow`.
 - 2026-04-27 [CODE] Current phase context: Phase 1 and Phase 2 are verified; Phase 2 code review is clean; Phase 3 discussion/context is complete and ready for planning.
+- 2026-04-27 [CODE] Phase 3 research is complete: `03-RESEARCH.md` captures centralized generator seams, strict preflight/fallback scope, stale Codex `$opsx <request>` surfaces, and required test/doc updates.
 - 2026-04-27 [TOOL] Repo had OpenSpec artifacts under `openspec/` but no existing `.planning/` directory.
 - 2026-04-27 [ASSUMPTION] Because interactive question tooling is unavailable in Default mode and the user supplied a complete implementation report, the milestone goals and roadmap approval are treated as covered by the user input.
 - 2026-04-27 [CODE] GSD planning layer now exists under `.planning/`; phase numbering is reset to Phase 1.
@@ -12,6 +13,7 @@
 - 2026-04-27 [CODE] Re-ran Phase 2 code review after Critical/Warning fixes, then fixed the remaining Info finding with `--all`; runtime suite passes `30/30`.
 - 2026-04-27 [CODE] Final Phase 2 code review now reports `status: clean` with Critical `0`, Warning `0`, Info `0`.
 - 2026-04-27 [CODE] Captured Phase 3 context and discussion log: Codex entrypoints are `$opsx-*` only, prompts use strict preflight wording with fallbacks, command generation is centralized, legacy OpenSpec surfaces are a hard clean break, and empty active-change routes are non-error guidance flows.
+- 2026-04-27 [CODE] Wrote `.planning/phases/03-skill-and-command-surface-rewrite/03-RESEARCH.md` with requirement mapping, runtime-state inventory, validation gaps, and recommended plan split for Phase 3.
 - 2026-04-27 [CODE] Completed Phase 2 Plan `02-04`: README/README-zh/docs/runtime docs now describe shipped `.opsx` behavior; templates include canonical save-path comments (`1318b74`, `19ff8ac`, `8c15054`).
 - 2026-04-27 [CODE] Planned Phase 2 as `02-01`..`02-04`; final checker pass covers DIR-01 through DIR-07 across Wave 0 tests/gitignore, Wave 1 migration core, Wave 2 runtime paths, and Wave 3 docs/templates.
 - 2026-04-27 [CODE] Revised Phase 2 plans `02-01` and `02-02` so Wave 0 fixtures and migration mappings use actual legacy shared-home assets `~/.openspec/commands/openspec.md` and `~/.openspec/skills/openspec/**`.
@@ -25,6 +27,8 @@
 - /Users/xubo/x-skills/openspec/.planning/REQUIREMENTS.md
 - /Users/xubo/x-skills/openspec/.planning/ROADMAP.md
 - /Users/xubo/x-skills/openspec/.planning/STATE.md
+- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-CONTEXT.md
+- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-RESEARCH.md
 - /Users/xubo/x-skills/openspec/.planning/phases/02-opsx-workspace-and-migration/02-CONTEXT.md
 - /Users/xubo/x-skills/openspec/.planning/phases/02-opsx-workspace-and-migration/02-RESEARCH.md
 - /Users/xubo/x-skills/openspec/.planning/phases/02-opsx-workspace-and-migration/02-VALIDATION.md
@@ -50,6 +54,7 @@
 - 2026-04-27 [TOOL] Phase 2 all-scope review-fix commits `e90c67b` and `8bdddc0` remove the unused migration reference constant and update `02-REVIEW-FIX.md` with `status: all_fixed`.
 - 2026-04-27 [TOOL] Final Phase 2 clean review commit `bbdd06e` writes `02-REVIEW.md` with `status: clean`; reviewer verification ran `npm run test:workflow-runtime` and passed `30/30`.
 - 2026-04-27 [TOOL] Phase 3 context committed as `fbb23c1`; state/session update committed as `5b66c89`.
+- 2026-04-27 [TOOL] `npm run test:workflow-runtime` still passes `30/30` on the pre-Phase-3 contract baseline while `node scripts/check-phase1-legacy-allowlist.js` fails with 32 hits, confirming the old allowlist gate must be replaced or narrowed during Phase 3.
 - 2026-04-27 [TOOL] Phase 2 review-fix report `02-REVIEW-FIX.md` has `status: all_fixed` for default `critical_warning` scope; commits `0e6f00f`, `5ebe7a1`, and `5322a75` record the fixes and report.
 - 2026-04-27 [TOOL] Phase 2 verifier wrote `02-VERIFICATION.md` with `status: passed`, `score: 9/9 must-haves verified`, and automated checks `npm run test:workflow-runtime`, `opsx --help`, `opsx status`, `opsx migrate --dry-run`, and `opsx check`.
 - 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 29/29 after 02-04 docs/template updates.
