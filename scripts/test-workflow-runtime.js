@@ -14,6 +14,9 @@ const {
   validateSchemaGraph,
   buildRuntimeKernel,
   buildStatus,
+  buildStatusText,
+  buildResumeInstructions,
+  buildContinueInstructions,
   buildArtifactInstructions,
   buildApplyInstructions
 } = require('../lib/runtime-guidance');
@@ -659,6 +662,86 @@ function runTests() {
 
     const persisted = loadChangeState(changeDir);
     assert.strictEqual(persisted.hashes.proposal, seeded.hashes.proposal);
+  });
+
+  test('status and resume read partial state without auto-creating files', () => {
+    const changeName = 'partial-state-read-only';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal from fixture\n'
+    });
+    const activePath = path.join(fixtureRoot, '.opsx', 'active.yaml');
+    const statePath = path.join(changeDir, 'state.yaml');
+    const contextPath = path.join(changeDir, 'context.md');
+    const driftPath = path.join(changeDir, 'drift.md');
+
+    writeText(activePath, `${YAML.stringify({
+      version: 1,
+      activeChange: changeName,
+      updatedAt: '2026-04-27T00:00:00.000Z'
+    })}\n`);
+    writeText(statePath, `${YAML.stringify({
+      change: changeName,
+      stage: 'SPECS_READY',
+      warnings: 'legacy warning from sparse state',
+      blockers: ['waiting for review']
+    })}\n`);
+    const stateBefore = fs.readFileSync(statePath, 'utf8');
+
+    assert.strictEqual(fs.existsSync(contextPath), false);
+    assert.strictEqual(fs.existsSync(driftPath), false);
+
+    const status = buildStatus({ repoRoot: fixtureRoot, changeName });
+    assert.strictEqual(status.stage, 'SPECS_READY');
+    assert.strictEqual(status.nextAction, 'design');
+    assert.strictEqual(status.active.taskGroup, null);
+    assert.deepStrictEqual(status.warnings, ['legacy warning from sparse state']);
+    assert.deepStrictEqual(status.blockers, ['waiting for review']);
+
+    const statusText = buildStatusText({ repoRoot: fixtureRoot, changeName });
+    assert(statusText.includes('Stage: SPECS_READY'));
+    assert(statusText.includes('Next action: design'));
+
+    const resume = buildResumeInstructions({ repoRoot: fixtureRoot, changeName });
+    assert.strictEqual(resume.stage, 'SPECS_READY');
+    assert.strictEqual(resume.nextAction, 'design');
+    assert.strictEqual(resume.route, 'opsx-design');
+
+    assert.strictEqual(fs.readFileSync(statePath, 'utf8'), stateBefore);
+    assert.strictEqual(fs.existsSync(contextPath), false);
+    assert.strictEqual(fs.existsSync(driftPath), false);
+  });
+
+  test('continue routes from persisted stage and active task group', () => {
+    const changeName = 'continue-routing-state';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Routing fixture\n'
+    });
+    const statePath = path.join(changeDir, 'state.yaml');
+    const initialState = {
+      change: changeName,
+      stage: 'APPLYING_GROUP',
+      active: {
+        taskGroup: '2. Runtime instructions'
+      }
+    };
+
+    writeText(statePath, `${YAML.stringify(initialState)}\n`);
+    const beforeContinue = fs.readFileSync(statePath, 'utf8');
+    const continueApply = buildContinueInstructions({ repoRoot: fixtureRoot, changeName });
+
+    assert.strictEqual(continueApply.stage, 'APPLYING_GROUP');
+    assert.strictEqual(continueApply.nextAction, 'apply');
+    assert.strictEqual(continueApply.route, 'opsx-apply');
+    assert.strictEqual(continueApply.active.taskGroup, '2. Runtime instructions');
+    assert.strictEqual(fs.readFileSync(statePath, 'utf8'), beforeContinue);
+
+    writeText(statePath, `${YAML.stringify({
+      change: changeName,
+      stage: 'VERIFIED'
+    })}\n`);
+    const continueSync = buildContinueInstructions({ repoRoot: fixtureRoot, changeName });
+    assert.strictEqual(continueSync.nextAction, 'sync');
+    assert.strictEqual(continueSync.route, 'opsx-sync');
   });
 
   test('runtime derives progression and blocked states from partial artifacts', () => {
