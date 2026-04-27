@@ -23,6 +23,7 @@ Execution rules:
 - Workspace not initialized: `.opsx/config.yaml` is missing.
 - No resumable change exists because `.opsx/active.yaml` has no active change.
 - Do not auto-create `.opsx/active.yaml` or change state from `resume`.
+- Warn on artifact hash drift, reload from disk, and do not refresh stored hashes from read-only routes.
 - Recommend `/opsx-new` or `/opsx-propose` when there is no active change to resume.
 - Use request details already present in the conversation.
 - Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.

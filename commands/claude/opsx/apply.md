@@ -22,7 +22,9 @@ Execution rules:
 - Route fallback guidance:
 - If `.opsx/config.yaml` is missing, stop and redirect to `/opsx-onboard`.
 - If `.opsx/active.yaml` is missing or points to a missing change, stop and ask the user to run `/opsx-new` or `/opsx-propose`.
-- Do not invent an active change, state file, or task state when required artifacts are absent.
+- Execute exactly one top-level task group by default.
+- After that group, record one execution checkpoint, refresh `context.md` / `drift.md`, and stop for the next run.
+- Update stored artifact hashes only after accepted checkpoint/state writes.
 - Use request details already present in the conversation.
 - Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.

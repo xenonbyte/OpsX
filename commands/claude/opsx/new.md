@@ -20,8 +20,9 @@ Execution rules:
 - When an active change exists, read current artifacts (`proposal.md`, `specs/`, `design.md`, optional `security-review.md`, and `tasks.md`) before mutating files.
 - If required artifacts are missing, report that honestly and apply route-specific fallback guidance.
 - Route fallback guidance:
-- If `.opsx/config.yaml` is missing, explain the workspace status and direct the user to `/opsx-onboard`.
-- If `.opsx/active.yaml` is missing, report it honestly and recommend the next explicit route.
+- If `.opsx/config.yaml` is missing, stop and redirect to `/opsx-onboard`.
+- Create `change.yaml`, placeholder planning files (`proposal.md`, `design.md`, `tasks.md`, `specs/README.md`), plus `state.yaml`, `context.md`, and `drift.md`.
+- Set `.opsx/active.yaml` to the new change and leave `stage: INIT` after scaffold creation.
 - Use request details already present in the conversation.
 - Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.
