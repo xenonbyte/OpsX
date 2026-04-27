@@ -4,7 +4,7 @@
 
 OpsX is the next major version of the current `xenonbyte/openspec` repository. It is an AI-native operational spec execution workflow for Claude Code, Codex, and Gemini that turns user intent into versioned specs, lightweight TDD tasks, state-machine-driven execution steps, checkpoint reviews, verification records, and archive history.
 
-The repository is being converted to OpsX as a breaking v3.0 release. Phase 1 converted the public package, CLI, skill, command, docs, and release surface to OpsX. Phase 2 made `.opsx/` and `~/.opsx/` canonical and added safe migration dry-run/execute behavior. Phase 3 made `/opsx-*`, `$opsx-*`, and `skills/opsx` the explicit public workflow surface with generator-backed parity checks. Later phases still own state-machine behavior, spec review, TDD-light, and archive/verify quality gates.
+The repository is being converted to OpsX as a breaking v3.0 release. Phase 1 converted the public package, CLI, skill, command, docs, and release surface to OpsX. Phase 2 made `.opsx/` and `~/.opsx/` canonical and added safe migration dry-run/execute behavior. Phase 3 made `/opsx-*`, `$opsx-*`, and `skills/opsx` the explicit public workflow surface with generator-backed parity checks. Phase 4 added the durable per-change state machine, artifact hash drift warnings, context/drift sidecars, and one-group apply guidance. Later phases still own spec review, TDD-light, archive/verify quality gates, and release hardening.
 
 ## Core Value
 
@@ -35,10 +35,10 @@ Agents can reliably continue spec-driven work from disk-backed OpsX artifacts in
 - ✓ Phase 1 OpsX package, CLI, skill, command, docs, release metadata, and legacy allowlist surface verified against NAME-01 through NAME-05 — v3.0 Phase 1
 - ✓ Phase 2 `.opsx/` and `~/.opsx/` workspace migration, dry-run/execute/default-abort behavior, migration scaffolds, and tracked-vs-ignored `.opsx` policy verified against DIR-01 through DIR-07 — v3.0 Phase 2
 - ✓ Phase 3 command, skill, docs, help, postinstall, template, and generated command surfaces verified against CMD-01 through CMD-05 — v3.0 Phase 3
+- ✓ Phase 4 durable change state, active change skeletons, lifecycle routing, artifact hash drift warnings, context/drift sidecars, and one-group apply guidance verified against STATE-01 through STATE-08 — v3.0 Phase 4
 
 ### Active
 
-- [ ] Introduce a durable change-level state machine that every command reads before acting.
 - [ ] Add spec-split automatic review and hidden requirement detection.
 - [ ] Add TDD-light planning and execution checkpoint enforcement.
 - [ ] Enforce verification, sync, archive, drift, and path-boundary quality gates.
@@ -77,7 +77,7 @@ Agents can reliably continue spec-driven work from disk-backed OpsX artifacts in
 | Rename OpenSpec to OpsX for v3.0 | Current naming is mixed and old entrypoints keep agents/users on stale mental models | Phase 1 complete for package, CLI, skill, command, docs, and release surface; path/state migration remains in later phases |
 | Use `.opsx/` and `~/.opsx/` as canonical directories | Dot-directory state is explicit workflow metadata and aligns project/global naming | Phase 2 complete for canonical paths, migration, and docs/templates |
 | Keep full `opsx-*` command set, no Lite profile | User explicitly wants complete workflow power without profile choice overhead | Phase 3 public command surface complete |
-| Add state/context/drift runtime artifacts | Durable disk state reduces chat-summary drift and enables clean-context recovery | Pending |
+| Add state/context/drift runtime artifacts | Durable disk state reduces chat-summary drift and enables clean-context recovery | Phase 4 complete |
 | Add TDD-light instead of strict TDD by default | Captures red/green verification discipline without making all tasks heavyweight | Pending |
 | Add spec-split checkpoint before design | Split specs need early coverage/conflict review before design and tasks harden | Pending |
 
@@ -99,4 +99,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-27 after Phase 3 verification*
+*Last updated: 2026-04-27 after Phase 4 verification*

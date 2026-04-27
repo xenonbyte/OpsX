@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 04-09-PLAN.md
-last_updated: "2026-04-27T16:28:21.177Z"
+status: ready_to_plan
+stopped_at: Phase 04 verified and completed
+last_updated: "2026-04-27T17:04:43Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 30
   completed_plans: 30
-  percent: 100
+  percent: 50
 ---
 
 # State
@@ -21,18 +21,18 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-27)
 
 **Core value:** Agents can reliably continue spec-driven work from disk-backed OpsX artifacts instead of relying on fragile chat history.
-**Current focus:** Phase 04 — Change State Machine and Drift Control
+**Current focus:** Phase 05 — Spec-Split Checkpoint
 
 ## Current Position
 
-Phase: 04 (Change State Machine and Drift Control) — EXECUTING
-Plan: 9 of 9
-Status: Phase complete — ready for verification
+Phase: 05 (Spec-Split Checkpoint)
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-04-27
 
 ## Next Action
 
-Run `$gsd-execute-phase 4` to execute the 9 Phase 4 plans.
+Run `$gsd-discuss-phase 5` to discuss Phase 5 before planning.
 
 ## Accumulated Context
 
@@ -45,6 +45,7 @@ Run `$gsd-execute-phase 4` to execute the 9 Phase 4 plans.
 - 2026-04-27: Phase 3 execution completed; verifier passed 5/5 must-haves and code review is clean with 0 findings.
 - 2026-04-27: Phase 4 context gathered; decisions lock a library-first state-machine implementation, strict mutation transitions, warn-and-reload hash drift, and one-top-level-task-group apply guidance.
 - 2026-04-27: Phase 4 planned into 9 plans across 7 waves; independent plan checker passed with all STATE-01 through STATE-08 requirements covered.
+- 2026-04-27: Phase 4 execution completed; verifier passed 5/5 must-haves, `04-REVIEW.md` is clean after remediation commit `7282e57`, and `npm run test:workflow-runtime` passed 49/49.
 
 ## Decisions
 
@@ -103,6 +104,7 @@ Run `$gsd-execute-phase 4` to execute the 9 Phase 4 plans.
 **Completed Phase:** 1 (OpsX Naming and CLI Surface) — 6/6 plans — verification passed — 2026-04-26
 **Completed Phase:** 2 (.opsx/ Workspace and Migration) — 4/4 plans — verification passed — 2026-04-27
 **Completed Phase:** 3 (Skill and Command Surface Rewrite) — 11/11 plans — verification passed — 2026-04-27
+**Completed Phase:** 4 (Change State Machine and Drift Control) — 9/9 plans — verification passed — 2026-04-27
 
 ## Performance Metrics
 
@@ -131,9 +133,8 @@ Run `$gsd-execute-phase 4` to execute the 9 Phase 4 plans.
 
 ## Session
 
-Last session: 2026-04-27T16:28:21.173Z
-Stopped At: Completed 04-09-PLAN.md
+Last session: 2026-04-27T17:04:43Z
+Stopped At: Phase 04 verified and completed
 Resume File: None
 
 **Planned Phase:** 04 (Change State Machine and Drift Control) — 9 plans — 2026-04-27T14:55:01.015Z
-04-27T14:55:01.015Z

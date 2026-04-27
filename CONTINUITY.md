@@ -1,34 +1,23 @@
 ## Snapshot
-- 2026-04-28 [CODE] Phase 4 Plan 09 is complete: temporary parity exemptions removed and strict repo-wide checked-in command parity restored in `scripts/test-workflow-runtime.js`.
-- 2026-04-28 [CODE] Phase 4 Plan 08 is complete: Gemini stateful prompt slice refreshed from `buildPlatformBundle('gemini')` with one-group apply and read-only drift wording.
-- 2026-04-28 [CODE] Phase 4 Plan 07 is complete: Codex stateful prompt slice refreshed from `buildPlatformBundle('codex')` with one-group apply and read-only drift wording.
 - 2026-04-27 [USER] Goal: Start a new GSD milestone from the supplied OpsX optimization report.
 - 2026-04-27 [CODE] Current milestone: `v3.0 OpsX migration and state-machine workflow`.
-- 2026-04-27 [CODE] Phase 1, Phase 2, and Phase 3 are complete and verified.
+- 2026-04-27 [CODE] Phase 1, Phase 2, Phase 3, and Phase 4 are complete and verified.
+- 2026-04-27T17:04Z [TOOL] Phase 4 verifier passed 5/5 must-haves; `04-VERIFICATION.md` was written with `status: passed`.
+- 2026-04-27 [TOOL] Phase 4 final code review `04-REVIEW.md` is clean after remediation commit `7282e57`.
+- 2026-04-27 [TOOL] Final Phase 4 checks passed: `npm run test:workflow-runtime` 49/49 and `gsd-sdk query verify.schema-drift 04`.
 - 2026-04-27 [CODE] Phase 3 code review is clean after remediation commits `9690fac` and `c719ba1`.
 - 2026-04-27 [CODE] Public current UX must not expose legacy OpenSpec routes/paths, `/prompts:*`, `/opsx:*`, standalone `$opsx`, or `$opsx <request>`.
 - 2026-04-27 [CODE] `commands/codex/prompts/opsx.md` remains only as an internal generated route catalog; public Codex entrypoints are explicit `$opsx-*`.
 - 2026-04-27 [CODE] `AGENTS.md` preserves repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
-- 2026-04-27 [CODE] Phase 4 is planned and verified; next GSD action is `$gsd-execute-phase 4`.
-- 2026-04-27 [CODE] Phase 4 planning is complete; `04-01-PLAN.md` through `04-09-PLAN.md` now define Wave 0 validation, state persistence, transition routing, drift/apply services, and bounded generated refresh slices.
-- 2026-04-27 [CODE] Phase 4 Plan 02 is complete: `createChangeSkeleton()` now writes full new-change scaffolds, sets `.opsx/active.yaml`, and keeps `state.yaml` at `INIT`.
-- 2026-04-27 [CODE] Phase 4 Plan 04 is complete: tracked artifact hash drift, context/drift sidecars, accepted-write persistence helpers, and one-group apply routing are now in runtime code with regression coverage.
+- 2026-04-27 [CODE] Current GSD position: Phase 5 (`spec-split-checkpoint`) is ready for discussion; no Phase 5 context exists yet.
 
 ## Done (recent)
-- 2026-04-28 [CODE] Executed Phase 4 Plan 09 with atomic commit `5d9af18`, removed temporary Phase 4 parity exemptions, and passed `npm run test:workflow-runtime` (49/49).
-- 2026-04-28 [CODE] Executed Phase 4 Plan 08 with atomic commit `3604738` and green `npm run test:workflow-runtime` plus Gemini bundle parity check.
-- 2026-04-28 [CODE] Executed Phase 4 Plan 07 with atomic commit `b6dbc29` and green `npm run test:workflow-runtime` plus Codex bundle parity check.
-- 2026-04-27 [CODE] Executed Phase 4 Plan 02 with atomic TDD commits (`6a9eb6e`, `e9d73aa`, `345dcce`, `499c130`) and green `npm run test:workflow-runtime` (39/39).
-- 2026-04-27 [CODE] Captured Phase 4 discussion decisions in `04-CONTEXT.md` and `04-DISCUSSION-LOG.md`.
-- 2026-04-27 [CODE] Wrote `04-RESEARCH.md` for Phase 4 with state-machine, YAML, drift, and test-planning guidance.
-- 2026-04-27 [CODE] Wrote Phase 4 plans `04-01-PLAN.md` through `04-09-PLAN.md` and updated `ROADMAP.md` with a 9-plan, 7-wave execution breakdown.
-- 2026-04-27 [CODE] Executed all Phase 3 plans `03-01` through `03-11`.
-- 2026-04-27 [CODE] Executed Phase 4 Plan 04 with atomic TDD commits (`f017c64`, `2dfa8d3`, `a58a5ed`, `dd49ddb`) and green `npm run test:workflow-runtime` (49/49).
-- 2026-04-27 [CODE] Added final runtime/public-surface gate: `npm run test:workflow-runtime` now passes 31/31.
-- 2026-04-27 [CODE] Fixed review findings by making generated fallback routes platform-aware and qualifying shared playbook routes.
-- 2026-04-27 [TOOL] Final Phase 3 code review `03-REVIEW.md` status is `clean` with 0 findings.
-- 2026-04-27 [TOOL] Phase 3 verifier wrote `03-VERIFICATION.md` with `status: passed`, `score: 5/5 must-haves verified`.
-- 2026-04-27 [CODE] `phase.complete 03` advanced state to Phase 4 and marked Phase 3 complete.
+- 2026-04-27 [CODE] Executed all Phase 4 plans `04-01` through `04-09`; summaries exist for every plan.
+- 2026-04-27 [CODE] Fixed Phase 4 review findings in commit `7282e57`: lifecycle route gaps, fresh/migrated hash baselines, lowercase legacy stage normalization, and active task group apply selection.
+- 2026-04-27 [CODE] Committed clean Phase 4 review report in `535df3b`.
+- 2026-04-27 [TOOL] Phase 4 verifier wrote `04-VERIFICATION.md` with `status: passed`, `score: 5/5`, and `requirements_verified: 8/8`.
+- 2026-04-27 [CODE] Updated `.planning/STATE.md`, `.planning/ROADMAP.md`, `.planning/PROJECT.md`, and `CONTINUITY.md` for Phase 4 completion and Phase 5 readiness.
+- 2026-04-27 [CODE] Executed all Phase 3 plans `03-01` through `03-11`; final review and verification passed.
 
 ## Working set
 - /Users/xubo/x-skills/openspec/.planning/ROADMAP.md
@@ -36,16 +25,13 @@
 - /Users/xubo/x-skills/openspec/.planning/STATE.md
 - /Users/xubo/x-skills/openspec/.planning/PROJECT.md
 - /Users/xubo/x-skills/openspec/CONTINUITY.md
-- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-CONTEXT.md
-- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-RESEARCH.md
-- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-DISCUSSION-LOG.md
-- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-02-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-02-SUMMARY.md
-- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-01-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-05-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-09-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-REVIEW.md
-- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-VERIFICATION.md
+- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-REVIEW.md
+- /Users/xubo/x-skills/openspec/.planning/phases/04-change-state-machine-and-drift-control/04-VERIFICATION.md
+- /Users/xubo/x-skills/openspec/lib/change-state.js
+- /Users/xubo/x-skills/openspec/lib/change-store.js
+- /Users/xubo/x-skills/openspec/lib/workspace.js
+- /Users/xubo/x-skills/openspec/lib/runtime-guidance.js
+- /Users/xubo/x-skills/openspec/scripts/test-workflow-runtime.js
 
 ## Decisions
 - 2026-04-27 [CODE] D001 ACTIVE: Treat v3.0 as a breaking OpsX rename and workflow-state upgrade.
@@ -65,6 +51,7 @@
 - 2026-04-27 [CODE] D015 ACTIVE: Phase 4 plans pin `yaml@2.8.3`, do not add `xstate`, and instead schedule a local transition-table module in `lib/change-state.js` to keep the implementation bounded and library-first.
 
 ## Receipts
+- 2026-04-27T17:04Z [TOOL] Verification pass confirmed Phase 4 goal achievement: `npm run test:workflow-runtime` passed 49/49, `04-REVIEW.md` remained clean, and `04-VERIFICATION.md` captures the passed report.
 - 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-09` after removing temporary parity exemptions and restoring full `commands/**` checked-in parity.
 - 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-08` and Gemini parity check returned `GEMINI_PARITY_OK`.
 - 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-07` and Codex parity check returned `CODEx_PARITY_OK`.
