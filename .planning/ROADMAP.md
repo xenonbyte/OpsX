@@ -66,6 +66,21 @@ Plans:
 
 **Requirements:** CMD-01, CMD-02, CMD-03, CMD-04, CMD-05
 
+**Plans:** 11 plans (5 waves)
+
+Plans:
+- [ ] `03-01-PLAN.md` — Rewrite the hard-clean-break planning contract and establish Phase 3 validation inventories without weakening migration internals.
+- [ ] `03-02-PLAN.md` — Move explicit-only route semantics and strict preflight into workflow metadata/templates and add Wave 1 source-output assertions.
+- [ ] `03-03-PLAN.md` — Refresh the first bounded Claude generated-bundle slice from the new source of truth.
+- [ ] `03-04-PLAN.md` — Refresh the second bounded Claude generated-bundle slice, including `onboard`/`resume`/`status`.
+- [ ] `03-05-PLAN.md` — Refresh the first bounded Codex prompt slice and keep `commands/codex/prompts/opsx.md` internal-only.
+- [ ] `03-06-PLAN.md` — Refresh the second bounded Codex prompt slice, including `onboard`/`resume`/`status`.
+- [ ] `03-07-PLAN.md` — Refresh the first bounded Gemini generated-bundle slice from the new source of truth.
+- [ ] `03-08-PLAN.md` — Refresh the second bounded Gemini generated-bundle slice, including `onboard`/`resume`/`status`.
+- [ ] `03-09-PLAN.md` — Rewrite `skills/opsx` and bilingual playbooks to the explicit-only route model.
+- [ ] `03-10-PLAN.md` — Rewrite README and docs to the hard clean break and current `.opsx` runtime guidance.
+- [ ] `03-11-PLAN.md` — Align CLI/help/postinstall/template/AGENTS guidance and activate final parity/public-surface verification.
+
 **Success criteria:**
 1. `skills/opsx/SKILL.md` has `name: opsx` and describes `.opsx/changes/*`.
 2. Claude command generation produces `/opsx-*` hyphen routes for every supported action.

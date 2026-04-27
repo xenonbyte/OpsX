@@ -397,17 +397,13 @@ This assertion is intentionally the one to replace or remove in Phase 3 because 
 
 All claims in this research were verified from the current repo state, config, or command output in this session; no user confirmation is required for factual accuracy. [VERIFIED: local repo files; npm run test:workflow-runtime; node scripts/check-phase1-legacy-allowlist.js]
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should `commands/codex/prompts/opsx.md` survive as a repo-only index file, or should it be removed entirely?**
-   - What we know: the current generator, install flow, checked-in output, and tests all treat `commands/codex/prompts/opsx.md` as the standalone Codex entry document, and its content explicitly says the preferred model is `$opsx <request>`. [VERIFIED: lib/generator.js; lib/install.js; commands/codex/prompts/opsx.md; scripts/test-workflow-runtime.js]
-   - What's unclear: whether any non-public internal consumer still benefits from keeping a root Codex index file once the public surface becomes explicit-only. [VERIFIED: no consumer found in repo search]
-   - Recommendation: prefer deleting it or excluding it from installed/public bundles unless a concrete internal consumer is demonstrated, because that is the simplest way to honor D-01 through D-03. [VERIFIED: 03-CONTEXT.md; lib/install.js]
+1. **`commands/codex/prompts/opsx.md`**
+   - Resolution: keep the file as an internal generated route catalog only. It may remain in the repo and installed Codex prompt surface, but it must not expose standalone `$opsx` or `$opsx <request>` as a public entrypoint. Phase 3 plans `03-02` and `03-05` encode this by rewriting the generator/template contract first and then refreshing the checked-in Codex index as an internal-only route list. [VERIFIED: 03-CONTEXT.md; lib/generator.js; lib/install.js]
 
-2. **How much of `AGENTS.md` should Phase 3 rewrite?**
-   - What we know: the route guidance line is stale (`$openspec <request>`, `/openspec`, `/opsx:*`), but the file also points the repo authoring workflow at `openspec/config.yaml` and `openspec/changes/`, which are repo-local source-of-truth paths rather than the distributed OpsX runtime surface. [VERIFIED: AGENTS.md; user additional_context]
-   - What's unclear: whether the phase should only update the route bullet or also reframe the repo-local authoring notes. [VERIFIED: AGENTS.md]
-   - Recommendation: change the route guidance in this phase, but do not rename repo authoring paths without a separate decision because the user only superseded the stale route guidance for this task. [VERIFIED: user additional_context; AGENTS.md]
+2. **`AGENTS.md` scope**
+   - Resolution: Phase 3 updates only stale route guidance. Repo-local authoring instructions that point to `openspec/config.yaml` and `openspec/changes/` remain intact because they describe this repository's source-of-truth workflow, not the distributed public OpsX runtime surface. Plan `03-11` encodes the exact change: replace the stale route bullet with current OpsX guidance while preserving the repo-local authoring-path bullets. [VERIFIED: AGENTS.md; 03-CONTEXT.md]
 
 ## Environment Availability
 
