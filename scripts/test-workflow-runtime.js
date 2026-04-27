@@ -129,7 +129,7 @@ function listFilesRecursive(rootDir) {
 
 function collectBundleParity(platform, generatedBundle) {
   const platformTarget = PLATFORM_BUNDLE_TARGETS[platform];
-  const generatedPaths = Object.keys(generatedBundle);
+  const generatedPaths = Object.keys(generatedBundle).sort((left, right) => left.localeCompare(right));
   const generatedPathSet = new Set(generatedPaths);
   const missing = [];
   const mismatched = [];
@@ -148,7 +148,8 @@ function collectBundleParity(platform, generatedBundle) {
 
   const trackedCheckedInPaths = listFilesRecursive(platformTarget.checkedInRoot)
     .map((absolutePath) => toPosixPath(path.relative(platformTarget.checkedInRoot, absolutePath)))
-    .filter((relativePath) => platformTarget.isTrackedBundlePath(relativePath));
+    .filter((relativePath) => platformTarget.isTrackedBundlePath(relativePath))
+    .sort((left, right) => left.localeCompare(right));
 
   const extra = trackedCheckedInPaths
     .filter((relativePath) => !generatedPathSet.has(relativePath))
@@ -157,6 +158,8 @@ function collectBundleParity(platform, generatedBundle) {
   return {
     totalGenerated: generatedPaths.length,
     totalCheckedIn: trackedCheckedInPaths.length,
+    generatedEntries: generatedPaths,
+    checkedInEntries: trackedCheckedInPaths,
     missing: missing.sort((left, right) => left.localeCompare(right)),
     mismatched: mismatched.sort((left, right) => left.localeCompare(right)),
     extra
@@ -951,10 +954,65 @@ function runTests() {
     assert(helpOutput.stdout.includes('opsx --check'));
     assert(helpOutput.stdout.includes('opsx --doc'));
     assert(helpOutput.stdout.includes('opsx --language <en|zh>'));
-    assert(helpOutput.stdout.includes('$opsx <request>'));
+    [
+      '$opsx-onboard',
+      '$opsx-propose',
+      '$opsx-status',
+      '$opsx-apply'
+    ].forEach((route) => {
+      assert(
+        helpOutput.stdout.includes(route),
+        `Help output must include explicit Codex route example ${route}`
+      );
+    });
+    assert(!helpOutput.stdout.includes('$opsx <request>'));
+    assert(!helpOutput.stdout.includes('/opsx:*'));
+    assert(!helpOutput.stdout.includes('/prompts:opsx-*'));
     assert(!helpOutput.stdout.includes('openspec'));
     assert(!helpOutput.stdout.includes('$openspec'));
     assert(!helpOutput.stdout.includes('/prompts:openspec'));
+  });
+
+  test('postinstall/template/hand-off guidance stays on explicit route contract', () => {
+    const postinstallResult = spawnSync(process.execPath, [path.join(REPO_ROOT, 'scripts', 'postinstall.js')], {
+      cwd: REPO_ROOT,
+      encoding: 'utf8'
+    });
+    assert.strictEqual(postinstallResult.status, 0, postinstallResult.stderr);
+
+    const postinstallOutput = postinstallResult.stdout;
+    [
+      '$opsx-onboard',
+      '$opsx-propose',
+      '$opsx-status',
+      '$opsx-apply'
+    ].forEach((route) => {
+      assert(postinstallOutput.includes(route), `Postinstall output must include ${route}`);
+    });
+    BANNED_PUBLIC_ROUTE_STRINGS.forEach((token) => {
+      assert(!postinstallOutput.includes(token), `Postinstall output must not include banned token ${token}`);
+    });
+
+    const handoffTemplate = fs.readFileSync(path.join(REPO_ROOT, 'templates', 'project', 'rule-file.md.tmpl'), 'utf8');
+    assert(handoffTemplate.includes('For Codex, use explicit `$opsx-*` routes; for Claude/Gemini, use `/opsx-*` routes.'));
+    BANNED_PUBLIC_ROUTE_STRINGS.forEach((token) => {
+      assert(!handoffTemplate.includes(token), `Project hand-off template must not include banned token ${token}`);
+    });
+
+    const agentsHandOff = fs.readFileSync(path.join(REPO_ROOT, 'AGENTS.md'), 'utf8');
+    assert(agentsHandOff.includes('- Read `openspec/config.yaml` for project context and workflow defaults.'));
+    assert(agentsHandOff.includes('- Keep change artifacts under `openspec/changes/`.'));
+    assert(agentsHandOff.includes('- For Codex, use explicit $opsx-* routes; for Claude/Gemini, use /opsx-* routes.'));
+    [
+      '$openspec',
+      '/openspec',
+      '/opsx:*',
+      '/prompts:openspec',
+      '/prompts:opsx-*',
+      '$opsx <request>'
+    ].forEach((token) => {
+      assert(!agentsHandOff.includes(token), `AGENTS hand-off must not include stale token ${token}`);
+    });
   });
 
   test('opsx check/doc/language work as subcommands and compatibility aliases', () => {
@@ -1295,6 +1353,13 @@ function runTests() {
       assert(Array.isArray(parity.missing), `${platform} parity record must expose missing array`);
       assert(Array.isArray(parity.mismatched), `${platform} parity record must expose mismatched array`);
       assert(Array.isArray(parity.extra), `${platform} parity record must expose extra array`);
+      assert(Array.isArray(parity.generatedEntries), `${platform} parity record must expose generated entries`);
+      assert(Array.isArray(parity.checkedInEntries), `${platform} parity record must expose checked-in entries`);
+      assert.deepStrictEqual(parity.missing, [], `${platform} checked-in bundle is missing generated files`);
+      assert.deepStrictEqual(parity.mismatched, [], `${platform} checked-in bundle content drifts from generated output`);
+      assert.deepStrictEqual(parity.extra, [], `${platform} checked-in bundle has extra tracked files outside generated output`);
+      assert.strictEqual(parity.totalGenerated, parity.totalCheckedIn, `${platform} tracked checked-in count must match generated count`);
+      assert.deepStrictEqual(parity.checkedInEntries, parity.generatedEntries, `${platform} checked-in entries must exactly match generated entries`);
     });
 
     const fallbackCoverage = collectFallbackCopyCoverage(generatedBundles);
