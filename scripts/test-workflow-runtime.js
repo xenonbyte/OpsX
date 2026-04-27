@@ -525,8 +525,18 @@ function runTests() {
   });
 
   test('opsx-new skeleton creates placeholder files, active pointer, and INIT stage', () => {
+    const { createChangeSkeleton } = require('../lib/workspace');
+    const { loadActiveChangePointer, loadChangeState } = require('../lib/change-store');
     const changeName = 'opsx-new-skeleton';
+    const createdAt = '2026-04-27T00:00:00.000Z';
     const changeDir = path.join(fixtureRoot, '.opsx', 'changes', changeName);
+
+    createChangeSkeleton({
+      repoRoot: fixtureRoot,
+      changeName,
+      createdAt
+    });
+
     [
       'change.yaml',
       'proposal.md',
@@ -539,6 +549,25 @@ function runTests() {
     ].forEach((relativePath) => {
       assert(fs.existsSync(path.join(changeDir, relativePath)), `Expected ${relativePath} to exist.`);
     });
+
+    assert(fs.statSync(path.join(changeDir, 'specs')).isDirectory());
+    assert(!fs.existsSync(path.join(changeDir, 'specs', 'spec.md')));
+
+    const state = loadChangeState(changeDir);
+    const activePointer = loadActiveChangePointer(fixtureRoot);
+
+    assert.strictEqual(activePointer.activeChange, changeName);
+    assert.strictEqual(state.stage, 'INIT');
+    assert.strictEqual(state.nextAction, 'Create proposal.md for this change.');
+
+    const designText = fs.readFileSync(path.join(changeDir, 'design.md'), 'utf8');
+    const tasksText = fs.readFileSync(path.join(changeDir, 'tasks.md'), 'utf8');
+
+    assert(designText.includes('## Context'));
+    assert(tasksText.includes('- [ ] 1.1 Replace placeholders with real task groups after planning checkpoints.'));
+    assert.strictEqual(state.checkpoints.task.status, 'PENDING');
+    assert.strictEqual(state.checkpoints.execution.status, 'PENDING');
+    assert.strictEqual(state.stage, 'INIT');
   });
 
   test('placeholder artifacts do not imply accepted planning stages', () => {
