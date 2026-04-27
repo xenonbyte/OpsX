@@ -6,7 +6,7 @@
 - 2026-04-27 [CODE] Public current UX must not expose legacy OpenSpec routes/paths, `/prompts:*`, `/opsx:*`, standalone `$opsx`, or `$opsx <request>`.
 - 2026-04-27 [CODE] `commands/codex/prompts/opsx.md` remains only as an internal generated route catalog; public Codex entrypoints are explicit `$opsx-*`.
 - 2026-04-27 [CODE] `AGENTS.md` preserves repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
-- 2026-04-27 [CODE] Phase 4 research is complete; next GSD action is `$gsd-plan-phase 4`.
+- 2026-04-27 [CODE] Phase 4 is planned and verified; next GSD action is `$gsd-execute-phase 4`.
 - 2026-04-27 [CODE] Phase 4 planning is complete; `04-01-PLAN.md` through `04-09-PLAN.md` now define Wave 0 validation, state persistence, transition routing, drift/apply services, and bounded generated refresh slices.
 
 ## Done (recent)

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 4 context gathered
-last_updated: "2026-04-27T13:57:21.243Z"
+status: ready_to_execute
+stopped_at: Phase 4 planned
+last_updated: "2026-04-27T14:55:01.021Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
   completed_phases: 3
-  total_plans: 21
+  total_plans: 30
   completed_plans: 21
-  percent: 38
+  percent: 70
 ---
 
 # State
@@ -26,13 +26,13 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 4
-Plan: Not started
-Status: Ready to plan
+Plan: 9 plans ready
+Status: Ready to execute
 Last activity: 2026-04-27
 
 ## Next Action
 
-Run `$gsd-plan-phase 4` to plan the change state machine and drift-control phase from the gathered context.
+Run `$gsd-execute-phase 4` to execute the 9 Phase 4 plans.
 
 ## Accumulated Context
 
@@ -44,6 +44,7 @@ Run `$gsd-plan-phase 4` to plan the change state machine and drift-control phase
 - 2026-04-27: Phase 3 revised planning now uses 11 plans across 5 waves: Wave 0 planning/gates, Wave 1 source-of-truth metadata/tests, Wave 2 six bounded generated refresh slices, Wave 3 skills/docs alignment, Wave 4 help + final verification.
 - 2026-04-27: Phase 3 execution completed; verifier passed 5/5 must-haves and code review is clean with 0 findings.
 - 2026-04-27: Phase 4 context gathered; decisions lock a library-first state-machine implementation, strict mutation transitions, warn-and-reload hash drift, and one-top-level-task-group apply guidance.
+- 2026-04-27: Phase 4 planned into 9 plans across 7 waves; independent plan checker passed with all STATE-01 through STATE-08 requirements covered.
 
 ## Decisions
 
@@ -72,6 +73,7 @@ Run `$gsd-plan-phase 4` to plan the change state machine and drift-control phase
 - Phase 03 code-review remediation made generated fallback routes platform-aware and added shared playbook route-label guards.
 - [Phase 04]: Keep Phase 4 library-first; avoid building a full Node workflow execution engine.
 - [Phase 04]: Use strict mutation transitions, readable status/resume, warn-and-reload hash drift, and one-top-level-task-group apply guidance.
+- [Phase 04]: Implement a local transition-table module instead of adding `xstate`; add `yaml@2.8.3` for persisted state YAML that includes arrays and nested collections.
 
 ## Blockers
 
@@ -104,5 +106,7 @@ Run `$gsd-plan-phase 4` to plan the change state machine and drift-control phase
 ## Session
 
 Last session: 2026-04-27T13:57:21.243Z
-Stopped At: Phase 4 context gathered
-Resume File: .planning/phases/04-change-state-machine-and-drift-control/04-CONTEXT.md
+Stopped At: Phase 4 planned
+Resume File: .planning/phases/04-change-state-machine-and-drift-control/04-01-PLAN.md
+
+**Planned Phase:** 04 (Change State Machine and Drift Control) — 9 plans — 2026-04-27T14:55:01.015Z
