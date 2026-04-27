@@ -105,7 +105,7 @@ Plans:
 - [x] `04-02-PLAN.md` — Build the narrow `opsx-new` skeleton writer and active-change persistence without implying accepted planning state.
 - [x] `04-03-PLAN.md` — Add the strict local transition table plus read-only status/resume/continue selectors.
 - [x] `04-04-PLAN.md` — Implement artifact hashing, bounded context/drift sidecars, and one-group apply persistence helpers.
-- [ ] `04-05-PLAN.md` — Update source-of-truth workflow/skill guidance for Phase 4 and stage a temporary source-output gate for generated refreshes.
+- [x] `04-05-PLAN.md` — Update source-of-truth workflow/skill guidance for Phase 4 and stage a temporary source-output gate for generated refreshes.
 - [ ] `04-06-PLAN.md` — Refresh the bounded Claude stateful action slice from the new Phase 4 source of truth.
 - [ ] `04-07-PLAN.md` — Refresh the bounded Codex stateful prompt slice from the new Phase 4 source of truth.
 - [ ] `04-08-PLAN.md` — Refresh the bounded Gemini stateful action slice from the new Phase 4 source of truth.
