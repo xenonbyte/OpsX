@@ -652,6 +652,27 @@ function runTests() {
     assert(!fs.existsSync(path.join(invalidFixtureRoot, '.opsx', 'escape')));
   });
 
+  test('createChangeSkeleton rejects invalid createdAt before writing files', () => {
+    const { createChangeSkeleton } = require('../lib/workspace');
+    const invalidFixtureRoot = createFixtureRepo();
+    cleanupTargets.push(invalidFixtureRoot);
+    const changeName = 'date-edge';
+    const changesDir = path.join(invalidFixtureRoot, '.opsx', 'changes');
+    const changeDir = path.join(changesDir, changeName);
+
+    assert.throws(() => {
+      createChangeSkeleton({
+        repoRoot: invalidFixtureRoot,
+        changeName,
+        createdAt: 'not-a-date'
+      });
+    }, /createdAt must be a valid ISO-8601 timestamp/);
+
+    assert.deepStrictEqual(fs.readdirSync(changesDir), []);
+    assert(!fs.existsSync(changeDir));
+    assert(!fs.existsSync(path.join(invalidFixtureRoot, '.opsx', 'active.yaml')));
+  });
+
   test('placeholder artifacts do not imply accepted planning stages', () => {
     const { loadChangeState } = require('../lib/change-store');
     const changeName = 'placeholder-artifacts';
