@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-04-27T09:40:13.422Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-04-27T09:53:14.206Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 21
-  completed_plans: 11
-  percent: 52
+  completed_plans: 12
+  percent: 57
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 3 (Skill and Command Surface Rewrite) — EXECUTING
-Plan: 2 of 11
+Plan: 3 of 11
 Status: Ready to execute
 Last activity: 2026-04-27
 
@@ -52,6 +52,8 @@ Run `$gsd-execute-phase 3` to execute the revised 11-plan / 5-wave Phase 3 plan 
 - [Phase 03]: Preserve repo-local `openspec/` authoring instructions in `AGENTS.md`; replace only stale route guidance with current OpsX routes.
 - Phase 03 Plan 01 rewrote NAME-04/CMD-04 and Phase 3 success criteria to enforce explicit banned public entrypoints.
 - Phase 03 Plan 01 established runtime helper inventories for route bans, bundle parity, and empty-state fallback matching before generated rewrites.
+- Phase 03-02 enforces explicit-only $opsx-* routing in workflow metadata/templates and removes $opsx <request> source guidance.
+- Wave 1 runtime tests now validate generated source output while deferring checked-in commands parity activation to later refresh waves.
 
 ## Blockers
 
@@ -72,9 +74,10 @@ Run `$gsd-execute-phase 3` to execute the revised 11-plan / 5-wave Phase 3 plan 
 |------|----------|-------|-------|
 | Phase 02 P04 | 3m | 2 tasks | 6 files |
 | Phase 03 P01 | 7m 4s | 2 tasks | 5 files |
+| Phase 03 P02 | 6m 14s | 2 tasks | 7 files |
 
 ## Session
 
-Last session: 2026-04-27T09:40:13.418Z
-Stopped At: Completed 03-01-PLAN.md
+Last session: 2026-04-27T09:53:14.202Z
+Stopped At: Completed 03-02-PLAN.md
 Resume File: None

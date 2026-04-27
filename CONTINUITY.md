@@ -6,10 +6,10 @@
 - 2026-04-27 [CODE] Public current UX must not expose legacy OpenSpec routes/paths, `/prompts:*`, `/opsx:*`, standalone `$opsx`, or `$opsx <request>`.
 - 2026-04-27 [CODE] `commands/codex/prompts/opsx.md` remains only as an internal generated route catalog; public Codex entrypoints are explicit `$opsx-*`.
 - 2026-04-27 [CODE] `AGENTS.md` must preserve repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
-- 2026-04-27 [CODE] Phase 03 plan `03-01` completed with task commits `a3a2bdd` and `c84c0cc`; next execution target is `03-02-PLAN.md`.
+- 2026-04-27 [CODE] Phase 03 plan `03-02` completed with commits `72253c1`, `6408c78`, and `e3fdd43`; next execution target is `03-03-PLAN.md`.
 
 ## Done (recent)
-- 2026-04-27 [CODE] Revised Phase 3 plan split from 4 plans / 4 waves to 11 plans / 5 waves to separate source-of-truth edits, bounded generated refreshes, skill/docs work, and final verification.
+- 2026-04-27 [CODE] Executed `03-02-PLAN.md`: centralized strict preflight/fallback metadata in workflow/templates and removed Codex `$opsx <request>` source guidance.
 - 2026-04-27 [CODE] Resolved Phase 3 research Q1: keep `commands/codex/prompts/opsx.md` as an internal generated index only, never a public standalone route.
 - 2026-04-27 [CODE] Resolved Phase 3 research Q2: update only stale route guidance in `AGENTS.md`; preserve legitimate repo-local `openspec/` authoring paths.
 - 2026-04-27 [CODE] Rewrote Phase 3 validation mapping to cover 11 plans, 5 waves, direct generated-bundle parity checks, and a final public-surface gate.
@@ -25,8 +25,8 @@
 - /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-RESEARCH.md
 - /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-VALIDATION.md
 - /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-01-SUMMARY.md
-- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-02-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-06-PLAN.md
+- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-02-SUMMARY.md
+- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-03-PLAN.md
 - /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-09-PLAN.md
 - /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-10-PLAN.md
 - /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-11-PLAN.md
@@ -54,3 +54,4 @@
 - 2026-04-27 [TOOL] Final Phase 2 clean review commit `bbdd06e` wrote `02-REVIEW.md` with `status: clean`; reviewer verification ran `npm run test:workflow-runtime` and passed `30/30`.
 - 2026-04-27 [TOOL] Revised Phase 3 `03-01-PLAN.md` through `03-11-PLAN.md` passed `frontmatter.validate`, `verify.plan-structure`, and the independent `gsd-plan-checker` with `VERIFICATION PASSED`.
 - 2026-04-27 [TOOL] `03-01` execution verification passed: `npm run test:workflow-runtime` (30/30), planning-doc grep contract, and validation-script grep contract.
+- 2026-04-27 [TOOL] `03-02` execution verification passed: `npm run test:workflow-runtime` (30/30) and source-contract grep checks for explicit routes plus strict preflight paths.
