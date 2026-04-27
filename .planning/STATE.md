@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: ready_to_plan
-stopped_at: Completed 02-04-PLAN.md
-last_updated: "2026-04-27T05:12:00Z"
+stopped_at: Phase 3 context gathered
+last_updated: "2026-04-27T07:42:27.331Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
@@ -32,7 +32,7 @@ Last activity: 2026-04-27
 
 ## Next Action
 
-Run `$gsd-code-review-fix 2` to address advisory Phase 2 review findings, then start Phase 3 with `$gsd-discuss-phase 3`.
+Run `$gsd-plan-phase 3` to plan the Skill and Command Surface Rewrite phase from `03-CONTEXT.md`.
 
 ## Accumulated Context
 
@@ -42,12 +42,14 @@ Run `$gsd-code-review-fix 2` to address advisory Phase 2 review findings, then s
 - 2026-04-27: Phase 1 execution completed and verification passed 5/5 requirements; next phase is `.opsx/` workspace and migration.
 - 2026-04-27: Phase 2 planning completed with 4 execution plans across 4 waves: Wave 0 tests/gitignore, Wave 1 migration core, Wave 2 runtime canonical paths, and Wave 3 docs/templates.
 - 2026-04-27: Phase 2 Plan 04 completed with canonical docs/template alignment for `.opsx/` and `~/.opsx/`; task commits `1318b74` and `19ff8ac`.
-- 2026-04-27: Phase 2 verification passed 9/9 must-haves and 29/29 runtime tests; code review remains advisory with 3 findings recorded in `02-REVIEW.md`.
+- 2026-04-27: Phase 2 verification passed 9/9 must-haves; post-fix code review is clean and runtime tests pass 30/30.
+- 2026-04-27: Phase 3 context captured command-surface decisions, including `$opsx-*` only for Codex, strict prompt preflight wording, centralized generation, hard legacy cleanup, and non-error empty active-change behavior.
 
 ## Decisions
 
 - [Phase 02]: Mirror tracked/ignored `.opsx` path list exactly from `.gitignore` in public docs. — Prevents operator policy drift between docs and repo behavior.
 - [Phase 02]: Keep legacy `openspec/` paths only in migration-candidate compatibility notes. — Avoids presenting legacy layout as canonical runtime path.
+- [Phase 03]: Hard clean break for legacy OpenSpec surfaces. — Supersedes earlier migration/history allowlists; planning must update requirements and tests accordingly.
 
 ## Blockers
 
@@ -55,8 +57,7 @@ Run `$gsd-code-review-fix 2` to address advisory Phase 2 review findings, then s
 
 ## Open Questions
 
-- Whether to publish a final `@xenonbyte/openspec@2.x` bridge package before publishing `@xenonbyte/opsx@3.0.0`.
-- Whether `opsx migrate --merge` should be implemented in v3.0 or deferred after the default safe abort/dry-run path.
+- How Phase 3 should update Phase 1/2 requirements and tests to reflect the hard clean-break decision without overreaching into later state-machine work.
 
 **Planned Phase:** 2 (.opsx/ Workspace and Migration) — 4 plans — 2026-04-27T03:38:15.333Z
 
@@ -71,6 +72,6 @@ Run `$gsd-code-review-fix 2` to address advisory Phase 2 review findings, then s
 
 ## Session
 
-Last session: 2026-04-27T04:59:11Z
-Stopped At: Completed 02-04-PLAN.md
-Resume File: None
+Last session: 2026-04-27T07:42:27.323Z
+Stopped At: Phase 3 context gathered
+Resume File: .planning/phases/03-skill-and-command-surface-rewrite/03-CONTEXT.md

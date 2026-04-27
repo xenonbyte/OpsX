@@ -5,7 +5,8 @@
   },
   "workflow": {
     "research": true,
-    "text_mode": true
+    "text_mode": true,
+    "_auto_chain_active": false
   },
   "milestone": {
     "version": "v3.0",
