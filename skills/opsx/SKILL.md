@@ -115,17 +115,21 @@ If `language: en`:
 1. Identify the workflow action and target change.
 2. Resolve config from change metadata, project config, then global config.
 3. Run the strict preflight reads (`.opsx/config.yaml`, `.opsx/active.yaml`, active `state.yaml`, active `context.md`, and current artifacts when present).
-4. Inspect artifact presence and dependency readiness from the active schema.
-5. Apply project context, per-artifact rules, and `securityReview` policy before writing.
-6. Read dependency artifacts before writing a new artifact.
-7. Run `spec checkpoint` before entering `tasks`, and `task checkpoint` before entering `apply`.
-8. During `apply`, run `execution checkpoint` after each top-level task group.
-9. Create or update files using the schema and template rules.
+4. Read persisted runtime state (`stage`, `nextAction`, `warnings`, `blockers`, and artifact hash status) from `state.yaml`; treat `context.md` and `drift.md` as persisted sidecars, not chat memory.
+5. For `status` and `resume`, keep behavior read-only: warn on hash drift, reload from disk, and do not refresh stored hashes from read-only routes.
+6. Apply project context, per-artifact rules, and `securityReview` policy before writing.
+7. Read dependency artifacts before writing a new artifact.
+8. Run `spec checkpoint` before entering `tasks`, and `task checkpoint` before entering `apply`.
+9. During `apply`, execute one top-level task group, run `execution checkpoint`, persist verification command/result plus changed files, refresh `context.md` / `drift.md`, then stop.
 10. Report changed files, current state, next step, and blockers.
 
 ## Guardrails
 
 - Ask concise clarification questions when missing scope can materially change behavior.
+- Keep `status` and `resume` strictly read-only; do not mutate `.opsx/active.yaml`, `state.yaml`, `context.md`, or `drift.md` from those routes.
+- When artifact hash drift is detected, warn and reload from disk first; refresh stored hashes only after accepted checkpoint/state writes.
+- Treat `allowedPaths` / `forbiddenPaths` as warnings during Phase 4. Do not hard-block `verify` or `archive` yet.
+- Hard enforcement for `verify` / `archive` path and drift gates is deferred to Phase 7.
 - Do not skip dependency checks silently.
 - Do not archive incomplete changes unless the user explicitly accepts the risk.
 - Keep outputs concise and action-oriented.

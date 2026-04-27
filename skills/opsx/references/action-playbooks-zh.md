@@ -36,20 +36,23 @@
 
 ## new
 
-- 仅创建 change 容器和 metadata。
-- 报告 proposal 是下一个 READY 工件。
+- 创建完整的新 change skeleton：`change.yaml`、占位 `proposal.md`、`design.md`、`tasks.md`、`specs/README.md`、`state.yaml`、`context.md`、`drift.md`。
+- 将 `.opsx/active.yaml` 指向该 active change。
+- 保持 `stage: INIT`，并报告 proposal 是下一个 READY 工件。
 
 ## continue
 
-- 检测依赖就绪状态。
-- 创建下一个 READY 工件。
-- 报告新的可执行后续步骤。
+- 遵循 `state.yaml` 中持久化的 `stage` 与 `nextAction`。
+- 当 `stage === APPLYING_GROUP` 时，优先继续持久化的 `active.taskGroup`。
+- 其余阶段只路由或创建下一个有效工件/动作，不重做无关规划。
+- 报告更新后的 `stage`、`nextAction`、`warnings`、`blockers`。
 
 ## resume
 
 - 若 `.opsx/config.yaml` 缺失，报告 workspace 未初始化并引导到对应平台的 onboard 路由：Codex `$opsx-onboard`，Claude/Gemini `/opsx-onboard`。
 - 若 `.opsx/active.yaml` 没有 active change，明确“无可恢复 change”，并建议对应平台的 `new` 或 `propose` 路由。
-- 若存在 active change，总结当前工件/任务状态并推荐下一个具体命令。
+- 若存在 active change，从持久化状态报告 `stage`、`nextAction`、`warnings`、`blockers`。
+- `resume` 必须保持只读：发现 hash drift 时先告警并从磁盘 reload，且 do not refresh stored hashes from read-only routes。
 - 不要 auto-create `.opsx/active.yaml`，不要虚构默认 change，也不要在 `resume` 路由里隐式改动状态。
 
 ## ff
@@ -69,12 +72,12 @@
 ## apply
 
 - 读取 proposal、specs、可选 design、tasks。
-- 按顺序执行 tasks。
-- 以一级任务组作为执行里程碑。
-- 每完成一个一级任务组后运行 `execution checkpoint`。
+- 默认只执行一个一级任务组（one top-level task group）。
+- 完成该一级任务组后运行 `execution checkpoint`。
+- 记录 verification command/result 与 changed files，刷新 `context.md` / `drift.md`，然后停止等待下一次执行。
 - 如果 `execution checkpoint` 返回 `WARN` 或 `BLOCK`，先回写已有工件再继续。
-- 完成后将任务更新为 `- [x]`。
-- 如实现改变范围，及时同步工件。
+- 仅将本次执行的任务组条目标记为 `- [x]`。
+- `allowedPaths` / `forbiddenPaths` 在 Phase 4 仅作为告警，不是硬阻塞；verify/archive 的硬门禁延后到 Phase 7。
 
 ## batch-apply
 
@@ -87,6 +90,7 @@
 
 - 从 Completeness、Correctness、Coherence 三个维度检查。
 - 输出 `CRITICAL`、`WARNING`、`SUGGESTION`。
+- Phase 4 里 drift 与路径边界问题先按告警处理；verify/archive 的硬门禁从 Phase 7 开始。
 
 ## sync
 
@@ -99,6 +103,7 @@
 - 确认任务完成状态。
 - 需要时先做 spec sync。
 - 将 change 移入 archive。
+- Phase 4 不要把 `allowedPaths` / `forbiddenPaths` 的 drift 直接当成 archive 硬阻塞；该硬门禁延后到 Phase 7。
 
 ## bulk-archive
 
@@ -111,11 +116,14 @@
 
 - 报告 workspace 是否存在（`.opsx/config.yaml`）以及 active change 是否存在（`.opsx/active.yaml`）。
 - 按 active schema 报告工件 READY/BLOCKED/DONE。
-- 报告阻塞项与下一个具体命令。
+- 报告 `stage`、`nextAction`、`warnings`、`blockers`。
 - 若 workspace 缺失，建议对应平台的 `onboard` 路由：Codex `$opsx-onboard`，Claude/Gemini `/opsx-onboard`。
 - 若无 active change，建议对应平台的 `new` 或 `propose` 路由：Codex `$opsx-new` / `$opsx-propose`，Claude/Gemini `/opsx-new` / `/opsx-propose`。
 - 在需要或建议进行 `security-review` 时，明确显示其状态。
 - checkpoint 输出需包含标准字段：`status`、`findings`、`patchTargets`、`nextStep`。
 - `security-review` 使用 `required`、`recommended`、`waived`、`completed`。
 - checkpoint 使用 `PASS`、`WARN`、`BLOCK`。
+- `status` 必须保持只读：发现 hash drift 时先告警并从磁盘 reload，且 do not refresh stored hashes from read-only routes。
+- 在 Phase 4 中 `allowedPaths` / `forbiddenPaths` 仅作为告警显示（不是硬阻塞）。
+- verify/archive 的路径硬门禁延后到 Phase 7。
 - 不要 auto-create `.opsx/active.yaml`，也不要在 `status` 路由里虚构 active change。

@@ -36,20 +36,23 @@ Use these when the active workflow action is explicit.
 
 ## new
 
-- Create the change container and metadata only.
-- Report that proposal is the next ready artifact.
+- Create the full new-change skeleton: `change.yaml`, placeholder `proposal.md`, `design.md`, `tasks.md`, `specs/README.md`, `state.yaml`, `context.md`, and `drift.md`.
+- Set `.opsx/active.yaml` to this active change.
+- Leave `stage: INIT` and report proposal as the next ready artifact.
 
 ## continue
 
-- Inspect dependency readiness.
-- Create the next ready artifact.
-- Report what became ready next.
+- Follow persisted `stage` and `nextAction` from `state.yaml`.
+- If `stage === APPLYING_GROUP`, continue the persisted `active.taskGroup` first.
+- Otherwise create or route only the next valid artifact/action.
+- Report updated `stage`, `nextAction`, and any warnings/blockers.
 
 ## resume
 
 - If `.opsx/config.yaml` is missing, report workspace-not-initialized and redirect to the platform-specific onboard route: Codex `$opsx-onboard`, Claude/Gemini `/opsx-onboard`.
 - If `.opsx/active.yaml` has no active change, state that no resumable change exists and recommend the platform-specific `new` or `propose` route.
-- If an active change exists, summarize current artifact/task state and recommend the next concrete command.
+- If an active change exists, report `stage`, `nextAction`, `warnings`, and `blockers` from persisted state.
+- Treat `resume` as read-only: warn on hash drift, reload from disk, and do not refresh stored hashes from read-only routes.
 - Do not auto-create `.opsx/active.yaml`, invent a default change, or mutate state from `resume`.
 
 ## ff
@@ -69,12 +72,12 @@ Use these when the active workflow action is explicit.
 ## apply
 
 - Read proposal, specs, design if present, and tasks.
-- Execute tasks in order.
-- Use top-level task groups as execution milestones.
-- Run `execution checkpoint` after each top-level task group.
+- Execute exactly one top-level task group by default.
+- Run `execution checkpoint` after that one top-level task group.
+- Record verification command/result plus changed files, refresh `context.md` / `drift.md`, and stop for the next run.
 - If `execution checkpoint` returns `WARN` or `BLOCK`, patch existing artifacts before continuing.
-- Mark completed tasks with `- [x]`.
-- Update artifacts when implementation changes scope.
+- Mark completed tasks with `- [x]` for the executed group only.
+- Surface `allowedPaths` / `forbiddenPaths` as warnings only in Phase 4; hard-block verify/archive enforcement is deferred to Phase 7.
 
 ## batch-apply
 
@@ -87,6 +90,7 @@ Use these when the active workflow action is explicit.
 
 - Check completeness, correctness, and coherence.
 - Report `CRITICAL`, `WARNING`, and `SUGGESTION` items.
+- In Phase 4, drift and path-boundary findings remain warnings. Hard verify/archive gates begin in Phase 7.
 
 ## sync
 
@@ -99,6 +103,7 @@ Use these when the active workflow action is explicit.
 - Confirm task completion state.
 - Sync specs when needed.
 - Move the change to archive.
+- In Phase 4, do not treat `allowedPaths` / `forbiddenPaths` drift as an automatic hard block here; that hard gate is deferred to Phase 7.
 
 ## bulk-archive
 
@@ -111,11 +116,14 @@ Use these when the active workflow action is explicit.
 
 - Report whether workspace exists (`.opsx/config.yaml`) and whether an active change is selected (`.opsx/active.yaml`).
 - Report artifact readiness from the active schema.
-- Report blockers and the next concrete command.
+- Report `stage`, `nextAction`, `warnings`, and `blockers`.
 - If workspace is missing, recommend the platform-specific `onboard` route: Codex `$opsx-onboard`, Claude/Gemini `/opsx-onboard`.
 - If no active change exists, recommend the platform-specific `new` or `propose` route: Codex `$opsx-new` / `$opsx-propose`, Claude/Gemini `/opsx-new` / `/opsx-propose`.
 - Make `security-review` readiness explicit when it is required or recommended.
 - Surface checkpoint output using canonical fields: `status`, `findings`, `patchTargets`, and `nextStep`.
 - Use `required`, `recommended`, `waived`, and `completed` for security-review state.
 - Use `PASS`, `WARN`, and `BLOCK` for checkpoint output.
+- Treat `status` as read-only: warn on hash drift, reload from disk, and do not refresh stored hashes from read-only routes.
+- Surface `allowedPaths` / `forbiddenPaths` as warnings in Phase 4 (not hard blocks).
+- Hard verify/archive path enforcement is deferred to Phase 7.
 - Do not auto-create `.opsx/active.yaml` or invent an active change from `status`.
