@@ -111,7 +111,7 @@
 | DIR-07 | Phase 2 | Completed |
 | CMD-01 | Phase 3 | Completed |
 | CMD-02 | Phase 3 | Completed |
-| CMD-03 | Phase 3 | Pending |
+| CMD-03 | Phase 3 | Completed |
 | CMD-04 | Phase 3 | Completed |
 | CMD-05 | Phase 3 | Completed |
 | STATE-01 | Phase 4 | Pending |

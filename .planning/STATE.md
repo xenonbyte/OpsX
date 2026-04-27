@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 03-11-PLAN.md
-last_updated: "2026-04-27T11:40:38.200Z"
+status: ready_to_plan
+stopped_at: Phase 3 verified and completed
+last_updated: "2026-04-27T12:11:06Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 21
   completed_plans: 21
-  percent: 100
+  percent: 38
 ---
 
 # State
@@ -21,18 +21,18 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-27)
 
 **Core value:** Agents can reliably continue spec-driven work from disk-backed OpsX artifacts instead of relying on fragile chat history.
-**Current focus:** Phase 3 — Skill and Command Surface Rewrite
+**Current focus:** Phase 4 — Change State Machine and Drift Control
 
 ## Current Position
 
-Phase: 3 (Skill and Command Surface Rewrite) — EXECUTING
-Plan: 11 of 11
-Status: Ready to execute
+Phase: 4
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-04-27
 
 ## Next Action
 
-Run `$gsd-execute-phase 3` to execute the revised 11-plan / 5-wave Phase 3 plan set.
+Run `$gsd-discuss-phase 4` to gather context for the change state machine and drift-control phase.
 
 ## Accumulated Context
 
@@ -42,6 +42,7 @@ Run `$gsd-execute-phase 3` to execute the revised 11-plan / 5-wave Phase 3 plan 
 - 2026-04-27: Phase 2 planning and execution completed; verification passed 9/9 must-haves and post-fix code review is clean.
 - 2026-04-27: Phase 3 context locked explicit `$opsx-*` Codex routing, strict prompt preflight wording, centralized generation, hard legacy cleanup, and non-mutating empty-state behavior for `onboard`, `status`, and `resume`.
 - 2026-04-27: Phase 3 revised planning now uses 11 plans across 5 waves: Wave 0 planning/gates, Wave 1 source-of-truth metadata/tests, Wave 2 six bounded generated refresh slices, Wave 3 skills/docs alignment, Wave 4 help + final verification.
+- 2026-04-27: Phase 3 execution completed; verifier passed 5/5 must-haves and code review is clean with 0 findings.
 
 ## Decisions
 
@@ -67,6 +68,7 @@ Run `$gsd-execute-phase 3` to execute the revised 11-plan / 5-wave Phase 3 plan 
 - Document commands/codex/prompts/opsx.md as internal catalog while keeping public Codex docs explicit-only.
 - Phase 03 Plan 11 enforces explicit-only Codex/Claude-Gemini route guidance across CLI help, postinstall, template, and AGENTS surfaces.
 - Phase 03 Plan 11 promotes checked-in commands/** parity to a hard runtime gate against buildPlatformBundle() output.
+- Phase 03 code-review remediation made generated fallback routes platform-aware and added shared playbook route-label guards.
 
 ## Blockers
 
@@ -76,10 +78,9 @@ Run `$gsd-execute-phase 3` to execute the revised 11-plan / 5-wave Phase 3 plan 
 
 (None)
 
-**Planned Phase:** 3 (Skill and Command Surface Rewrite) — 11 plans — 2026-04-27T09:24:13.582Z
-
 **Completed Phase:** 1 (OpsX Naming and CLI Surface) — 6/6 plans — verification passed — 2026-04-26
 **Completed Phase:** 2 (.opsx/ Workspace and Migration) — 4/4 plans — verification passed — 2026-04-27
+**Completed Phase:** 3 (Skill and Command Surface Rewrite) — 11/11 plans — verification passed — 2026-04-27
 
 ## Performance Metrics
 
@@ -100,5 +101,5 @@ Run `$gsd-execute-phase 3` to execute the revised 11-plan / 5-wave Phase 3 plan 
 ## Session
 
 Last session: 2026-04-27T11:40:38.196Z
-Stopped At: Completed 03-11-PLAN.md
+Stopped At: Phase 3 verified and completed
 Resume File: None

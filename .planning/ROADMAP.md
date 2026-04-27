@@ -66,6 +66,10 @@ Plans:
 
 **Requirements:** CMD-01, CMD-02, CMD-03, CMD-04, CMD-05
 
+**Status:** Complete — 2026-04-27
+
+**Verification:** `.planning/phases/03-skill-and-command-surface-rewrite/03-VERIFICATION.md`
+
 **Plans:** 11 plans (5 waves)
 
 Plans:
@@ -78,8 +82,8 @@ Plans:
 - [x] `03-07-PLAN.md` — Refresh the first bounded Gemini generated-bundle slice from the new source of truth.
 - [x] `03-08-PLAN.md` — Refresh the second bounded Gemini generated-bundle slice, including `onboard`/`resume`/`status`.
 - [x] `03-09-PLAN.md` — Rewrite `skills/opsx` and bilingual playbooks to the explicit-only route model.
-- [ ] `03-10-PLAN.md` — Rewrite README and docs to the hard clean break and current `.opsx` runtime guidance.
-- [ ] `03-11-PLAN.md` — Align CLI/help/postinstall/template/AGENTS guidance and activate final parity/public-surface verification.
+- [x] `03-10-PLAN.md` — Rewrite README and docs to the hard clean break and current `.opsx` runtime guidance.
+- [x] `03-11-PLAN.md` — Align CLI/help/postinstall/template/AGENTS guidance and activate final parity/public-surface verification.
 
 **Success criteria:**
 1. `skills/opsx/SKILL.md` has `name: opsx` and describes `.opsx/changes/*`.

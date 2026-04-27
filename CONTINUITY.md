@@ -1,35 +1,29 @@
 ## Snapshot
 - 2026-04-27 [USER] Goal: Start a new GSD milestone from the supplied OpsX optimization report.
 - 2026-04-27 [CODE] Current milestone: `v3.0 OpsX migration and state-machine workflow`.
-- 2026-04-27 [CODE] Phase 1 and Phase 2 are complete, verified, and code-review clean.
-- 2026-04-27 [CODE] Phase 3 revised planning is complete with 11 execution plans across 5 waves.
+- 2026-04-27 [CODE] Phase 1, Phase 2, and Phase 3 are complete and verified.
+- 2026-04-27 [CODE] Phase 3 code review is clean after remediation commits `9690fac` and `c719ba1`.
 - 2026-04-27 [CODE] Public current UX must not expose legacy OpenSpec routes/paths, `/prompts:*`, `/opsx:*`, standalone `$opsx`, or `$opsx <request>`.
 - 2026-04-27 [CODE] `commands/codex/prompts/opsx.md` remains only as an internal generated route catalog; public Codex entrypoints are explicit `$opsx-*`.
-- 2026-04-27 [CODE] `AGENTS.md` must preserve repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
-- 2026-04-27 [CODE] Phase 03 plan `03-07` task execution completed with commit `152b286`; next execution target is `03-08-PLAN.md`.
+- 2026-04-27 [CODE] `AGENTS.md` preserves repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
+- 2026-04-27 [CODE] Next GSD action is `$gsd-discuss-phase 4` for Change State Machine and Drift Control.
 
 ## Done (recent)
-- 2026-04-27 [CODE] Executed `03-07-PLAN.md`: refreshed the first bounded Gemini command slice (index + 7 action leaves) from `buildPlatformBundle('gemini')` with parity verification.
-- 2026-04-27 [CODE] Executed `03-06-PLAN.md`: refreshed the second bounded Codex command slice from `buildPlatformBundle('codex')` with parity verification.
-- 2026-04-27 [CODE] Executed `03-05-PLAN.md`: refreshed the first bounded Codex command slice from `buildPlatformBundle('codex')` with parity verification.
-- 2026-04-27 [CODE] Executed `03-04-PLAN.md`: refreshed the second bounded Claude command slice from `buildPlatformBundle('claude')` with parity verification.
-- 2026-04-27 [CODE] Resolved Phase 3 research Q1: keep `commands/codex/prompts/opsx.md` as an internal generated index only, never a public standalone route.
-- 2026-04-27 [CODE] Rewrote Phase 3 validation mapping to cover 11 plans, 5 waves, direct generated-bundle parity checks, and a final public-surface gate.
-- 2026-04-27 [CODE] Updated `.planning/STATE.md` and `03-07-SUMMARY.md` after completing Plan 03-07 verification and commit.
+- 2026-04-27 [CODE] Executed all Phase 3 plans `03-01` through `03-11`.
+- 2026-04-27 [CODE] Added final runtime/public-surface gate: `npm run test:workflow-runtime` now passes 31/31.
+- 2026-04-27 [CODE] Fixed review findings by making generated fallback routes platform-aware and qualifying shared playbook routes.
+- 2026-04-27 [TOOL] Final Phase 3 code review `03-REVIEW.md` status is `clean` with 0 findings.
+- 2026-04-27 [TOOL] Phase 3 verifier wrote `03-VERIFICATION.md` with `status: passed`, `score: 5/5 must-haves verified`.
+- 2026-04-27 [CODE] `phase.complete 03` advanced state to Phase 4 and marked Phase 3 complete.
 
 ## Working set
 - /Users/xubo/x-skills/openspec/.planning/ROADMAP.md
+- /Users/xubo/x-skills/openspec/.planning/REQUIREMENTS.md
 - /Users/xubo/x-skills/openspec/.planning/STATE.md
+- /Users/xubo/x-skills/openspec/.planning/PROJECT.md
 - /Users/xubo/x-skills/openspec/CONTINUITY.md
-- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-CONTEXT.md
-- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-RESEARCH.md
-- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-VALIDATION.md
-- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-05-SUMMARY.md
-- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-06-SUMMARY.md
-- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-07-SUMMARY.md
-- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-08-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-09-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-10-PLAN.md
+- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-REVIEW.md
+- /Users/xubo/x-skills/openspec/.planning/phases/03-skill-and-command-surface-rewrite/03-VERIFICATION.md
 
 ## Decisions
 - 2026-04-27 [CODE] D001 ACTIVE: Treat v3.0 as a breaking OpsX rename and workflow-state upgrade.
@@ -42,8 +36,12 @@
 - 2026-04-27 [CODE] D008 ACTIVE: Phase 3 supersedes earlier migration/history allowlist assumptions; v3.0 should remove legacy OpenSpec surfaces rather than preserving historical compatibility wording/tests.
 - 2026-04-27 [CODE] D009 ACTIVE: Keep `commands/codex/prompts/opsx.md` only as an internal generated route catalog; public Codex entrypoints remain explicit `$opsx-*`.
 - 2026-04-27 [CODE] D010 ACTIVE: In `AGENTS.md`, preserve repo-local `openspec/` authoring-path guidance and change only stale route bullets to current OpsX routes.
+- 2026-04-27 [CODE] D011 ACTIVE: Shared playbooks may mention `$opsx-*` only when the same line labels Codex and gives the Claude/Gemini `/opsx-*` equivalent.
 
 ## Receipts
+- 2026-04-27 [TOOL] Final Phase 3 verification commands passed: `npm run test:workflow-runtime` 31/31, `node scripts/check-phase1-legacy-allowlist.js`, `node bin/opsx.js --help`, `gsd-sdk query verify.schema-drift 03`, and wrong-platform route greps.
+- 2026-04-27 [TOOL] `03-REVIEW.md` final status `clean`; `03-VERIFICATION.md` final status `passed`.
+- 2026-04-27 [CODE] Commits `9690fac`, `c719ba1`, `2d17425`, and `950e2f4` closed Phase 3 review remediation, clean review, and verification report.
 - 2026-04-27 [CODE] Phase 3 revision addressed all checker blockers/warnings by splitting source-of-truth edits from generated refreshes and separating skill/docs/help surfaces into bounded plans.
 - 2026-04-27 [TOOL] `date -u +%Y-%m-%dT%H:%M:%SZ` returned `2026-04-27T09:01:50Z` for the revised planning timestamp.
 - 2026-04-27 [TOOL] Phase 3 generated bundle inventory confirmed 45 checked-in command files across Claude, Codex, and Gemini, requiring bounded refresh slices to stay under plan file-budget warnings.
