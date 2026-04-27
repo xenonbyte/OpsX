@@ -4,7 +4,7 @@ milestone: v3.0
 milestone_name: milestone
 status: planning
 stopped_at: Phase 5 context gathered
-last_updated: "2026-04-27T18:30:31.525Z"
+last_updated: "2026-04-27T18:32:54.743Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
@@ -32,7 +32,7 @@ Last activity: 2026-04-27
 
 ## Next Action
 
-Run `$gsd-discuss-phase 5` to discuss Phase 5 before planning.
+Run `$gsd-plan-phase 5` to plan Phase 5 from the captured context.
 
 ## Accumulated Context
 
