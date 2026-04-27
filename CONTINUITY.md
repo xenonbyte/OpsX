@@ -7,6 +7,7 @@
 - 2026-04-27 [CODE] GSD planning layer now exists under `.planning/`; phase numbering is reset to Phase 1.
 
 ## Done (recent)
+- 2026-04-27 [CODE] Created `.planning/phases/02-opsx-workspace-and-migration/02-RESEARCH.md` with canonical `.opsx/`/`~/.opsx/` migration architecture, runtime-state inventory, dry-run/execute pattern, validation gaps, and `.gitignore` guidance.
 - 2026-04-27 [CODE] Created `.planning/phases/01-opsx-naming-and-cli-surface/01-RESEARCH.md` with naming-surface inventory, phase boundaries, implementation order, runtime-state inventory, verification gates, and rename risks.
 - 2026-04-27 [CODE] Created `.planning/phases/01-opsx-naming-and-cli-surface/01-01-PLAN.md`, `01-02-PLAN.md`, and `01-03-PLAN.md` covering package/CLI identity, install+generated asset rename, and docs/release allowlist gating.
 - 2026-04-27 [CODE] Revised Phase 1 plans so `opsx check|doc|language` are the primary CLI surface and the over-wide plans are now split into `01-02` skill/plumbing, `01-03` generator/assets, `01-04` runtime regressions, `01-05` docs/templates, and `01-06` changelog/allowlist gates.
@@ -46,6 +47,8 @@
 - 2026-04-27 [CODE] D007 ACTIVE: Phase 1 may perform coarse generated asset/skill path renames for package coherence, while Phase 3 owns detailed command/skill preflight semantics.
 
 ## Receipts
+- 2026-04-27 [TOOL] Phase 2 research verified current local legacy install state under `~/.openspec/` and current repo workspace state under `openspec/`; planning must account for shared-home manifests/skills/config as well as repo-tree migration.
+- 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 25/25 before Phase 2 implementation; migration coverage is still missing and was documented as a Wave 0 gap in `02-RESEARCH.md`.
 - 2026-04-27 [TOOL] `gsd-sdk query init.new-milestone` reported `project_exists: false`, `roadmap_exists: false`, `state_exists: false`, and `research_enabled: true`.
 - 2026-04-27 [TOOL] Phase 1 changed `package.json` to `@xenonbyte/opsx` version `3.0.0` with binary `opsx`.
 - 2026-04-27 [TOOL] Phase 1 rewrote public README/docs/commands/skills/templates to OpsX surface; remaining legacy tokens are allowlisted deferred-runtime/history references.
