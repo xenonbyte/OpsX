@@ -49,15 +49,20 @@ $opsx-status
 
 ## Project Config
 
-OpsX's target project-level workflow defaults live in `.opsx/config.yaml`.
-Phase 1 renames the public package, CLI, skill, and command surface first; the
-workspace path migration is completed by `opsx migrate` in Phase 2.
+OpsX project-level workflow defaults now live in `.opsx/config.yaml`.
+Use `opsx migrate --dry-run` to print the exact `MOVE`/`CREATE` mapping with
+zero writes. Run `opsx migrate` to execute the same plan; it aborts by default
+if `.opsx/` already exists.
 
 Precedence:
-- change metadata
-- project config
-- global config
+- change metadata (`.opsx/changes/<name>/change.yaml`)
+- project config (`.opsx/config.yaml`)
+- global config (`~/.opsx/config.yaml`)
 - package defaults
+
+Workspace tracking policy:
+- Tracked: `.opsx/config.yaml`, `.opsx/active.yaml`, `.opsx/changes/**`, `.opsx/specs/**`, `.opsx/archive/**`
+- Ignored: `.opsx/cache/**`, `.opsx/tmp/**`, `.opsx/logs/**`
 
 ## Workflow Checkpoints
 

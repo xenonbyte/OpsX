@@ -2,7 +2,7 @@
 
 ## Project Config
 
-After the Phase 2 workspace migration, create or edit `.opsx/config.yaml`:
+Create or edit `.opsx/config.yaml` in your project workspace:
 
 ```yaml
 schema: spec-driven
@@ -30,9 +30,10 @@ securityReview:
 
 ## Global Config Semantics
 
-`~/.opsx/config.yaml` is the target installation/runtime shared config after
-the Phase 2 path migration. Phase 1 exposes the OpsX command surface first; run
-`opsx check` to inspect the runtime paths available in the installed build.
+`~/.opsx/config.yaml` is the current shared-home config for install/runtime
+commands. Shared install state is currently derived from
+`~/.opsx/manifests/*.manifest`; run `opsx check` to inspect both canonical
+paths and legacy migration candidates in the installed build.
 
 - `platform` stores the last selected install target (not a single source of truth for installed platforms).
 - Installed platform state is derived from manifest files under `~/.opsx/manifests/*.manifest`.
