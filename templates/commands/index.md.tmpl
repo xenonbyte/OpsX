@@ -14,7 +14,9 @@ Available routes:
 Notes:
 - CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
 - `{{inline_note}}`
-- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
+- Preflight before acting:
+{{preflight_note}}
+- If workspace files are missing, report missing paths and recommend the next explicit route instead of inventing state.
 - Security-review states: {{review_state_note}}
 - Checkpoints: {{checkpoint_note}}
 - Checkpoint outcomes: {{checkpoint_state_note}}

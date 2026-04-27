@@ -15,10 +15,13 @@ Available commands:
 {{command_list}}
 
 Codex guidance:
-- Prefer `$opsx <request>` for natural-language requests.
-- Use `$opsx-*` or `/opsx-*` for explicit routing.
+- Use explicit `/opsx-*` routes for Claude/Gemini and `$opsx-*` routes for Codex.
 - CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
-- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
+- Preflight before acting:
+- Read `.opsx/config.yaml` if present to confirm workspace rules.
+- Read `.opsx/active.yaml` if present to identify the active change.
+- When an active change exists, read `state.yaml`, `context.md`, and current artifacts before mutating files.
+- If required artifacts are missing, report missing files and recommend the next explicit route.
 
 Security review guidance:
 - Use `security-review.md` after `design` and before `tasks` for security-sensitive changes.

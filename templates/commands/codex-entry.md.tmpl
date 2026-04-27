@@ -1,21 +1,21 @@
 ---
-description: OpsX entrypoint for Codex. Prefer the opsx skill for natural-language workflow requests.
+description: OpsX internal Codex route catalog generated from shared workflow metadata.
 ---
-# OpsX
+# OpsX Routes (Codex Internal Catalog)
 
 Use the `opsx` skill for this request.
 
-Codex usage model:
-- Preferred: `$opsx <request>`
-- Explicit routing: `$opsx-*`
+This file is an internal generated route catalog. Public Codex workflow routing uses explicit `$opsx-*` commands only.
 
 Available routes:
 {{command_list}}
 
 Important:
+- Strict preflight before acting:
+{{preflight_note}}
 - Treat `$opsx-*` as action selectors in Codex.
 - If details are still needed after command selection, provide them in the next message.
+- If required artifacts are missing, report missing files and redirect to the next explicit route instead of fabricating state.
 - CLI quick checks: `opsx check`, `opsx doc`, `opsx language <en|zh>`.
-- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
 - Security-review states: {{review_state_note}}
 - Checkpoints: {{checkpoint_note}}

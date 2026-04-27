@@ -12,7 +12,13 @@ Explicit action route: `{{action_syntax}}`
 Execution rules:
 - Follow the `{{action}}` playbook from the `opsx` skill and its referenced files.
 - CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
-- Keep guidance phase-accurate: `.opsx/active.yaml`, per-change `state.yaml`, `spec-split-checkpoint`, and TDD-light checks are planned for later phases.
+- Preflight before acting:
+- Read `.opsx/config.yaml` and `.opsx/active.yaml` when those files exist.
+- When an active change exists, read active `state.yaml`, `context.md`, and current artifacts before mutating files.
+{{preflight_note}}
+- If required artifacts are missing, report that honestly and apply route-specific fallback guidance.
+- Route fallback guidance:
+{{fallback_note}}
 - Use request details already present in the conversation.
 - {{inline_argument_note}}
 - Security-review states are {{review_state_note}}.
