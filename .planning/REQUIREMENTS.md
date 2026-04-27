@@ -15,20 +15,13 @@
 
 ### Workspace and Migration
 
-- [x] **DIR-01
-**: Project workflow artifacts live under `.opsx/` with `config.yaml`, `active.yaml`, `changes/`, `specs/`, `archive/`, `cache/`, `tmp/`, and `logs/`.
-- [x] **DIR-02
-**: Global OpsX files live under `~/.opsx/` with `config.yaml`, `manifests/`, `skills/opsx/`, and `cache/`.
-- [x] **DIR-03
-**: User can run `opsx migrate --dry-run` to preview the full `openspec/` to `.opsx/` migration mapping without writing files.
-- [x] **DIR-04
-**: User can run `opsx migrate` to move project config, changes, specs, archive, and change metadata into the `.opsx/` layout.
-- [x] **DIR-05
-**: Migration renames per-change `.openspec.yaml` files to `change.yaml` and creates missing `state.yaml`, `context.md`, `drift.md`, and `.opsx/active.yaml` defaults.
-- [x] **DIR-06
-**: Migration aborts by default when `.opsx/` already exists and requires explicit merge intent before combining directories.
-- [x] **DIR-07
-**: Git ignore guidance preserves tracked `.opsx/` workflow artifacts while ignoring `.opsx/cache/`, `.opsx/tmp/`, and `.opsx/logs/`.
+- [x] **DIR-01**: Project workflow artifacts live under `.opsx/` with `config.yaml`, `active.yaml`, `changes/`, `specs/`, `archive/`, `cache/`, `tmp/`, and `logs/`.
+- [x] **DIR-02**: Global OpsX files live under `~/.opsx/` with `config.yaml`, `manifests/`, `skills/opsx/`, and `cache/`.
+- [x] **DIR-03**: User can run `opsx migrate --dry-run` to preview the full `openspec/` to `.opsx/` migration mapping without writing files.
+- [x] **DIR-04**: User can run `opsx migrate` to move project config, changes, specs, archive, and change metadata into the `.opsx/` layout.
+- [x] **DIR-05**: Migration renames per-change `.openspec.yaml` files to `change.yaml` and creates missing `state.yaml`, `context.md`, `drift.md`, and `.opsx/active.yaml` defaults.
+- [x] **DIR-06**: Migration aborts by default when `.opsx/` already exists and requires explicit merge intent before combining directories.
+- [x] **DIR-07**: Git ignore guidance preserves tracked `.opsx/` workflow artifacts while ignoring `.opsx/cache/`, `.opsx/tmp/`, and `.opsx/logs/`.
 
 ### Commands and Skills
 
@@ -155,4 +148,4 @@
 
 ---
 *Requirements defined: 2026-04-27*
-*Last updated: 2026-04-27 after Phase 1 verification*
+*Last updated: 2026-04-27 after Phase 2 verification*
