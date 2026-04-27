@@ -364,14 +364,14 @@ The example is intentionally simple: plan first, then move, then create only if 
 |---|-------|---------|---------------|
 | None | All claims in this research were verified from local repo/runtime state, official docs, or npm registry checks. [VERIFIED: local files; local commands; official docs; npm registry] | — | — |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **How much of `~/.openspec/` should `opsx migrate` move versus only detect?** [VERIFIED: 02-CONTEXT.md; local runtime inventory `~/.openspec`]
+1. **RESOLVED: How much of `~/.openspec/` should `opsx migrate` move versus only detect?** [VERIFIED: 02-CONTEXT.md; local runtime inventory `~/.openspec`]
    - What we know: Phase 2 makes `~/.opsx/` canonical, and this machine already has legacy config, manifests, shared commands, skills, and backups under `~/.openspec/`. [VERIFIED: 02-CONTEXT.md; local runtime inventory `~/.openspec`]
    - What's unclear: the success criteria explicitly describe project-tree moves, but do not enumerate whether `commands/` and `backups/` under the shared home should also migrate. [VERIFIED: .planning/ROADMAP.md; lib/install.js]
    - Recommendation: lock a minimum safe scope before planning. The minimum that protects install/uninstall/check continuity is `config.yaml`, `manifests/`, and shared skill/command assets; backups can remain legacy if the planner wants to keep the execute path smaller. [VERIFIED: lib/install.js; local runtime inventory `~/.openspec`]
 
-2. **Should Phase 2 update `lib/runtime-guidance.js` path resolution now?** [VERIFIED: lib/runtime-guidance.js; 02-CONTEXT.md]
+2. **RESOLVED: Should Phase 2 update `lib/runtime-guidance.js` path resolution now?** [VERIFIED: lib/runtime-guidance.js; 02-CONTEXT.md]
    - What we know: the module still loads `openspec/config.yaml` and `.openspec.yaml`, while docs and the skill already reference `.opsx/config.yaml` and `change.yaml`. [VERIFIED: lib/runtime-guidance.js; docs/customization.md; skills/opsx/SKILL.md]
    - What's unclear: the phase explicitly defers deep status/state-machine semantics, but leaving legacy path resolution in place would keep runtime internals inconsistent with migrated workspaces. [VERIFIED: 02-CONTEXT.md; .planning/ROADMAP.md]
    - Recommendation: update path resolution to the new canonical files in Phase 2, but keep `opsx status` output minimal and truthful so Phase 4 still owns durable stage semantics. [VERIFIED: 02-CONTEXT.md; lib/runtime-guidance.js]
