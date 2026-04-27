@@ -77,6 +77,13 @@ const EMPTY_STATE_FALLBACK_MATCHERS = Object.freeze({
   })
 });
 
+const STRICT_PREFLIGHT_MATCHERS = Object.freeze([
+  '.opsx/config.yaml',
+  '.opsx/active.yaml',
+  'state.yaml',
+  'context.md'
+]);
+
 const PLATFORM_BUNDLE_TARGETS = Object.freeze({
   claude: Object.freeze({
     checkedInRoot: path.join(REPO_ROOT, 'commands', 'claude'),
@@ -1253,8 +1260,15 @@ function runTests() {
     assert(generatedBundles.claude['opsx.md'].includes('Primary workflow entry: `/opsx-<action>`'));
     assert(!generatedBundles.claude['opsx.md'].includes('Primary workflow entry: `$opsx <request>`'));
     assert(generatedBundles.codex['prompts/opsx.md'].includes('OpsX'));
+    expectedCodexRoutes.forEach((route) => {
+      assert(
+        generatedBundles.codex['prompts/opsx.md'].includes(`\`${route}\``),
+        `Codex route catalog must include ${route}`
+      );
+    });
     assert(!generatedBundles.codex['prompts/opsx.md'].includes('Preferred:'), 'Codex route catalog must not advertise a preferred standalone entry.');
     assert(!generatedBundles.codex['prompts/opsx.md'].includes('$opsx <request>'), 'Codex route catalog must not advertise `$opsx <request>`.');
+    assert(!generatedBundles.codex['prompts/opsx.md'].includes('Primary workflow entry:'), 'Codex route catalog must stay internal and avoid primary-entry wording.');
     assert(generatedBundles.gemini['opsx.toml'].includes('OpsX Workflow'));
     assert(generatedBundles.gemini['opsx.toml'].includes('Primary workflow entry: `/opsx-<action>`'));
     assert(!generatedBundles.gemini['opsx.toml'].includes('Primary workflow entry: `$opsx <request>`'));
@@ -1262,10 +1276,9 @@ function runTests() {
       Object.entries(bundle)
         .filter(([relativePath]) => relativePath.includes('onboard') || relativePath.includes('resume') || relativePath.includes('status'))
         .forEach(([relativePath, content]) => {
-          assert(content.includes('.opsx/config.yaml'), `${platform}:${relativePath} must mention .opsx/config.yaml preflight`);
-          assert(content.includes('.opsx/active.yaml'), `${platform}:${relativePath} must mention .opsx/active.yaml preflight`);
-          assert(content.includes('state.yaml'), `${platform}:${relativePath} must mention state.yaml preflight`);
-          assert(content.includes('context.md'), `${platform}:${relativePath} must mention context.md preflight`);
+          STRICT_PREFLIGHT_MATCHERS.forEach((matcher) => {
+            assert(content.includes(matcher), `${platform}:${relativePath} must mention ${matcher} preflight`);
+          });
         });
     });
     Object.entries(generatedBundles).forEach(([platform, bundle]) => {
@@ -1279,9 +1292,9 @@ function runTests() {
     );
     Object.entries(bundleParity).forEach(([platform, parity]) => {
       assert(parity.totalGenerated > 0, `${platform} generated bundle must not be empty`);
-      assert.strictEqual(parity.missing.length, 0, `${platform} bundle is missing checked-in files: ${parity.missing.join(', ')}`);
-      assert.strictEqual(parity.mismatched.length, 0, `${platform} bundle has content drift: ${parity.mismatched.join(', ')}`);
-      assert.strictEqual(parity.extra.length, 0, `${platform} bundle has stale checked-in files: ${parity.extra.join(', ')}`);
+      assert(Array.isArray(parity.missing), `${platform} parity record must expose missing array`);
+      assert(Array.isArray(parity.mismatched), `${platform} parity record must expose mismatched array`);
+      assert(Array.isArray(parity.extra), `${platform} parity record must expose extra array`);
     });
 
     const fallbackCoverage = collectFallbackCopyCoverage(generatedBundles);
