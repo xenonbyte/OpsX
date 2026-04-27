@@ -13,8 +13,6 @@ Execution rules:
 - Follow the `onboard` playbook from the `opsx` skill and its referenced files.
 - CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
 - Preflight before acting:
-- Read `.opsx/config.yaml` and `.opsx/active.yaml` when those files exist.
-- When an active change exists, read active `state.yaml`, `context.md`, and current artifacts before mutating files.
 - Read `.opsx/config.yaml` if present to confirm schema, language, and workspace rules.
 - Read `.opsx/active.yaml` if present to locate the active change pointer.
 - When an active change exists, read `.opsx/changes/<active-change>/state.yaml` before acting.
@@ -25,7 +23,7 @@ Execution rules:
 - Workspace not initialized: `.opsx/config.yaml` is missing.
 - No active change is selected in `.opsx/active.yaml`.
 - Do not auto-create `.opsx/active.yaml` or change state from `onboard`.
-- Guide the user to run `opsx install --platform <claude|codex|gemini[,...]>` and then use `$opsx-new` or `$opsx-propose`.
+- Guide the user to run `opsx install --platform <claude|codex|gemini[,...]>` and then use `/opsx-new` or `/opsx-propose`.
 - Use request details already present in the conversation.
 - Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.

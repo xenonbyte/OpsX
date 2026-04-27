@@ -17,8 +17,8 @@ Use these when the active workflow action is explicit.
 ## onboard
 
 - If `.opsx/config.yaml` is missing, report that the workspace is not initialized.
-- Recommend `opsx install --platform <claude|codex|gemini[,...]>`, then continue with `$opsx-new` or `$opsx-propose`.
-- If workspace exists but `.opsx/active.yaml` has no active change, report that state and suggest `$opsx-new` or `$opsx-propose`.
+- Recommend `opsx install --platform <claude|codex|gemini[,...]>`, then continue with the platform route: Codex `$opsx-new` / `$opsx-propose`, Claude/Gemini `/opsx-new` / `/opsx-propose`.
+- If workspace exists but `.opsx/active.yaml` has no active change, report that state and suggest the same platform-specific `new` or `propose` route.
 - Keep onboarding instructional and do not auto-create `.opsx/config.yaml`, `.opsx/active.yaml`, or change files implicitly.
 
 ## propose
@@ -47,8 +47,8 @@ Use these when the active workflow action is explicit.
 
 ## resume
 
-- If `.opsx/config.yaml` is missing, report workspace-not-initialized and redirect to `$opsx-onboard`.
-- If `.opsx/active.yaml` has no active change, state that no resumable change exists and recommend `$opsx-new` or `$opsx-propose`.
+- If `.opsx/config.yaml` is missing, report workspace-not-initialized and redirect to the platform-specific onboard route: Codex `$opsx-onboard`, Claude/Gemini `/opsx-onboard`.
+- If `.opsx/active.yaml` has no active change, state that no resumable change exists and recommend the platform-specific `new` or `propose` route.
 - If an active change exists, summarize current artifact/task state and recommend the next concrete command.
 - Do not auto-create `.opsx/active.yaml`, invent a default change, or mutate state from `resume`.
 

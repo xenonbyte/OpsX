@@ -13,8 +13,6 @@ Execution rules:
 - Follow the `resume` playbook from the `opsx` skill and its referenced files.
 - CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
 - Preflight before acting:
-- Read `.opsx/config.yaml` and `.opsx/active.yaml` when those files exist.
-- When an active change exists, read active `state.yaml`, `context.md`, and current artifacts before mutating files.
 - Read `.opsx/config.yaml` if present to confirm schema, language, and workspace rules.
 - Read `.opsx/active.yaml` if present to locate the active change pointer.
 - When an active change exists, read `.opsx/changes/<active-change>/state.yaml` before acting.
@@ -25,7 +23,7 @@ Execution rules:
 - Workspace not initialized: `.opsx/config.yaml` is missing.
 - No resumable change exists because `.opsx/active.yaml` has no active change.
 - Do not auto-create `.opsx/active.yaml` or change state from `resume`.
-- Recommend `$opsx-new` or `$opsx-propose` when there is no active change to resume.
+- Recommend `/opsx-new` or `/opsx-propose` when there is no active change to resume.
 - Use request details already present in the conversation.
 - Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.

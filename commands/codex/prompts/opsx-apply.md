@@ -13,8 +13,6 @@ Execution rules:
 - Follow the `apply` playbook from the `opsx` skill and its referenced files.
 - CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
 - Preflight before acting:
-- Read `.opsx/config.yaml` and `.opsx/active.yaml` when those files exist.
-- When an active change exists, read active `state.yaml`, `context.md`, and current artifacts before mutating files.
 - Read `.opsx/config.yaml` if present to confirm schema, language, and workspace rules.
 - Read `.opsx/active.yaml` if present to locate the active change pointer.
 - When an active change exists, read `.opsx/changes/<active-change>/state.yaml` before acting.

@@ -17,8 +17,8 @@
 ## onboard
 
 - 若 `.opsx/config.yaml` 缺失，明确报告 workspace 尚未初始化。
-- 推荐先执行 `opsx install --platform <claude|codex|gemini[,...]>`，然后使用 `$opsx-new` 或 `$opsx-propose`。
-- 若 workspace 存在但 `.opsx/active.yaml` 没有 active change，明确报告该状态并建议 `$opsx-new` 或 `$opsx-propose`。
+- 推荐先执行 `opsx install --platform <claude|codex|gemini[,...]>`，然后使用对应平台路由：Codex `$opsx-new` / `$opsx-propose`，Claude/Gemini `/opsx-new` / `/opsx-propose`。
+- 若 workspace 存在但 `.opsx/active.yaml` 没有 active change，明确报告该状态并建议对应平台的 `new` 或 `propose` 路由。
 - 保持 onboarding 指导属性，不要 auto-create `.opsx/config.yaml`、`.opsx/active.yaml`，也不要隐式改动状态文件。
 
 ## propose
@@ -47,8 +47,8 @@
 
 ## resume
 
-- 若 `.opsx/config.yaml` 缺失，报告 workspace 未初始化并引导到 `$opsx-onboard`。
-- 若 `.opsx/active.yaml` 没有 active change，明确“无可恢复 change”，并建议 `$opsx-new` 或 `$opsx-propose`。
+- 若 `.opsx/config.yaml` 缺失，报告 workspace 未初始化并引导到对应平台的 onboard 路由：Codex `$opsx-onboard`，Claude/Gemini `/opsx-onboard`。
+- 若 `.opsx/active.yaml` 没有 active change，明确“无可恢复 change”，并建议对应平台的 `new` 或 `propose` 路由。
 - 若存在 active change，总结当前工件/任务状态并推荐下一个具体命令。
 - 不要 auto-create `.opsx/active.yaml`，不要虚构默认 change，也不要在 `resume` 路由里隐式改动状态。
 

@@ -105,6 +105,12 @@ const PLATFORM_BUNDLE_TARGETS = Object.freeze({
   })
 });
 
+const WRONG_PLATFORM_ROUTE_PATTERNS = Object.freeze({
+  claude: /\$opsx-/,
+  codex: /\/opsx-/,
+  gemini: /\$opsx-/
+});
+
 function toPosixPath(filePath) {
   return filePath.split(path.sep).join('/');
 }
@@ -1342,6 +1348,15 @@ function runTests() {
     Object.entries(generatedBundles).forEach(([platform, bundle]) => {
       Object.keys(bundle).forEach((relativePath) => {
         assert(!relativePath.includes('openspec'), `${platform} bundle contains legacy path: ${relativePath}`);
+      });
+    });
+    Object.entries(generatedBundles).forEach(([platform, bundle]) => {
+      const wrongRoutePattern = WRONG_PLATFORM_ROUTE_PATTERNS[platform];
+      Object.entries(bundle).forEach(([relativePath, content]) => {
+        assert(
+          !wrongRoutePattern.test(content),
+          `${platform}:${relativePath} contains route guidance for another platform`
+        );
       });
     });
 

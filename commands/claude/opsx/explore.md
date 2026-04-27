@@ -13,8 +13,6 @@ Execution rules:
 - Follow the `explore` playbook from the `opsx` skill and its referenced files.
 - CLI quick checks: `opsx check`, `opsx doc`, and `opsx language <en|zh>`.
 - Preflight before acting:
-- Read `.opsx/config.yaml` and `.opsx/active.yaml` when those files exist.
-- When an active change exists, read active `state.yaml`, `context.md`, and current artifacts before mutating files.
 - Read `.opsx/config.yaml` if present to confirm schema, language, and workspace rules.
 - Read `.opsx/active.yaml` if present to locate the active change pointer.
 - When an active change exists, read `.opsx/changes/<active-change>/state.yaml` before acting.
@@ -22,7 +20,7 @@ Execution rules:
 - When an active change exists, read current artifacts (`proposal.md`, `specs/`, `design.md`, optional `security-review.md`, and `tasks.md`) before mutating files.
 - If required artifacts are missing, report that honestly and apply route-specific fallback guidance.
 - Route fallback guidance:
-- If `.opsx/config.yaml` is missing, explain the workspace status and direct the user to `$opsx-onboard`.
+- If `.opsx/config.yaml` is missing, explain the workspace status and direct the user to `/opsx-onboard`.
 - If `.opsx/active.yaml` is missing, report it honestly and recommend the next explicit route.
 - Use request details already present in the conversation.
 - Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
