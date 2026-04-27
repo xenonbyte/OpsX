@@ -10,7 +10,7 @@
 - [x] **NAME-01**: User can install the breaking release as `@xenonbyte/opsx`.
 - [x] **NAME-02**: User can invoke the CLI as `opsx` with `--help`, `--version`, `install`, `uninstall`, `check`, `doc`, `language`, `migrate`, and `status`.
 - [x] **NAME-03**: User-facing docs, package metadata, templates, generated command text, and runtime messages consistently use `OpsX`, `opsx`, and `@xenonbyte/opsx`.
-- [x] **NAME-04**: Historical OpenSpec references remain only where they explain source lineage, migration, or changelog history.
+- [x] **NAME-04**: Historical OpenSpec references are implementation-only migration/archive/source-lineage details and are not allowed in current public/help/doc/skill/generated guidance.
 - [x] **NAME-05**: Release metadata clearly communicates `3.0.0` as a breaking OpsX rename and workflow-state upgrade.
 
 ### Workspace and Migration
@@ -28,7 +28,7 @@
 - [ ] **CMD-01**: Claude Code users can use `/opsx-explore`, `/opsx-new`, `/opsx-propose`, `/opsx-continue`, `/opsx-ff`, `/opsx-apply`, `/opsx-verify`, `/opsx-status`, `/opsx-resume`, `/opsx-sync`, `/opsx-archive`, `/opsx-batch-apply`, `/opsx-bulk-archive`, and `/opsx-onboard`.
 - [ ] **CMD-02**: Codex users can use the corresponding `$opsx-*` commands as the public primary entrypoints.
 - [ ] **CMD-03**: The distributed skill lives at `skills/opsx/` with frontmatter `name: opsx` and reads `.opsx/` and `~/.opsx/` config in the correct precedence order.
-- [ ] **CMD-04**: Generated prompts no longer present `/openspec`, `$openspec`, `/prompts:openspec`, or `/opsx:*` as primary workflow entrypoints.
+- [ ] **CMD-04**: Generated prompts treat `/openspec`, `$openspec`, `/prompts:openspec`, `/opsx:*`, `/prompts:opsx-*`, standalone `$opsx`, and `$opsx <request>` as banned public workflow entrypoints.
 - [ ] **CMD-05**: `opsx-onboard`, `opsx-status`, and `opsx-resume` behave correctly even when no active change exists.
 
 ### State Machine and Drift Control

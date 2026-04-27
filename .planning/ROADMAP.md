@@ -84,9 +84,9 @@ Plans:
 **Success criteria:**
 1. `skills/opsx/SKILL.md` has `name: opsx` and describes `.opsx/changes/*`.
 2. Claude command generation produces `/opsx-*` hyphen routes for every supported action.
-3. Codex command generation produces `$opsx-*` as public primary routes and stops presenting `/prompts:*` as the main UX.
-4. Command prompts read `.opsx/config.yaml`, `.opsx/active.yaml`, and active change `state.yaml` before acting.
-5. Status/onboard/resume commands handle an empty project or missing active change gracefully.
+3. Codex command generation exposes only explicit `$opsx-*` public routes and stops presenting `/prompts:*`, standalone `$opsx`, or `$opsx <request>` as the main UX.
+4. Command prompts enforce strict preflight reads of `.opsx/config.yaml`, `.opsx/active.yaml`, active change `state.yaml`, `context.md`, and current artifacts when present before acting.
+5. Status/onboard/resume commands report empty workspace or missing active change with concrete next steps and do not auto-create active state.
 
 ### Phase 4: Change State Machine and Drift Control
 

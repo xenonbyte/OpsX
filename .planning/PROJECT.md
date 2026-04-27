@@ -48,7 +48,7 @@ Agents can reliably continue spec-driven work from disk-backed OpsX artifacts in
 
 - Lite/advanced command profiles — explicitly excluded; OpsX keeps the full command set by default.
 - A full autonomous agent engine — OpsX should stay a lightweight workflow state machine, not a GSD2-style auto runner.
-- Keeping `/openspec`, `$openspec`, `/prompts:openspec`, or `/opsx:*` as primary v3.0 runtime surfaces — only migration guidance may mention old names.
+- Keeping `/openspec`, `$openspec`, `/prompts:openspec`, `/opsx:*`, `/prompts:opsx-*`, standalone `$opsx`, or `$opsx <request>` in current public/help/doc/skill/generated surfaces — legacy names remain implementation-only migration/archive history details.
 - Silent compatibility shims in `@xenonbyte/opsx@3.0.0` — the old `@xenonbyte/openspec` package may provide bridge messaging separately.
 - Hosted services, telemetry, remote sync, or cloud execution — not needed for this milestone.
 
