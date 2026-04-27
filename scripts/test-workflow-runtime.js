@@ -524,6 +524,23 @@ function runTests() {
     assert.strictEqual(state.nextAction, 'Create proposal.md for this change.');
   });
 
+  test('opsx-new skeleton creates placeholder files, active pointer, and INIT stage', () => {
+    const changeName = 'opsx-new-skeleton';
+    const changeDir = path.join(fixtureRoot, '.opsx', 'changes', changeName);
+    [
+      'change.yaml',
+      'proposal.md',
+      'design.md',
+      'tasks.md',
+      'specs/README.md',
+      'state.yaml',
+      'context.md',
+      'drift.md'
+    ].forEach((relativePath) => {
+      assert(fs.existsSync(path.join(changeDir, relativePath)), `Expected ${relativePath} to exist.`);
+    });
+  });
+
   test('placeholder artifacts do not imply accepted planning stages', () => {
     const { loadChangeState } = require('../lib/change-store');
     const changeName = 'placeholder-artifacts';
