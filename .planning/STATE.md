@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-10-PLAN.md
-last_updated: "2026-04-27T11:26:16.890Z"
+stopped_at: Completed 03-11-PLAN.md
+last_updated: "2026-04-27T11:40:38.200Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 21
-  completed_plans: 20
-  percent: 95
+  completed_plans: 21
+  percent: 100
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 3 (Skill and Command Surface Rewrite) — EXECUTING
-Plan: 10 of 11
+Plan: 11 of 11
 Status: Ready to execute
 Last activity: 2026-04-27
 
@@ -65,6 +65,8 @@ Run `$gsd-execute-phase 3` to execute the revised 11-plan / 5-wave Phase 3 plan 
 - Phase 03 Plan 09 aligned bilingual playbooks with non-mutating empty-state guidance for onboard/status/resume/batch-apply/bulk-archive.
 - Remove public $opsx <request> guidance and standardize docs on explicit $opsx-* routes only.
 - Document commands/codex/prompts/opsx.md as internal catalog while keeping public Codex docs explicit-only.
+- Phase 03 Plan 11 enforces explicit-only Codex/Claude-Gemini route guidance across CLI help, postinstall, template, and AGENTS surfaces.
+- Phase 03 Plan 11 promotes checked-in commands/** parity to a hard runtime gate against buildPlatformBundle() output.
 
 ## Blockers
 
@@ -93,9 +95,10 @@ Run `$gsd-execute-phase 3` to execute the revised 11-plan / 5-wave Phase 3 plan 
 | Phase 03 P08 | 7m | 1 tasks | 7 files |
 | Phase 03 P09 | 3m 32s | 1 tasks | 5 files |
 | Phase 03 P10 | 2m 29s | 1 tasks | 6 files |
+| Phase 03 P11 | 10m | 1 tasks | 5 files |
 
 ## Session
 
-Last session: 2026-04-27T11:26:16.886Z
-Stopped At: Completed 03-10-PLAN.md
+Last session: 2026-04-27T11:40:38.196Z
+Stopped At: Completed 03-11-PLAN.md
 Resume File: None
