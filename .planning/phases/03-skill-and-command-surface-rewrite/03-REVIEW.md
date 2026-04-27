@@ -1,6 +1,6 @@
 ---
 phase: 03-skill-and-command-surface-rewrite
-reviewed: 2026-04-27T12:02:26Z
+reviewed: 2026-04-27T12:24:27Z
 depth: standard
 files_reviewed: 68
 files_reviewed_list:
@@ -82,41 +82,39 @@ status: clean
 
 # Phase 03: Code Review Report
 
-**Reviewed:** 2026-04-27T12:02:26Z
+**Reviewed:** 2026-04-27T12:24:27Z
 **Depth:** standard
 **Files Reviewed:** 68
 **Status:** clean
 
 ## Summary
 
-Re-reviewed Phase 03 at current `HEAD` (`c719ba1`) after remediation commits `9690fac` and `c719ba1`.
+Re-reviewed Phase 03 at current `HEAD` (`f7fe98d`) against the same implementation/public-surface scope as the prior Phase 03 review.
 
-All prior findings are fixed. Generated Claude and Gemini fallback guidance now stays on `/opsx-*`, generated Codex prompts stay on `$opsx-*`, the runtime suite includes wrong-platform route assertions for generated bundles, shared skill playbooks qualify every `$opsx-*` line with Codex plus the Claude/Gemini `/opsx-*` equivalent, and generated action prompts no longer duplicate strict preflight bullets.
-
-All reviewed files meet quality standards. No critical, warning, or info issues were found.
+No critical, warning, or info findings were found. The Phase 03 command and skill surfaces remain aligned: generated Claude and Gemini routes use `/opsx-*`, generated Codex routes use `$opsx-*`, shared playbooks qualify `$opsx-*` with the Codex label and the Claude/Gemini `/opsx-*` equivalent, and generated action prompts contain a single strict preflight block.
 
 ## Verification
 
 - `npm run test:workflow-runtime` passed: 31/31 tests.
 - `node scripts/check-phase1-legacy-allowlist.js` passed: scanned 72 files, 4 allowlisted legacy-token hits.
-- `node bin/opsx.js --help` passed and printed OpsX v3.0.0 help with explicit Codex `$opsx-*` usage.
+- `node bin/opsx.js --help` passed and printed OpsX v3.0.0 help with explicit Codex `$opsx-*` examples.
 - `rg -n '\$opsx-' commands/claude commands/gemini` produced no matches, as expected.
 - `rg -n '/opsx-' commands/codex/prompts` produced no matches, as expected.
-- `rg -n '\$opsx-' skills/opsx/references/action-playbooks.md skills/opsx/references/action-playbooks-zh.md` produced only qualified lines; each matching line includes `Codex`, `Claude/Gemini`, and a `/opsx-*` equivalent.
+- `rg -n '\$opsx-' skills/opsx/references/action-playbooks.md skills/opsx/references/action-playbooks-zh.md` produced only qualified lines; each match includes `Codex`, `Claude/Gemini`, and a `/opsx-*` equivalent.
 
 ## Prior Finding Recheck
 
-- Generated Claude/Gemini fallback guidance does not point to Codex `$opsx-*`; generated Codex prompts do not point to `/opsx-*`.
-- Runtime tests define wrong-platform route patterns for generated Claude, Codex, and Gemini bundles and assert each generated bundle excludes routes from the other platform family.
-- Shared playbooks contain `$opsx-*` only in platform-labeled lines with the corresponding Claude/Gemini `/opsx-*` route on the same line.
-- `templates/commands/action.md.tmpl` now has one generated strict preflight insertion point, and checked generated action prompts contain one strict preflight block.
+- Generated fallback routes are platform-aware for Claude, Codex, and Gemini.
+- Runtime tests still enforce wrong-platform route rejection and checked-in generated bundle parity.
+- Shared playbook `$opsx-*` references are all platform-qualified with the corresponding Claude/Gemini `/opsx-*` route.
+- Checked generated action prompts have one `Preflight before acting:` block per action prompt.
 
 ## Residual Risks / Test Gaps
 
-The review relied on generated-bundle parity plus representative generated-file inspection rather than manually validating every repeated generated command body line-by-line. This is appropriate for the current generator-backed command surface, but future hand edits under `commands/` should keep the parity test in the required verification path.
+The review relies on generator parity and focused route-surface assertions for repeated generated command leaves rather than manually validating every repeated line independently. This is appropriate for the current generator-backed surface, but future hand edits under `commands/` should keep `npm run test:workflow-runtime` and the wrong-platform route greps in the required verification path.
 
 ---
 
-_Reviewed: 2026-04-27T12:02:26Z_
+_Reviewed: 2026-04-27T12:24:27Z_
 _Reviewer: Codex (gsd-code-reviewer)_
 _Depth: standard_
