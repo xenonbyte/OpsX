@@ -80,7 +80,7 @@ Use these when the active workflow action is explicit.
 
 - Confirm the target set and execution order before mutating files.
 - Apply only changes that are actually ready to execute.
-- If no ready changes are found, stop and recommend `$opsx-status` to inspect readiness and blockers.
+- If no ready changes are found, stop and recommend the platform-specific `status` route: Codex `$opsx-status`, Claude/Gemini `/opsx-status`.
 - Do not auto-create missing state, do not fabricate ready tasks, and do not skip checkpoint requirements.
 
 ## verify
@@ -104,7 +104,7 @@ Use these when the active workflow action is explicit.
 
 - Confirm the target set before archiving multiple changes.
 - Archive only changes that are completed and ready for archival.
-- If no completed changes are found, stop and recommend `$opsx-status` to inspect completion state.
+- If no completed changes are found, stop and recommend the platform-specific `status` route: Codex `$opsx-status`, Claude/Gemini `/opsx-status`.
 - Do not auto-create archive metadata, and do not mark incomplete changes as completed.
 
 ## status
@@ -112,8 +112,8 @@ Use these when the active workflow action is explicit.
 - Report whether workspace exists (`.opsx/config.yaml`) and whether an active change is selected (`.opsx/active.yaml`).
 - Report artifact readiness from the active schema.
 - Report blockers and the next concrete command.
-- If workspace is missing, recommend `$opsx-onboard`.
-- If no active change exists, recommend `$opsx-new` or `$opsx-propose`.
+- If workspace is missing, recommend the platform-specific `onboard` route: Codex `$opsx-onboard`, Claude/Gemini `/opsx-onboard`.
+- If no active change exists, recommend the platform-specific `new` or `propose` route: Codex `$opsx-new` / `$opsx-propose`, Claude/Gemini `/opsx-new` / `/opsx-propose`.
 - Make `security-review` readiness explicit when it is required or recommended.
 - Surface checkpoint output using canonical fields: `status`, `findings`, `patchTargets`, and `nextStep`.
 - Use `required`, `recommended`, `waived`, and `completed` for security-review state.

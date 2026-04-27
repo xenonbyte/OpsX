@@ -195,6 +195,17 @@ function collectFallbackCopyCoverage(generatedBundles) {
   return coverage;
 }
 
+function assertPlatformLabeledCodexRouteLines(relativePath) {
+  const content = fs.readFileSync(path.join(REPO_ROOT, relativePath), 'utf8');
+  content.split(/\r?\n/).forEach((line, index) => {
+    if (!/\$opsx-/.test(line)) return;
+    assert(
+      /Codex/.test(line) && /Claude\/Gemini/.test(line) && /\/opsx-/.test(line),
+      `${relativePath}:${index + 1} has unqualified Codex route guidance`
+    );
+  });
+}
+
 function expectRuntimeError(run, code) {
   let caught = null;
   try {
@@ -1019,6 +1030,11 @@ function runTests() {
     ].forEach((token) => {
       assert(!agentsHandOff.includes(token), `AGENTS hand-off must not include stale token ${token}`);
     });
+
+    [
+      'skills/opsx/references/action-playbooks.md',
+      'skills/opsx/references/action-playbooks-zh.md'
+    ].forEach(assertPlatformLabeledCodexRouteLines);
   });
 
   test('opsx check/doc/language work as subcommands and compatibility aliases', () => {

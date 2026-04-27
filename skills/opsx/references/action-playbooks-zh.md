@@ -80,7 +80,7 @@
 
 - 执行前先确认目标变更集合与执行顺序。
 - 仅对真实 READY 的 changes 执行批量 apply。
-- 若未找到 READY changes，立即停止并建议运行 `$opsx-status` 查看就绪度与阻塞项。
+- 若未找到 READY changes，立即停止并建议对应平台的 `status` 路由：Codex `$opsx-status`，Claude/Gemini `/opsx-status`。
 - 不要 auto-create 缺失状态，不要伪造 READY 任务，也不要跳过 checkpoint 要求。
 
 ## verify
@@ -104,7 +104,7 @@
 
 - 批量归档前先确认目标集合。
 - 仅归档已完成且满足归档条件的 changes。
-- 若没有可归档的 completed changes，立即停止并建议运行 `$opsx-status` 查看完成状态。
+- 若没有可归档的 completed changes，立即停止并建议对应平台的 `status` 路由：Codex `$opsx-status`，Claude/Gemini `/opsx-status`。
 - 不要 auto-create archive metadata，也不要把未完成 change 标记为 completed。
 
 ## status
@@ -112,8 +112,8 @@
 - 报告 workspace 是否存在（`.opsx/config.yaml`）以及 active change 是否存在（`.opsx/active.yaml`）。
 - 按 active schema 报告工件 READY/BLOCKED/DONE。
 - 报告阻塞项与下一个具体命令。
-- 若 workspace 缺失，建议 `$opsx-onboard`。
-- 若无 active change，建议 `$opsx-new` 或 `$opsx-propose`。
+- 若 workspace 缺失，建议对应平台的 `onboard` 路由：Codex `$opsx-onboard`，Claude/Gemini `/opsx-onboard`。
+- 若无 active change，建议对应平台的 `new` 或 `propose` 路由：Codex `$opsx-new` / `$opsx-propose`，Claude/Gemini `/opsx-new` / `/opsx-propose`。
 - 在需要或建议进行 `security-review` 时，明确显示其状态。
 - checkpoint 输出需包含标准字段：`status`、`findings`、`patchTargets`、`nextStep`。
 - `security-review` 使用 `required`、`recommended`、`waived`、`completed`。
