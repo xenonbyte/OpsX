@@ -381,6 +381,52 @@ function runTests() {
     }, 'schema-dependency-cycle');
   });
 
+  test('change-store exports Phase 4 persistence contract', () => {
+    const changeStore = require('../lib/change-store');
+    [
+      'buildChangeStateSkeleton',
+      'normalizeChangeState',
+      'loadActiveChangePointer',
+      'writeActiveChangePointer',
+      'loadChangeState',
+      'writeChangeState'
+    ].forEach((symbol) => {
+      assert.strictEqual(typeof changeStore[symbol], 'function', `Expected ${symbol} export.`);
+    });
+  });
+
+  test('change-store normalizes sparse Phase 2 state to Phase 4 defaults', () => {
+    const { normalizeChangeState } = require('../lib/change-store');
+    const normalized = normalizeChangeState({
+      change: 'legacy-normalize',
+      blockers: 'legacy blocker',
+      warnings: 'legacy warning',
+      allowedPaths: 'lib/**',
+      forbiddenPaths: '*.pem',
+      verificationLog: 'legacy verification note'
+    });
+
+    assert.strictEqual(normalized.stage, 'INIT');
+    assert.strictEqual(normalized.nextAction, 'Create proposal.md for this change.');
+    ['spec', 'task', 'execution'].forEach((checkpointId) => {
+      assert(Object.prototype.hasOwnProperty.call(normalized.checkpoints, checkpointId));
+    });
+    assert(Array.isArray(normalized.blockers));
+    assert(Array.isArray(normalized.warnings));
+    assert(Array.isArray(normalized.allowedPaths));
+    assert(Array.isArray(normalized.forbiddenPaths));
+    assert(Array.isArray(normalized.verificationLog));
+    assert.strictEqual(normalized.active.taskGroup, null);
+    assert.strictEqual(normalized.active.nextTaskGroup, null);
+  });
+
+  test('writeTextAtomic persists full file contents', () => {
+    const { writeTextAtomic } = require('../lib/fs-utils');
+    const atomicPath = path.join(fixtureRoot, '.opsx', 'changes', 'atomic-write.txt');
+    writeTextAtomic(atomicPath, 'phase4-atomic-write\n');
+    assert.strictEqual(fs.readFileSync(atomicPath, 'utf8'), 'phase4-atomic-write\n');
+  });
+
   test('runtime derives progression and blocked states from partial artifacts', () => {
     const changeName = 'kernel-progression';
     createChange(fixtureRoot, changeName, {
