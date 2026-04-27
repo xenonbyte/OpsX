@@ -470,10 +470,21 @@ function runTests() {
     assert.strictEqual(resolveContinueAction({ stage: 'INIT' }), 'proposal');
     assert.strictEqual(resolveContinueAction({ stage: 'PROPOSAL_READY' }), 'specs');
     assert.strictEqual(resolveContinueAction({ stage: 'SPECS_READY' }), 'design');
+    assert.strictEqual(resolveContinueAction({ stage: 'SPEC_SPLIT_REVIEWED' }), 'design');
+    assert.strictEqual(resolveContinueAction({ stage: 'DESIGN_READY' }), 'tasks');
+    assert.strictEqual(resolveContinueAction({ stage: 'SECURITY_REVIEW_REQUIRED' }), 'security-review');
+    assert.strictEqual(resolveContinueAction({ stage: 'SECURITY_REVIEWED' }), 'tasks');
+    assert.strictEqual(resolveContinueAction({ stage: 'SPEC_REVIEWED' }), 'tasks');
+    assert.strictEqual(resolveContinueAction({ stage: 'TASKS_READY' }), 'apply');
     assert.strictEqual(resolveContinueAction({
       stage: 'APPLYING_GROUP',
       active: { taskGroup: '1. Runtime instructions' }
     }), 'apply');
+    assert.strictEqual(resolveContinueAction({
+      stage: 'GROUP_VERIFIED',
+      active: { nextTaskGroup: '2. Follow-up' }
+    }), 'apply');
+    assert.strictEqual(resolveContinueAction({ stage: 'GROUP_VERIFIED' }), 'verify');
     assert.strictEqual(resolveContinueAction({ stage: 'IMPLEMENTED' }), 'verify');
     assert.strictEqual(resolveContinueAction({ stage: 'VERIFIED' }), 'sync');
     assert.strictEqual(resolveContinueAction({ stage: 'SYNCED' }), 'archive');
@@ -483,6 +494,7 @@ function runTests() {
     const { normalizeChangeState } = require('../lib/change-store');
     const normalized = normalizeChangeState({
       change: 'legacy-normalize',
+      stage: 'tasks',
       blockers: 'legacy blocker',
       warnings: 'legacy warning',
       allowedPaths: 'lib/**',
@@ -490,7 +502,7 @@ function runTests() {
       verificationLog: 'legacy verification note'
     });
 
-    assert.strictEqual(normalized.stage, 'INIT');
+    assert.strictEqual(normalized.stage, 'TASKS_READY');
     assert.strictEqual(normalized.nextAction, 'Create proposal.md for this change.');
     ['spec', 'task', 'execution'].forEach((checkpointId) => {
       assert(Object.prototype.hasOwnProperty.call(normalized.checkpoints, checkpointId));
@@ -560,6 +572,10 @@ function runTests() {
     const state = loadChangeState(changeDir);
     assert.strictEqual(state.stage, 'INIT');
     assert.strictEqual(state.nextAction, 'Create proposal.md for this change.');
+    assert(Object.prototype.hasOwnProperty.call(state.hashes, 'proposal.md'));
+    assert(Object.prototype.hasOwnProperty.call(state.hashes, 'design.md'));
+    assert(Object.prototype.hasOwnProperty.call(state.hashes, 'tasks.md'));
+    assert.deepStrictEqual(buildStatus({ repoRoot: fixtureRoot, changeName }).hashDriftWarnings, []);
   });
 
   test('opsx-new skeleton creates placeholder files, active pointer, and INIT stage', () => {
@@ -597,6 +613,9 @@ function runTests() {
     assert.strictEqual(activePointer.activeChange, changeName);
     assert.strictEqual(state.stage, 'INIT');
     assert.strictEqual(state.nextAction, 'Create proposal.md for this change.');
+    assert(Object.prototype.hasOwnProperty.call(state.hashes, 'proposal.md'));
+    assert(Object.prototype.hasOwnProperty.call(state.hashes, 'design.md'));
+    assert(Object.prototype.hasOwnProperty.call(state.hashes, 'tasks.md'));
 
     const designText = fs.readFileSync(path.join(changeDir, 'design.md'), 'utf8');
     const tasksText = fs.readFileSync(path.join(changeDir, 'tasks.md'), 'utf8');
@@ -1541,9 +1560,9 @@ function runTests() {
     setActiveTaskGroup(changeDir, '2. Runtime integration', '3. Verification');
 
     const apply = buildApplyInstructions({ repoRoot: fixtureRoot, changeName });
-    assert.strictEqual(apply.nextTaskGroup, '3. Verification');
+    assert.strictEqual(apply.nextTaskGroup, '2. Runtime integration');
     assert.strictEqual(apply.remainingTaskGroups.length, 1);
-    assert.strictEqual(apply.remainingTaskGroups[0].title, '3. Verification');
+    assert.strictEqual(apply.remainingTaskGroups[0].title, '2. Runtime integration');
   });
 
   test('invalid inputs are rejected for unsafe change names, missing changes, and unknown artifacts', () => {
@@ -1765,6 +1784,14 @@ function runTests() {
     assert(fs.existsSync(path.join(executeHome, '.opsx', 'commands', 'opsx.md')));
 
     assert(!fs.existsSync(path.join(executeFixture, 'openspec', 'changes', changeName, '.openspec.yaml')));
+
+    const { loadChangeState } = require('../lib/change-store');
+    const migratedState = loadChangeState(path.join(executeFixture, '.opsx', 'changes', changeName));
+    assert.strictEqual(migratedState.stage, 'PROPOSAL_READY');
+    assert(Object.prototype.hasOwnProperty.call(migratedState.hashes, 'proposal.md'));
+    const migratedStatus = buildStatus({ repoRoot: executeFixture, changeName });
+    assert.strictEqual(migratedStatus.nextAction, 'specs');
+    assert.deepStrictEqual(migratedStatus.hashDriftWarnings, []);
   });
 
   test('opsx migrate aborts by default when canonical .opsx exists and keeps legacy tree untouched', () => {
