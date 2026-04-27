@@ -5,6 +5,7 @@ const { spawnSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { createHash } = require('node:crypto');
 const { copyDir, ensureDir, removePath, writeText } = require('../lib/fs-utils');
 const { REPO_ROOT, PACKAGE_VERSION } = require('../lib/constants');
 const {
@@ -338,6 +339,50 @@ function runGitCheckIgnore(repoRoot, relativePath, options = {}) {
     stdout: result.stdout || '',
     stderr: result.stderr || ''
   };
+}
+
+function hashFileSha256(filePath) {
+  const hash = createHash('sha256');
+  hash.update(fs.readFileSync(filePath));
+  return hash.digest('hex');
+}
+
+function resolveArtifactPath(state, artifactId, fallbackPath) {
+  const artifactValue = state && state.artifacts ? state.artifacts[artifactId] : null;
+  if (typeof artifactValue === 'string' && artifactValue.trim()) {
+    return artifactValue.trim();
+  }
+  if (artifactValue && typeof artifactValue === 'object' && typeof artifactValue.path === 'string') {
+    const resolved = artifactValue.path.trim();
+    if (resolved) return resolved;
+  }
+  return fallbackPath;
+}
+
+function inspectReadOnlyStateForDrift(changeDir) {
+  const { loadChangeState } = require('../lib/change-store');
+  const state = loadChangeState(changeDir);
+  const warnings = Array.isArray(state.warnings) ? [...state.warnings] : [];
+  const proposalRelativePath = resolveArtifactPath(state, 'proposal', 'proposal.md');
+  const proposalPath = path.join(changeDir, proposalRelativePath);
+  const storedHash = state && state.hashes && typeof state.hashes.proposal === 'string'
+    ? state.hashes.proposal.trim()
+    : '';
+
+  if (!storedHash || !fs.existsSync(proposalPath)) {
+    return { state, warnings };
+  }
+
+  const currentHash = hashFileSha256(proposalPath);
+  if (storedHash !== currentHash) {
+    warnings.push(`Hash drift detected for ${proposalRelativePath}`);
+    return {
+      state: loadChangeState(changeDir),
+      warnings
+    };
+  }
+
+  return { state, warnings };
 }
 
 function runTests() {
