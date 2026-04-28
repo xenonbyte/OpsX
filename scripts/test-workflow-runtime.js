@@ -1460,6 +1460,54 @@ function runTests() {
     assert.strictEqual(fs.existsSync(path.join(fixtureRoot, '.opsx', 'archive', `${changeName}-`)), false);
   });
 
+  test('archiveChange recalculates gate instead of trusting supplied gate result', () => {
+    const { archiveChange } = require('../lib/archive');
+    const { writeChangeState } = require('../lib/change-store');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const changeName = 'archive-recalculate-gate-result';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Archive stale gate',
+        '- TDD Class: behavior-change',
+        '- [x] RED: add stale gate regression coverage',
+        '- [ ] GREEN: implement archive gate recalculation',
+        '- [ ] VERIFY: run workflow runtime regression'
+      ].join('\n'),
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Archive stale gate rejection',
+        'The system SHALL recalculate archive gates before moving change directories.'
+      ].join('\n')
+    });
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'SYNCED',
+      hashes: hashTrackedArtifacts(changeDir),
+      allowedPaths: ['specs/**'],
+      forbiddenPaths: ['*.pem']
+    });
+
+    const result = archiveChange({
+      changeDir,
+      gateResult: {
+        status: 'PASS',
+        repoRoot: fixtureRoot,
+        changeDir,
+        findings: [],
+        patchTargets: []
+      }
+    });
+
+    assert.strictEqual(result.status, 'BLOCK');
+    assert.strictEqual(result.archived, false);
+    assert.strictEqual(fs.existsSync(changeDir), true);
+    assert.strictEqual(fs.existsSync(path.join(fixtureRoot, '.opsx', 'archive', changeName)), false);
+    assert(result.findings.some((finding) => finding.code === 'archive-verify-blocked'));
+    assert(result.findings.some((finding) => finding.code === 'task-group-incomplete'));
+  });
+
   test('runBatchApply isolates per-change readiness and skip reasons', () => {
     const { runBatchApply } = require('../lib/batch');
     const { writeChangeState } = require('../lib/change-store');
