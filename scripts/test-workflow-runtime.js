@@ -787,6 +787,146 @@ function runTests() {
     assert.deepStrictEqual(accepted.hashes, hashTrackedArtifacts(changeDir));
   });
 
+  test('sync plan blocks duplicate requirement ids and writes nothing', () => {
+    const { planSync, applySyncPlan } = require('../lib/sync');
+    const changeName = 'sync-plan-duplicate-requirement';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Runtime sync safety',
+        'The system SHALL enforce deterministic sync planning before writes.',
+        '',
+        '#### Scenario: Deterministic plan',
+        '- **WHEN** sync planning starts',
+        '- **THEN** all target writes are computed in memory first',
+        '',
+        '## MODIFIED Requirements',
+        '### Requirement: Runtime sync safety',
+        'The system SHALL enforce deterministic sync planning before writes.',
+        '',
+        '#### Scenario: Duplicate requirement id',
+        '- **WHEN** a requirement title repeats',
+        '- **THEN** sync must block with duplicate id findings'
+      ].join('\n')
+    });
+    const canonicalPath = path.join(fixtureRoot, '.opsx', 'specs', 'runtime', 'spec.md');
+    const canonicalBefore = [
+      '## ADDED Requirements',
+      '### Requirement: Runtime sync safety',
+      'The system SHALL enforce deterministic sync planning before writes.',
+      '',
+      '#### Scenario: Baseline canonical',
+      '- **WHEN** canonical specs are loaded',
+      '- **THEN** sync compares deltas without partial writes'
+    ].join('\n');
+    writeText(canonicalPath, canonicalBefore);
+
+    const plan = planSync({ changeDir });
+    assert.strictEqual(plan.status, 'BLOCK');
+    assert(plan.findings.some((finding) => finding.code === 'duplicate-requirement-id'));
+
+    const applied = applySyncPlan(plan);
+    assert.strictEqual(applied.status, 'BLOCK');
+    assert.strictEqual(fs.readFileSync(canonicalPath, 'utf8'), canonicalBefore);
+  });
+
+  test('sync plan blocks omitted canonical requirements and conflicting normative language', () => {
+    const { planSync } = require('../lib/sync');
+    const changeName = 'sync-plan-omission-conflict';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'specs/runtime/spec.md': [
+        '## MODIFIED Requirements',
+        '### Requirement: Session token rotation rule',
+        'The system MUST NOT rotate access tokens for every session request and keep audit logs unchanged.',
+        '',
+        '#### Scenario: Conflicting polarity',
+        '- **WHEN** session token handling executes',
+        '- **THEN** the requirement conflicts with canonical normative behavior'
+      ].join('\n')
+    });
+    writeText(path.join(fixtureRoot, '.opsx', 'specs', 'runtime', 'spec.md'), [
+      '## ADDED Requirements',
+      '### Requirement: Session token rotation baseline',
+      'The system SHALL rotate access tokens for every session request and keep audit logs unchanged.',
+      '',
+      '#### Scenario: Canonical rotation baseline',
+      '- **WHEN** a session request succeeds',
+      '- **THEN** the token rotates and audit logs are persisted',
+      '',
+      '### Requirement: Preserve canonical metrics coverage',
+      'The system SHALL preserve canonical metrics coverage unless explicitly removed.',
+      '',
+      '#### Scenario: Preserve metrics coverage',
+      '- **WHEN** sync evaluates delta specs',
+      '- **THEN** canonical metrics coverage remains present'
+    ].join('\n'));
+
+    const plan = planSync({ changeDir });
+    assert.strictEqual(plan.status, 'BLOCK');
+    const findingCodes = new Set(plan.findings.map((finding) => finding.code));
+    assert(findingCodes.has('omitted-canonical-requirement'));
+    assert(findingCodes.has('conflicting-requirements'));
+  });
+
+  test('applySyncPlan writes full conflict-free capability files and advances VERIFIED to SYNCED', () => {
+    const { planSync, applySyncPlan, acceptSyncPlan } = require('../lib/sync');
+    const { writeChangeState, loadChangeState } = require('../lib/change-store');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const changeName = 'sync-plan-acceptance';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': '## 1. Sync planning\n- [x] 1.1 Implement conservative sync\n',
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Canonical runtime baseline',
+        'The system SHALL preserve canonical runtime baseline behavior during sync.',
+        '',
+        '#### Scenario: Preserve baseline',
+        '- **WHEN** sync applies a conflict-free plan',
+        '- **THEN** baseline behavior remains in canonical specs',
+        '',
+        '### Requirement: Runtime sync append capability',
+        'The system SHALL append conflict-free capability requirements into canonical specs.',
+        '',
+        '#### Scenario: Append capability',
+        '- **WHEN** a new runtime requirement is conflict-free',
+        '- **THEN** canonical specs include it after sync'
+      ].join('\n')
+    });
+    const canonicalPath = path.join(fixtureRoot, '.opsx', 'specs', 'runtime', 'spec.md');
+    writeText(canonicalPath, [
+      '## ADDED Requirements',
+      '### Requirement: Canonical runtime baseline',
+      'The system SHALL preserve canonical runtime baseline behavior during sync.',
+      '',
+      '#### Scenario: Existing baseline',
+      '- **WHEN** canonical runtime specs are read',
+      '- **THEN** baseline behavior is present'
+    ].join('\n'));
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'VERIFIED',
+      hashes: {
+        'proposal.md': 'stale-hash'
+      }
+    });
+
+    const plan = planSync({ changeDir });
+    assert.strictEqual(plan.status, 'PASS');
+    assert.strictEqual(plan.writes.length, 1);
+
+    const applied = applySyncPlan(plan);
+    assert.strictEqual(applied.status, 'PASS');
+    assert.strictEqual(fs.readFileSync(canonicalPath, 'utf8'), fs.readFileSync(path.join(changeDir, 'specs', 'runtime', 'spec.md'), 'utf8'));
+
+    const accepted = acceptSyncPlan(changeDir, applied);
+    assert.strictEqual(accepted.stage, 'SYNCED');
+    assert.strictEqual(accepted.nextAction, 'archive');
+    assert.deepStrictEqual(accepted.hashes, hashTrackedArtifacts(changeDir));
+    assert.strictEqual(loadChangeState(changeDir).stage, 'SYNCED');
+  });
+
   test('change-store normalizes sparse Phase 2 state to Phase 4 defaults', () => {
     const { normalizeChangeState } = require('../lib/change-store');
     const normalized = normalizeChangeState({
