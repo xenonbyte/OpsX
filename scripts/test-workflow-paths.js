@@ -102,6 +102,17 @@ function registerTests(test, helpers) {
     assert(pathScope.includes("require('./glob-utils')"));
   });
 
+  test('write-sensitive migrate and sync guards import shared path-utils helpers', () => {
+    const migrateSource = fs.readFileSync(path.join(__dirname, '../lib/migrate.js'), 'utf8');
+    const syncSource = fs.readFileSync(path.join(__dirname, '../lib/sync.js'), 'utf8');
+
+    assert(migrateSource.includes("require('./path-utils')"));
+    assert(syncSource.includes("require('./path-utils')"));
+    assert.strictEqual(/function ensureWithinBase\(/.test(migrateSource), false);
+    assert.strictEqual(/function ensureWithinBase\(/.test(syncSource), false);
+    assert(syncSource.includes('Sync plan canonicalSpecsDir must match repoRoot/.opsx/specs.'));
+  });
+
   test('matchPathScope uses picomatch globs for allowed and forbidden paths', () => {
     const { matchPathScope } = require('../lib/path-scope');
     const result = matchPathScope(
