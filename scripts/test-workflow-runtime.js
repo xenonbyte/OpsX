@@ -1981,6 +1981,46 @@ function runTests() {
     assert(checkpoint.findings.some((finding) => finding.code === 'tdd-verify-missing' && finding.severity === 'WARN'));
   });
 
+  test('task checkpoint strict mode blocks unclassified task groups', () => {
+    const checkpoint = runTaskCheckpoint({
+      config: {
+        rules: {
+          tdd: {
+            mode: 'strict',
+            requireFor: ['behavior-change', 'bugfix'],
+            exempt: ['docs-only', 'copy-only', 'config-only']
+          }
+        }
+      },
+      sources: {
+        proposal: '## Why\nNeed resilient outbound HTTP calls.',
+        specs: [
+          '## ADDED Requirements',
+          '### Requirement: Retry transient failures',
+          'The system SHALL retry transient HTTP failures before surfacing an error.'
+        ].join('\n'),
+        design: [
+          '## Context',
+          'Retry logic adds runtime control flow for transient HTTP failures.'
+        ].join('\n'),
+        tasks: [
+          '## Test Plan',
+          '- Behavior: retry transient HTTP failures.',
+          '- Requirement/Scenario: TDD-03 runtime checkpoint requirement.',
+          '- Verification: automated runtime checks.',
+          '- TDD Mode: strict',
+          '- Exemption Reason: none',
+          '',
+          '## 1. Add retry logic',
+          '- [ ] GREEN: Implement retry handling for transient failures.'
+        ].join('\n')
+      }
+    });
+
+    assert.strictEqual(checkpoint.status, 'BLOCK');
+    assert(checkpoint.findings.some((finding) => finding.code === 'tdd-classification-missing' && finding.severity === 'BLOCK'));
+  });
+
   test('task checkpoint off mode skips TDD findings', () => {
     const checkpoint = runTaskCheckpoint({
       config: {
@@ -2124,8 +2164,10 @@ function runTests() {
       ].join('\n'),
       'tasks.md': [
         '## 1. Runtime status guidance',
-        '- [x] 1.1 Add runtime status output implementation',
-        '- [x] 1.2 Add verification, security, and compatibility checks',
+        '- TDD Class: behavior-change',
+        '- [x] RED: Add runtime status output regression coverage.',
+        '- [x] GREEN: Add runtime status output implementation.',
+        '- [x] VERIFY: Add verification, security, and compatibility checks.',
         '- [x] 1.3 Document rollout migration and rollback guidance'
       ].join('\n')
     });
@@ -2180,8 +2222,10 @@ function runTests() {
       ].join('\n'),
       tasks: [
         '## 1. Runtime preview',
-        '- [x] 1.1 Add runtime preview implementation',
-        '- [x] 1.2 Add verification and compatibility checks',
+        '- TDD Class: behavior-change',
+        '- [x] RED: Add runtime preview regression coverage.',
+        '- [x] GREEN: Add runtime preview implementation.',
+        '- [x] VERIFY: Add verification and compatibility checks.',
         '- [x] 1.3 Document rollout migration and rollback guidance'
       ].join('\n')
     };
@@ -2246,12 +2290,16 @@ function runTests() {
       ].join('\n'),
       tasks: [
         '## 1. Preview base',
-        '- [x] 1.1 Add preview flow implementation',
-        '- [x] 1.2 Add verification and compatibility checks',
+        '- TDD Class: behavior-change',
+        '- [x] RED: Add preview flow regression coverage.',
+        '- [x] GREEN: Add preview flow implementation.',
+        '- [x] VERIFY: Add verification and compatibility checks.',
         '',
         '## 2. Preview follow-up',
-        '- [ ] 2.1 Add preview follow-up API',
-        '- [ ] 2.2 Add preview follow-up verification'
+        '- TDD Class: behavior-change',
+        '- [ ] RED: Add preview follow-up API coverage.',
+        '- [ ] GREEN: Add preview follow-up API.',
+        '- [ ] VERIFY: Add preview follow-up verification.'
       ]
     };
 
@@ -2463,12 +2511,16 @@ function runTests() {
       ].join('\n'),
       'tasks.md': [
         '## 1. Graph kernel',
-        '- [x] 1.1 Implement runtime apply instructions graph kernel',
-        '- [x] 1.2 Add migration rollback compatibility validators',
+        '- TDD Class: behavior-change',
+        '- [x] RED: Add runtime apply graph kernel regression coverage.',
+        '- [x] GREEN: Implement runtime apply instructions graph kernel.',
+        '- [x] VERIFY: Add migration rollback compatibility validators.',
         '',
         '## 2. Runtime instructions',
-        '- [ ] 2.1 Add runtime apply instructions API implementation',
-        '- [ ] 2.2 Add runtime apply verification tests and compatibility checks'
+        '- TDD Class: behavior-change',
+        '- [ ] RED: Add runtime apply instructions API coverage.',
+        '- [ ] GREEN: Add runtime apply instructions API implementation.',
+        '- [ ] VERIFY: Add runtime apply verification tests and compatibility checks.'
       ].join('\n')
     });
 
