@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
-status: verifying
+status: milestone_complete
 stopped_at: Completed 08-07-PLAN.md
 last_updated: "2026-04-28T20:05:38.903Z"
 last_activity: 2026-04-28
@@ -21,18 +21,18 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-28)
 
 **Core value:** Agents can reliably continue spec-driven work from disk-backed OpsX artifacts instead of relying on fragile chat history.
-**Current focus:** Phase 08 — Stability, JSON, and Release Coverage
+**Current focus:** Milestone complete — Phase 08 verification passed
 
 ## Current Position
 
-Phase: 8 (Stability, JSON, and Release Coverage) — EXECUTING
+Phase: 08 (Stability, JSON, and Release Coverage) — COMPLETE
 Plan: 7 of 7
-Status: Phase complete — ready for verification
+Status: Milestone complete
 Last activity: 2026-04-28
 
 ## Next Action
 
-Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening plans.
+Run `$gsd-progress` to review the completed milestone, then address the Phase 8 review warnings or complete the milestone archive.
 
 ## Accumulated Context
 
@@ -54,6 +54,7 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 - 2026-04-28T16:30Z: Phase 7 code-review fixes applied all 4 warning findings; `07-REVIEW-FIX.md` reports `status: all_fixed`, and `npm run test:workflow-runtime` passed 109/109.
 - 2026-04-28T16:47Z: Phase 7 post-fix re-review is clean across 30 files; `07-REVIEW.md` reports 0 findings and `npm run test:workflow-runtime` passed 109/109.
 - 2026-04-29: Phase 8 context gathered; decisions lock full `status --json` envelope semantics, researched path/glob dependency selection, full path-surface coverage, split test scripts with `npm test`, complete release gate, `npm pack --dry-run --json`, and release docs updates.
+- 2026-04-29: Phase 8 execution completed across 7/7 plans; verifier passed 6/6 requirements, `npm test` passed 126/126, and schema drift returned valid with 0 issues.
 
 ## Decisions
 
@@ -184,6 +185,7 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 **Completed Phase:** 5 (Spec-Split Checkpoint) — 7/7 plans — verification passed — 2026-04-28
 **Completed Phase:** 6 (TDD-Light Workflow) — 9/9 plans — verification passed — 2026-04-28
 **Completed Phase:** 7 (Verify, Sync, Archive, and Batch Gates) — 8/8 plans — verification passed — 2026-04-28
+**Completed Phase:** 8 (Stability, JSON, and Release Coverage) — 7/7 plans — verification passed — 2026-04-28
 
 ## Performance Metrics
 
