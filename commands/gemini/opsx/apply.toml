@@ -31,8 +31,8 @@ Execution rules:
 - Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.
 - If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
-- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
-- `execution checkpoint` runs after each top-level task group during `apply`.
+- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`, applies `rules.tdd.mode`, requires `RED` and `VERIFY` for `behavior-change` and `bugfix` groups, and accepts visible `TDD Exemption:` reasons for exempt work.
+- `execution checkpoint` runs after each top-level task group during `apply` and records completed TDD steps, verification command/result, diff summary, and drift status.
 - Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
 - If the required change name, description, or selection is missing, ask for the minimum clarification needed.
 - Read the relevant change artifacts before modifying product code.
