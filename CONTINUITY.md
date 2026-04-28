@@ -7,12 +7,12 @@
 - 2026-04-27 [CODE] `AGENTS.md` preserves repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
 - 2026-04-28 [TOOL] Phase 5 (`spec-split-checkpoint`) verification passed; `05-VERIFICATION.md` is written and `npm run test:workflow-runtime` passed 66/66.
 - 2026-04-28 [CODE] Phase 6 context is captured; TDD mode default decision is `strict` for behavior-change and bugfix work.
-- 2026-04-28 [CODE] Phase 6 planning is complete: 9 plans across 6 waves, with a temporary 12-prompt parity window for `apply` / `propose` / `continue` / `ff` before final strict parity restore.
+- 2026-04-28 [CODE] Phase 6 planning is complete and independently verified: 9 plans across 6 waves, with a temporary 12-prompt parity window for `apply` / `propose` / `continue` / `ff` before final strict parity restore.
 
 ## Done (recent)
 - 2026-04-28 [TOOL] Verified Phase 5 goal achievement: schema, state store, validator, workflow facade, generator, docs, and prompt parity all match the split-spec checkpoint contract.
 - 2026-04-28 [CODE] Captured Phase 6 context and discussion log in `.planning/phases/06-tdd-light-workflow/`.
-- 2026-04-28 [CODE] Created `06-01-PLAN.md` through `06-09-PLAN.md` and updated `.planning/ROADMAP.md` / `.planning/STATE.md` for Phase 6 execution readiness.
+- 2026-04-28 [CODE] Created `06-01-PLAN.md` through `06-09-PLAN.md`; independent plan checker passed after resolving Phase 6 research questions.
 - 2026-04-27 [CODE] Executed all Phase 4 plans `04-01` through `04-09`; summaries exist for every plan.
 - 2026-04-27 [CODE] Fixed Phase 4 review findings in commit `7282e57`: lifecycle route gaps, fresh/migrated hash baselines, lowercase legacy stage normalization, and active task group apply selection.
 - 2026-04-27 [CODE] Committed clean Phase 4 review report in `535df3b`.
@@ -61,6 +61,7 @@
 
 ## Receipts
 - 2026-04-28 [TOOL] Phase 5 verification completed: `npm run test:workflow-runtime` passed 66/66; direct spot-checks for `runSpecSplitCheckpoint()` and `validateCheckpointContracts()` passed; `05-VERIFICATION.md` was written.
+- 2026-04-28 [TOOL] Independent `gsd-plan-checker` returned `## VERIFICATION PASSED` for all 9 Phase 6 plans; TDD-01 through TDD-04 are covered after research questions were resolved in commit `2834516`.
 - 2026-04-28 [TOOL] Phase 6 context committed as `e633a9e`; STATE session record committed as `5f0249f`.
 - 2026-04-28T08:55:43Z [TOOL] Phase 6 plans `06-01` through `06-09` passed `frontmatter.validate` and `verify.plan-structure`; planning docs did not require a runtime-code test run.
 - 2026-04-28 [TOOL] Phase 5 context committed as `08235de`; STATE session record committed as `8aa329d`.
