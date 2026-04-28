@@ -479,17 +479,15 @@ This example follows the locked Phase 6 decisions: a top-level Test Plan, explic
 
 All factual claims in this research were verified from repo-local sources or the npm registry; no unresolved `[ASSUMED]` implementation claims remain. [VERIFIED: .planning/phases/06-tdd-light-workflow/06-CONTEXT.md; lib/config.js; lib/workflow.js; lib/change-store.js; npm view yaml version time --json]
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should Phase 6 include adjacent generator and distributed-skill parity refreshes, even though the requested focus list centers on core runtime/template files?**
    - What we know: `skills/opsx/SKILL.md`, `lib/generator.js`, and checked-in `commands/**` still contain wording that is incomplete or explicitly deferred to Phase 6, and the runtime suite already checks generated/source-of-truth alignment. [VERIFIED: skills/opsx/SKILL.md; lib/generator.js; commands/codex/prompts/opsx-apply.md; scripts/test-workflow-runtime.js]
-   - What's unclear: whether the planner should keep scope strictly to the user-listed files or include one bounded parity wave at the end of the phase. [VERIFIED: user objective + focus file list; lib/generator.js; skills/opsx/SKILL.md]
-   - Recommendation: include a final parity wave if Phase 6 expands tests to assert shipped TDD-light wording; otherwise document a deliberate follow-up so guidance drift is explicit rather than accidental. [VERIFIED: scripts/test-workflow-runtime.js; lib/generator.js]
+   - Resolution: include a bounded parity wave in Phase 6. Plans `06-05` through `06-09` cover generator/source wording, checked-in Claude/Codex/Gemini prompt refreshes, and restoration of strict repo-wide parity. [VERIFIED: .planning/phases/06-tdd-light-workflow/06-05-PLAN.md; .planning/phases/06-tdd-light-workflow/06-06-PLAN.md; .planning/phases/06-tdd-light-workflow/06-07-PLAN.md; .planning/phases/06-tdd-light-workflow/06-08-PLAN.md; .planning/phases/06-tdd-light-workflow/06-09-PLAN.md]
 
 2. **How much of the richer execution proof should `buildStatus()` and `buildResumeInstructions()` surface in Phase 6 versus Phase 7?**
    - What we know: TDD-04 requires the execution checkpoint to record richer evidence after each top-level group, but current status/resume payloads only expose stage, next action, warnings, blockers, and task-group pointers. [VERIFIED: .planning/REQUIREMENTS.md; lib/runtime-guidance.js]
-   - What's unclear: whether Phase 6 should surface the new proof only in `context.md` and `state.yaml`, or also in runtime-guidance JSON/text payloads for operators. [VERIFIED: lib/runtime-guidance.js; lib/change-capsule.js]
-   - Recommendation: at minimum, update `buildApplyInstructions()` to explain TDD blockers and selected-group expectations in Phase 6; keep broader status/reporting expansion optional unless the planner wants earlier operator visibility. [VERIFIED: lib/runtime-guidance.js; .planning/ROADMAP.md]
+   - Resolution: Phase 6 should persist richer proof in `state.yaml` / `verificationLog`, render it in `context.md`, append relevant drift entries, and expose TDD blockers/selected-group expectations through apply guidance. Broader `status` / `resume` reporting expansion remains out of scope unless needed by those existing paths after the persistence change; Phase 7 owns final verify/archive quality gates and broader status/reporting implications. [VERIFIED: .planning/phases/06-tdd-light-workflow/06-03-PLAN.md; .planning/phases/06-tdd-light-workflow/06-04-PLAN.md; .planning/phases/06-tdd-light-workflow/06-CONTEXT.md]
 
 ## Environment Availability
 
