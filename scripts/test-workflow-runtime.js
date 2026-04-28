@@ -1401,7 +1401,10 @@ function runTests() {
       verificationCommand: 'npm run test:workflow-runtime',
       verificationResult: 'PASS',
       changedFiles: ['lib/change-store.js', 'lib/runtime-guidance.js'],
-      checkpointStatus: 'PASS'
+      checkpointStatus: 'PASS',
+      completedSteps: ['RED', 'GREEN', 'VERIFY'],
+      diffSummary: 'Applied task-group runtime integration changes.',
+      driftStatus: 'clean'
     });
 
     assert.strictEqual(persisted.active.taskGroup, '2. Runtime integration');
@@ -1413,7 +1416,10 @@ function runTests() {
       'verificationCommand',
       'verificationResult',
       'changedFiles',
-      'checkpointStatus'
+      'checkpointStatus',
+      'completedSteps',
+      'diffSummary',
+      'driftStatus'
     ]);
 
     const contextText = fs.readFileSync(path.join(changeDir, 'context.md'), 'utf8');
@@ -1423,6 +1429,73 @@ function runTests() {
     assert(contextText.includes('## Last Verification'));
     assert(contextText.includes('npm run test:workflow-runtime'));
     assert(contextText.includes('1. Runtime setup'));
+  });
+
+  test('recordTaskGroupExecution persists extended verification evidence', () => {
+    const { recordTaskGroupExecution, writeChangeState } = require('../lib/change-store');
+    const changeName = 'persist-extended-verification-evidence';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': '## 1. Runtime evidence\n- [x] 1.1 Persist execution proof\n',
+      'specs/runtime/spec.md': '## ADDED Requirements\n### Requirement: Runtime evidence\n'
+    });
+
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'APPLYING_GROUP',
+      active: {
+        taskGroup: '1. Runtime evidence',
+        nextTaskGroup: null
+      }
+    });
+
+    const persisted = recordTaskGroupExecution(changeDir, {
+      taskGroup: '1. Runtime evidence',
+      nextTaskGroup: null,
+      verificationCommand: 'npm run test:workflow-runtime',
+      verificationResult: 'PASS',
+      changedFiles: ['lib/workflow.js', 'lib/change-store.js'],
+      checkpointStatus: 'PASS',
+      completedSteps: ['RED', 'GREEN', 'VERIFY'],
+      diffSummary: 'Persisted execution-proof fields in existing verification log.',
+      driftStatus: 'clean'
+    });
+
+    assert.strictEqual(persisted.verificationLog.length, 1);
+    assert.deepStrictEqual(persisted.verificationLog[0].completedSteps, ['RED', 'GREEN', 'VERIFY']);
+    assert.strictEqual(
+      persisted.verificationLog[0].diffSummary,
+      'Persisted execution-proof fields in existing verification log.'
+    );
+    assert.strictEqual(persisted.verificationLog[0].driftStatus, 'clean');
+  });
+
+  test('context capsule renders completed tdd steps and diff summary', () => {
+    const { renderContextCapsule } = require('../lib/change-capsule');
+    const text = renderContextCapsule({
+      stage: 'APPLYING_GROUP',
+      nextAction: 'verify',
+      active: {
+        taskGroup: '1. Runtime evidence',
+        nextTaskGroup: '2. Follow-up'
+      },
+      verificationLog: [{
+        at: '2026-04-28T10:10:00.000Z',
+        taskGroup: '1. Runtime evidence',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        checkpointStatus: 'PASS',
+        changedFiles: ['lib/workflow.js'],
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Persisted execution-proof fields in existing verification log.',
+        driftStatus: 'clean'
+      }]
+    });
+
+    assert(text.includes('completedSteps: RED, GREEN, VERIFY'));
+    assert(text.includes('diffSummary: Persisted execution-proof fields in existing verification log.'));
+    assert(text.includes('driftStatus: clean'));
   });
 
   test('blocked execution checkpoint preserves artifact hashes and active task group', () => {
@@ -3179,6 +3252,71 @@ function runTests() {
 
     assert.strictEqual(result.status, 'PASS');
     assert(!result.findings.some((finding) => finding.code === 'new-constraints-detected'));
+  });
+
+  test('execution checkpoint records completed tdd steps diff summary and drift status', () => {
+    const tasksText = [
+      '## 1. Runtime evidence',
+      '- [x] RED: add failing runtime proof coverage',
+      '- [x] GREEN: persist execution evidence',
+      '- [x] VERIFY: run workflow runtime tests'
+    ].join('\n');
+    const baseOptions = {
+      schemaName: 'spec-driven',
+      artifacts: {
+        proposal: true,
+        specs: true,
+        design: true,
+        tasks: true
+      },
+      sources: {
+        proposal: '## Why\nNeed richer execution evidence persistence.',
+        specs: [
+          '## ADDED Requirements',
+          '### Requirement: Execution proof',
+          'The system SHALL persist execution proof fields after each completed task group.'
+        ].join('\n'),
+        design: [
+          '## Context',
+          'Execution proof persistence.',
+          '## Migration Plan',
+          'No migration.'
+        ].join('\n'),
+        tasks: tasksText
+      },
+      group: {
+        title: '1. Runtime evidence',
+        text: tasksText,
+        completed: true
+      }
+    };
+
+    const withProof = runExecutionCheckpoint({
+      ...baseOptions,
+      executionEvidence: {
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        diffSummary: 'Persisted completed steps and drift status through verification log.',
+        driftStatus: 'clean',
+        driftSummary: 'No drift detected after execution.',
+        implementationSummary: 'Persisted execution-proof fields through existing store/capsule path.'
+      }
+    });
+
+    assert.strictEqual(withProof.status, 'PASS');
+    assert(!withProof.findings.some((finding) => finding.code === 'execution-proof-missing'));
+
+    const missingProof = runExecutionCheckpoint({
+      ...baseOptions,
+      executionEvidence: {
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        implementationSummary: 'Persisted execution-proof fields through existing store/capsule path.'
+      }
+    });
+
+    assert.strictEqual(missingProof.status, 'WARN');
+    assert(missingProof.findings.some((finding) => finding.code === 'execution-proof-missing'));
   });
 
   let failures = 0;
