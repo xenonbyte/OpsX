@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 08-06-PLAN.md
-last_updated: "2026-04-28T19:55:57.413Z"
+status: verifying
+stopped_at: Completed 08-07-PLAN.md
+last_updated: "2026-04-28T20:05:38.903Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 61
-  completed_plans: 60
-  percent: 98
+  completed_plans: 61
+  percent: 100
 ---
 
 # State
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-28)
 
 Phase: 8 (Stability, JSON, and Release Coverage) — EXECUTING
 Plan: 7 of 7
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-28
 
 ## Next Action
@@ -165,6 +165,9 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 - 08-05: Keep scripts/test-workflow-runtime.js aggregate-only with fixed topic order package->generation->state->paths->gates.
 - 08-06: generation topic executes check-phase1 legacy allowlist and preserves explicit post-release checks for schema-drift/code-review/verify-work.
 - 08-06: status --json gate treats ok=true as transport success and validates readiness via workspace/migration/changeStatus diagnostics.
+- Phase 8 Plan 07 sets docs/release-checklist.md as the canonical prepublish gate with exact commands.
+- Phase 8 Plan 07 documents status --json ok=true as transport success while readiness remains in workspace/migration/changeStatus/warnings/errors.
+- Phase 8 Plan 07 preserves explicit-only public routes and avoids standalone $opsx wording in release docs.
 
 ## Blockers
 
@@ -236,11 +239,12 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 | Phase 08 P04 | 6 min | 2 tasks | 4 files |
 | Phase 08 P05 | 8 min | 2 tasks | 2 files |
 | Phase 08 P06 | 10 min | 2 tasks | 2 files |
+| Phase 08 P07 | 5 min | 2 tasks | 6 files |
 
 ## Session
 
-Last session: 2026-04-28T19:55:57.409Z
-Stopped At: Completed 08-06-PLAN.md
+Last session: 2026-04-28T20:05:38.899Z
+Stopped At: Completed 08-07-PLAN.md
 Resume File: None
 
 **Next Phase:** 8 (Stability, JSON, and Release Coverage)
