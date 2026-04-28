@@ -927,6 +927,303 @@ function runTests() {
     assert.strictEqual(loadChangeState(changeDir).stage, 'SYNCED');
   });
 
+  test('archive gate blocks unsafe verify and sync prerequisites', () => {
+    const { evaluateArchiveGate } = require('../lib/archive');
+    const { writeChangeState } = require('../lib/change-store');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const now = new Date().toISOString();
+
+    const verifyBlockedChangeName = 'archive-gate-verify-blocked';
+    const verifyBlockedChangeDir = createChange(fixtureRoot, verifyBlockedChangeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Incomplete task group',
+        '- [x] RED: add archive gate regression coverage',
+        '- [ ] GREEN: implement archive precondition enforcement',
+        '- [ ] VERIFY: run workflow runtime regression'
+      ].join('\n'),
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Archive gate verify prerequisite',
+        'The system SHALL block archive when verify prerequisites are incomplete.'
+      ].join('\n')
+    });
+    writeChangeState(verifyBlockedChangeDir, {
+      change: verifyBlockedChangeName,
+      stage: 'VERIFIED',
+      hashes: hashTrackedArtifacts(verifyBlockedChangeDir),
+      checkpoints: {
+        execution: {
+          status: 'PASS',
+          updatedAt: now
+        }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Incomplete task group',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        changedFiles: ['lib/archive.js'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Archive gate prerequisite checks.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['lib/**'],
+      forbiddenPaths: ['*.pem']
+    });
+
+    const verifyBlockedGate = evaluateArchiveGate({
+      changeDir: verifyBlockedChangeDir,
+      changedFiles: ['lib/archive.js']
+    });
+    assert.strictEqual(verifyBlockedGate.status, 'BLOCK');
+    assert(verifyBlockedGate.findings.some((finding) => finding.code === 'archive-verify-blocked'));
+    assert(verifyBlockedGate.findings.some((finding) => finding.code === 'task-group-incomplete'));
+
+    const syncBlockedChangeName = 'archive-gate-sync-blocked';
+    const syncBlockedChangeDir = createChange(fixtureRoot, syncBlockedChangeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Archive prerequisites',
+        '- [x] RED: add archive gate regression coverage',
+        '- [x] GREEN: implement archive precondition enforcement',
+        '- [x] VERIFY: run workflow runtime regression'
+      ].join('\n'),
+      'specs/runtime/spec.md': [
+        '## MODIFIED Requirements',
+        '### Requirement: Session token rotation rule',
+        'The system MUST NOT rotate access tokens for every session request and keep audit logs aligned.',
+        '',
+        '#### Scenario: Conflicting polarity',
+        '- **WHEN** session token handling executes',
+        '- **THEN** token rotation and audit logs remain aligned'
+      ].join('\n')
+    });
+    writeText(path.join(fixtureRoot, '.opsx', 'specs', 'runtime', 'spec.md'), [
+      '## ADDED Requirements',
+      '### Requirement: Session token rotation baseline',
+      'The system SHALL rotate access tokens for every session request and keep audit logs aligned.',
+      '',
+      '#### Scenario: Canonical rotation baseline',
+      '- **WHEN** session token handling executes',
+      '- **THEN** token rotation and audit logs remain aligned',
+      '',
+      '### Requirement: Preserve canonical metrics coverage',
+      'The system SHALL preserve canonical metrics coverage unless explicitly removed.',
+      '',
+      '#### Scenario: Preserve metrics coverage',
+      '- **WHEN** sync evaluates delta specs',
+      '- **THEN** canonical metrics coverage remains present'
+    ].join('\n'));
+    writeText(path.join(syncBlockedChangeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+    writeChangeState(syncBlockedChangeDir, {
+      change: syncBlockedChangeName,
+      stage: 'VERIFIED',
+      hashes: hashTrackedArtifacts(syncBlockedChangeDir),
+      checkpoints: {
+        execution: {
+          status: 'PASS',
+          updatedAt: now
+        }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Archive prerequisites',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        changedFiles: ['specs/runtime/spec.md'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Archive gate sync prerequisite checks.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['specs/**', '.opsx/specs/**'],
+      forbiddenPaths: ['*.pem']
+    });
+
+    const syncBlockedGate = evaluateArchiveGate({
+      changeDir: syncBlockedChangeDir,
+      changedFiles: ['specs/runtime/spec.md']
+    });
+    assert.strictEqual(syncBlockedGate.status, 'BLOCK');
+    assert(syncBlockedGate.findings.some((finding) => finding.code === 'archive-sync-unsafe'));
+    assert(syncBlockedGate.findings.some((finding) => finding.code === 'omitted-canonical-requirement'));
+  });
+
+  test('archiveChange syncs a VERIFIED change before moving it into archive', () => {
+    const { archiveChange } = require('../lib/archive');
+    const { writeChangeState, writeActiveChangePointer } = require('../lib/change-store');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const changeName = 'archive-sync-before-move';
+    const now = new Date().toISOString();
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Archive readiness',
+        '- [x] RED: add archive move regression coverage',
+        '- [x] GREEN: implement archive move behavior',
+        '- [x] VERIFY: run workflow runtime regression'
+      ].join('\n'),
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Archive sync before move',
+        'The system SHALL apply safe sync before archive when the lifecycle is VERIFIED.',
+        '',
+        '#### Scenario: Verified archive request',
+        '- **WHEN** archive executes from VERIFIED state',
+        '- **THEN** canonical specs are synced before archive move'
+      ].join('\n')
+    });
+    writeText(path.join(fixtureRoot, '.opsx', 'specs', 'runtime', 'spec.md'), [
+      '## ADDED Requirements',
+      '### Requirement: Archive sync before move',
+      'The system SHALL keep canonical runtime behavior aligned with verified changes.',
+      '',
+      '#### Scenario: Canonical baseline',
+      '- **WHEN** canonical specs are loaded',
+      '- **THEN** baseline behavior remains defined'
+    ].join('\n'));
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'VERIFIED',
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        execution: {
+          status: 'PASS',
+          updatedAt: now
+        }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Archive readiness',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        changedFiles: ['specs/runtime/spec.md'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Archive sync-before-move readiness proof.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['specs/**', '.opsx/specs/**'],
+      forbiddenPaths: ['*.pem']
+    });
+    writeActiveChangePointer(fixtureRoot, changeName);
+
+    const result = archiveChange({ changeDir });
+    assert.strictEqual(result.status, 'PASS');
+    assert.strictEqual(result.syncApplied, true);
+    assert.strictEqual(fs.existsSync(changeDir), false);
+
+    const archivedDir = path.join(fixtureRoot, '.opsx', 'archive', changeName);
+    assert.strictEqual(result.archivedChangeDir, archivedDir);
+    assert.strictEqual(fs.existsSync(archivedDir), true);
+    assert.strictEqual(fs.readFileSync(path.join(fixtureRoot, '.opsx', 'specs', 'runtime', 'spec.md'), 'utf8'), fs.readFileSync(path.join(archivedDir, 'specs', 'runtime', 'spec.md'), 'utf8'));
+  });
+
+  test('archiveChange moves a fully synced change into .opsx archive using the exact change name', () => {
+    const { archiveChange } = require('../lib/archive');
+    const { writeChangeState, loadChangeState, writeActiveChangePointer, loadActiveChangePointer } = require('../lib/change-store');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const changeName = 'archive-synced-exact-name';
+    const now = new Date().toISOString();
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Archive move',
+        '- [x] RED: add archive path regression coverage',
+        '- [x] GREEN: implement archive path behavior',
+        '- [x] VERIFY: run workflow runtime regression'
+      ].join('\n'),
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Archive exact destination',
+        'The system SHALL archive synced changes into deterministic `.opsx/archive/<change-name>/` paths.'
+      ].join('\n')
+    });
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'SYNCED',
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        execution: {
+          status: 'PASS',
+          updatedAt: now
+        }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Archive move',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        changedFiles: ['specs/runtime/spec.md'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Archive deterministic destination readiness proof.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['specs/**', '.opsx/specs/**'],
+      forbiddenPaths: ['*.pem']
+    });
+    writeActiveChangePointer(fixtureRoot, changeName);
+
+    const result = archiveChange({ changeDir });
+    const archivedDir = path.join(fixtureRoot, '.opsx', 'archive', changeName);
+    assert.strictEqual(result.status, 'PASS');
+    assert.strictEqual(result.syncApplied, false);
+    assert.strictEqual(result.archivedChangeDir, archivedDir);
+    assert.strictEqual(fs.existsSync(path.join(fixtureRoot, '.opsx', 'changes', changeName)), false);
+    assert.strictEqual(fs.existsSync(archivedDir), true);
+    assert.strictEqual(loadChangeState(archivedDir).stage, 'ARCHIVED');
+    assert.strictEqual(loadActiveChangePointer(fixtureRoot).activeChange, '');
+    assert.strictEqual(fs.existsSync(path.join(fixtureRoot, '.opsx', 'archive', `${changeName}-`)), false);
+  });
+
   test('change-store normalizes sparse Phase 2 state to Phase 4 defaults', () => {
     const { normalizeChangeState } = require('../lib/change-store');
     const normalized = normalizeChangeState({
