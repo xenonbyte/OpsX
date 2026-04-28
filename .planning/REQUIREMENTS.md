@@ -125,10 +125,10 @@
 | STATE-06 | Phase 4 | Completed |
 | STATE-07 | Phase 4 | Completed |
 | STATE-08 | Phase 4 | Completed |
-| SPEC-01 | Phase 5 | Pending |
-| SPEC-02 | Phase 5 | Pending |
-| SPEC-03 | Phase 5 | Pending |
-| SPEC-04 | Phase 5 | Pending |
+| SPEC-01 | Phase 5 | Completed |
+| SPEC-02 | Phase 5 | Completed |
+| SPEC-03 | Phase 5 | Completed |
+| SPEC-04 | Phase 5 | Completed |
 | TDD-01 | Phase 6 | Pending |
 | TDD-02 | Phase 6 | Pending |
 | TDD-03 | Phase 6 | Pending |
