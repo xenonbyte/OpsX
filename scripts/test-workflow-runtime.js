@@ -1697,6 +1697,35 @@ function runTests() {
     assert.deepStrictEqual(result.results, []);
   });
 
+  test('batch operations stop when workspace config is missing', () => {
+    const { runBatchApply, runBulkArchive } = require('../lib/batch');
+    const partialRoot = createFixtureRepo();
+    cleanupTargets.push(partialRoot);
+    createChange(partialRoot, 'partial-workspace-change', {
+      'proposal.md': '# Proposal\n'
+    });
+    removePath(path.join(partialRoot, '.opsx', 'config.yaml'));
+
+    [
+      runBatchApply({
+        repoRoot: partialRoot,
+        changeNames: ['partial-workspace-change']
+      }),
+      runBulkArchive({
+        repoRoot: partialRoot,
+        changeNames: ['partial-workspace-change']
+      })
+    ].forEach((result) => {
+      assert.strictEqual(result.status, 'BLOCK');
+      assert.strictEqual(result.code, 'workspace-config-missing');
+      assert.strictEqual(result.summary.ready, 0);
+      assert.strictEqual(result.summary.archived, 0);
+      assert.strictEqual(result.summary.blocked, 0);
+      assert.strictEqual(result.summary.skipped, 0);
+      assert.deepStrictEqual(result.results, []);
+    });
+  });
+
   test('change-store normalizes sparse Phase 2 state to Phase 4 defaults', () => {
     const { normalizeChangeState } = require('../lib/change-store');
     const normalized = normalizeChangeState({
