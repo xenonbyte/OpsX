@@ -191,7 +191,7 @@ Plans:
 - [x] `07-02-PLAN.md` — Build conservative in-memory spec sync with no-partial-write semantics and accepted `SYNCED` transitions.
 - [x] `07-03-PLAN.md` — Implement archive safe-sync gating, exact `.opsx/archive/<change-name>/` moves, and isolated batch orchestration.
 - [x] `07-04-PLAN.md` — Update source-of-truth verify/sync/archive/batch guidance and stage a temporary 15-route prompt assertion scope.
-- [ ] `07-05-PLAN.md` — Refresh the bounded Claude verify/sync/archive/batch route slice from generator output.
+- [x] `07-05-PLAN.md` — Refresh the bounded Claude verify/sync/archive/batch route slice from generator output.
 - [ ] `07-06-PLAN.md` — Refresh the bounded Codex verify/sync/archive/batch prompt slice from generator output.
 - [ ] `07-07-PLAN.md` — Refresh the bounded Gemini verify/sync/archive/batch route slice from generator output.
 - [ ] `07-08-PLAN.md` — Remove temporary Phase 7 prompt allowances and restore strict full-bundle parity.
