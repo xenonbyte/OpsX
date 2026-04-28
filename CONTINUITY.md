@@ -9,9 +9,10 @@
 - 2026-04-27 [CODE] Public current UX must not expose legacy OpenSpec routes/paths, `/prompts:*`, `/opsx:*`, standalone `$opsx`, or `$opsx <request>`.
 - 2026-04-27 [CODE] `commands/codex/prompts/opsx.md` remains only as an internal generated route catalog; public Codex entrypoints are explicit `$opsx-*`.
 - 2026-04-27 [CODE] `AGENTS.md` preserves repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
-- 2026-04-28 [CODE] Current GSD position: Phase 5 (`spec-split-checkpoint`) is planned into 7 plans across 5 waves; next step is `$gsd-execute-phase 5`.
+- 2026-04-28 [TOOL] Phase 5 (`spec-split-checkpoint`) verification passed; `05-VERIFICATION.md` is written and `npm run test:workflow-runtime` passed 66/66.
 
 ## Done (recent)
+- 2026-04-28 [TOOL] Verified Phase 5 goal achievement: schema, state store, validator, workflow facade, generator, docs, and prompt parity all match the split-spec checkpoint contract.
 - 2026-04-27 [CODE] Executed all Phase 4 plans `04-01` through `04-09`; summaries exist for every plan.
 - 2026-04-27 [CODE] Fixed Phase 4 review findings in commit `7282e57`: lifecycle route gaps, fresh/migrated hash baselines, lowercase legacy stage normalization, and active task group apply selection.
 - 2026-04-27 [CODE] Committed clean Phase 4 review report in `535df3b`.
@@ -61,6 +62,7 @@
 - 2026-04-27 [CODE] D015 ACTIVE: Phase 4 plans pin `yaml@2.8.3`, do not add `xstate`, and instead schedule a local transition-table module in `lib/change-state.js` to keep the implementation bounded and library-first.
 
 ## Receipts
+- 2026-04-28 [TOOL] Phase 5 verification completed: `npm run test:workflow-runtime` passed 66/66; direct spot-checks for `runSpecSplitCheckpoint()` and `validateCheckpointContracts()` passed; `05-VERIFICATION.md` was written.
 - 2026-04-28 [TOOL] Phase 5 context committed as `08235de`; STATE session record committed as `8aa329d`.
 - 2026-04-28 [TOOL] Phase 5 planning artifacts committed as `738a8a9` (research/validation), `c913212` (patterns), `6986346` (plans), and `b51b74f` (STATE planned-phase).
 - 2026-04-28 [TOOL] Independent `gsd-plan-checker` returned `## VERIFICATION PASSED` for all 7 Phase 5 plans; SPEC-01 through SPEC-04 are covered.
