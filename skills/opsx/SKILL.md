@@ -93,12 +93,16 @@ securityWaiver:
 
 ## Checkpoints
 
+- `spec-split-checkpoint`: after `specs`, before `design`
 - `spec checkpoint`: after `design`, before `tasks`
 - `task checkpoint`: after `tasks`, before `apply`
 - `execution checkpoint`: after each top-level task group during `apply`
 - Canonical checkpoint states are `PASS`, `WARN`, and `BLOCK`.
 - Checkpoints do not create `spec-review.md`, `task-review.md`, or `execution-review.md`.
 - When a checkpoint finds issues, update existing artifacts such as `proposal.md`, `specs/*.md`, `design.md`, `security-review.md`, or `tasks.md`.
+- Simple single-spec changes can pass `spec-split-checkpoint` inline within existing planning actions.
+- Risky split-spec sets (multi-spec, cross-capability, security-sensitive, or larger requirement sets) may require a read-only reviewer pass before `design`.
+- Read-only reviewer behavior is inspection-only: reviewer may read artifacts and report findings, but must not write files directly and must not create `spec-review.md`.
 
 ## Load References On Demand
 
@@ -119,7 +123,7 @@ If `language: en`:
 5. For `status` and `resume`, keep behavior read-only: warn on hash drift, reload from disk, and do not refresh stored hashes from read-only routes.
 6. Apply project context, per-artifact rules, and `securityReview` policy before writing.
 7. Read dependency artifacts before writing a new artifact.
-8. Run `spec checkpoint` before entering `tasks`, and `task checkpoint` before entering `apply`.
+8. Run `spec-split-checkpoint` after `specs` and before `design`; run `spec checkpoint` before entering `tasks`, and `task checkpoint` before entering `apply`.
 9. During `apply`, execute one top-level task group, run `execution checkpoint`, persist verification command/result plus changed files, refresh `context.md` / `drift.md`, then stop.
 10. Report changed files, current state, next step, and blockers.
 
@@ -129,6 +133,7 @@ If `language: en`:
 - Keep `status` and `resume` strictly read-only; do not mutate `.opsx/active.yaml`, `state.yaml`, `context.md`, or `drift.md` from those routes.
 - When artifact hash drift is detected, warn and reload from disk first; refresh stored hashes only after accepted checkpoint/state writes.
 - Treat `allowedPaths` / `forbiddenPaths` as warnings during Phase 4. Do not hard-block `verify` or `archive` yet.
+- TDD-light RED/GREEN/REFACTOR/VERIFY workflow rules are deferred to Phase 6.
 - Hard enforcement for `verify` / `archive` path and drift gates is deferred to Phase 7.
 - Do not skip dependency checks silently.
 - Do not archive incomplete changes unless the user explicitly accepts the risk.

@@ -11,8 +11,14 @@
 5. 若必需工件缺失，必须如实报告，并执行对应路由的 fallback 指引。
 6. 如果 config 或 metadata 显式标记为 security-sensitive，则在 `tasks` 之前强制要求 `security-review.md`。
 7. 如果命中安全启发式信号，则默认建议补 `security-review.md`；若用户选择跳过，必须在工件里记录原因。
-8. 在 `design` 之后、`tasks` 之前运行 `spec checkpoint`。
-9. 在 `tasks` 之后、`apply` 之前运行 `task checkpoint`。
+8. 在 `specs` 之后、`design` 之前运行 `spec-split-checkpoint`。
+9. 对简单单 spec 变更可内联完成 `spec-split-checkpoint`；对高风险集合（multi-spec、cross-capability、security-sensitive 或较大 requirement 集）在 `design` 前请求只读审阅。
+10. 只读审阅（read-only reviewer）仅可读取工件并反馈问题：must not write files directly，且 must not create `spec-review.md`。
+11. 在 `design` 之后、`tasks` 之前运行 `spec checkpoint`。
+12. 在 `tasks` 之后、`apply` 之前运行 `task checkpoint`。
+13. 路由面保持不变：Codex 不得新增 `$opsx-spec-split-*`，Claude/Gemini 不得新增 `/opsx-spec-split-*`，继续使用现有 `propose` / `continue` / `ff` 路由。
+14. TDD-light 的 RED/GREEN/REFACTOR/VERIFY 规则延后到 Phase 6。
+15. verify/archive 的硬门禁继续延后到 Phase 7。
 
 ## onboard
 
@@ -59,6 +65,7 @@
 
 - 按依赖顺序一次生成所有规划工件。
 - 显式记录假设。
+- 在 `design` 前先运行 `spec-split-checkpoint`；若建议升级审阅，保持只读审阅且不新增审阅工件。
 - 在显式要求或启发式命中时，将 `security-review.md` 插入到 `design` 和 `tasks` 之间。
 - 在交给 `apply` 前，先通过 `spec checkpoint` 和 `task checkpoint`。
 

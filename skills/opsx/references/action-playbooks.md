@@ -11,8 +11,14 @@ Use these when the active workflow action is explicit.
 5. If required artifacts are missing, report that honestly and apply route-specific fallback guidance.
 6. If config explicitly marks a change as security-sensitive, require `security-review.md` before `tasks`.
 7. If the change matches security heuristics, recommend `security-review.md`; if waived, record the reason in artifacts.
-8. Run `spec checkpoint` after `design` and before `tasks`.
-9. Run `task checkpoint` after `tasks` and before `apply`.
+8. Run `spec-split-checkpoint` after `specs` and before `design`.
+9. For simple single-spec changes, run `spec-split-checkpoint` inline; for risky sets (multi-spec, cross-capability, security-sensitive, or larger requirement sets), request a read-only reviewer pass before `design`.
+10. Read-only reviewer behavior is inspection-only: reviewer may read artifacts and report findings, but must not write files directly and must not create `spec-review.md`.
+11. Run `spec checkpoint` after `design` and before `tasks`.
+12. Run `task checkpoint` after `tasks` and before `apply`.
+13. Keep route surface unchanged: Codex must not add `$opsx-spec-split-*`, Claude/Gemini must not add `/opsx-spec-split-*`; use existing `propose` / `continue` / `ff` routes.
+14. TDD-light RED/GREEN/REFACTOR/VERIFY rules are deferred to Phase 6.
+15. Hard verify/archive enforcement remains deferred to Phase 7.
 
 ## onboard
 
@@ -59,6 +65,7 @@ Use these when the active workflow action is explicit.
 
 - Generate all planning artifacts in dependency order.
 - Record assumptions explicitly.
+- Run `spec-split-checkpoint` before `design`; if escalation is recommended, keep reviewer behavior read-only and artifact-free.
 - Insert `security-review.md` between `design` and `tasks` when explicit config requires it or when the workflow chooses to include it after a heuristic match.
 - Finish planning by passing `spec checkpoint` and `task checkpoint` before handing off to `apply`.
 
