@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 08-05-PLAN.md
-last_updated: "2026-04-28T19:44:33.882Z"
+stopped_at: Completed 08-06-PLAN.md
+last_updated: "2026-04-28T19:55:57.413Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 7
   total_plans: 61
-  completed_plans: 59
-  percent: 97
+  completed_plans: 60
+  percent: 98
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-28)
 ## Current Position
 
 Phase: 8 (Stability, JSON, and Release Coverage) — EXECUTING
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
 Last activity: 2026-04-28
 
@@ -163,6 +163,8 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 - 08-05: Move remaining gate-domain assertions into scripts/test-workflow-gates.js as source of truth.
 - 08-05: Preserve Node >=14.14.0 CommonJS compatibility assertion by retaining require('crypto') in runtime aggregate file.
 - 08-05: Keep scripts/test-workflow-runtime.js aggregate-only with fixed topic order package->generation->state->paths->gates.
+- 08-06: generation topic executes check-phase1 legacy allowlist and preserves explicit post-release checks for schema-drift/code-review/verify-work.
+- 08-06: status --json gate treats ok=true as transport success and validates readiness via workspace/migration/changeStatus diagnostics.
 
 ## Blockers
 
@@ -233,11 +235,12 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 | Phase 08 P03 | 6 min | 2 tasks | 7 files |
 | Phase 08 P04 | 6 min | 2 tasks | 4 files |
 | Phase 08 P05 | 8 min | 2 tasks | 2 files |
+| Phase 08 P06 | 10 min | 2 tasks | 2 files |
 
 ## Session
 
-Last session: 2026-04-28T19:43:41.652Z
-Stopped At: Completed 08-05-PLAN.md
+Last session: 2026-04-28T19:55:57.409Z
+Stopped At: Completed 08-06-PLAN.md
 Resume File: None
 
 **Next Phase:** 8 (Stability, JSON, and Release Coverage)
