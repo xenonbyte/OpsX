@@ -23,6 +23,7 @@ const {
 } = require('../lib/runtime-guidance');
 const {
   runSpecSplitCheckpoint,
+  runTaskCheckpoint,
   runExecutionCheckpoint,
   summarizeWorkflowState,
   validatePhaseOneWorkflowContract,
@@ -1804,6 +1805,211 @@ function runTests() {
     assert.deepStrictEqual(first, second);
     assert.strictEqual(first.artifacts.proposal.state, 'ready');
     assert.strictEqual(first.next.artifactId, 'proposal');
+  });
+
+  test('task checkpoint strict mode blocks missing RED and VERIFY for behavior-change groups', () => {
+    const checkpoint = runTaskCheckpoint({
+      config: {
+        rules: {
+          tdd: {
+            mode: 'strict',
+            requireFor: ['behavior-change', 'bugfix'],
+            exempt: ['docs-only', 'copy-only', 'config-only']
+          }
+        }
+      },
+      sources: {
+        proposal: '## Why\nNeed behavior-change checkpoint coverage.',
+        specs: [
+          '## ADDED Requirements',
+          '### Requirement: Behavior-change checkpoint',
+          'The system SHALL support behavior-change checkpoint coverage.'
+        ].join('\n'),
+        design: [
+          '## Context',
+          'Runtime behavior-change checkpoint design.'
+        ].join('\n'),
+        tasks: [
+          '## Test Plan',
+          '- Behavior: behavior-change task group coverage.',
+          '- Requirement/Scenario: TDD-03 runtime checkpoint requirement.',
+          '- Verification: automated runtime checks.',
+          '- TDD Mode: strict',
+          '- Exemption Reason: none',
+          '',
+          '## 1. Runtime behavior-change update',
+          '- TDD Class: behavior-change',
+          '- [ ] GREEN: Implement runtime checkpoint behavior.',
+          '- [ ] REFACTOR: Optional cleanup while preserving behavior.'
+        ].join('\n')
+      }
+    });
+
+    assert.strictEqual(checkpoint.status, 'BLOCK');
+    assert(checkpoint.findings.some((finding) => finding.code === 'tdd-red-missing' && finding.severity === 'BLOCK'));
+    assert(checkpoint.findings.some((finding) => finding.code === 'tdd-verify-missing' && finding.severity === 'BLOCK'));
+  });
+
+  test('task checkpoint light mode warns missing RED and VERIFY for behavior-change groups', () => {
+    const checkpoint = runTaskCheckpoint({
+      config: {
+        rules: {
+          tdd: {
+            mode: 'light',
+            requireFor: ['behavior-change', 'bugfix'],
+            exempt: ['docs-only', 'copy-only', 'config-only']
+          }
+        }
+      },
+      sources: {
+        proposal: '## Why\nNeed behavior-change checkpoint coverage.',
+        specs: [
+          '## ADDED Requirements',
+          '### Requirement: Behavior-change checkpoint',
+          'The system SHALL support behavior-change checkpoint coverage.'
+        ].join('\n'),
+        design: [
+          '## Context',
+          'Runtime behavior-change checkpoint design.'
+        ].join('\n'),
+        tasks: [
+          '## Test Plan',
+          '- Behavior: behavior-change task group coverage.',
+          '- Requirement/Scenario: TDD-03 runtime checkpoint requirement.',
+          '- Verification: automated runtime checks.',
+          '- TDD Mode: light',
+          '- Exemption Reason: none',
+          '',
+          '## 1. Runtime behavior-change update',
+          '- TDD Class: behavior-change',
+          '- [ ] GREEN: Implement runtime checkpoint behavior.',
+          '- [ ] REFACTOR: Optional cleanup while preserving behavior.'
+        ].join('\n')
+      }
+    });
+
+    assert.strictEqual(checkpoint.status, 'WARN');
+    assert(checkpoint.findings.some((finding) => finding.code === 'tdd-red-missing' && finding.severity === 'WARN'));
+    assert(checkpoint.findings.some((finding) => finding.code === 'tdd-verify-missing' && finding.severity === 'WARN'));
+  });
+
+  test('task checkpoint off mode skips TDD findings', () => {
+    const checkpoint = runTaskCheckpoint({
+      config: {
+        rules: {
+          tdd: {
+            mode: 'off',
+            requireFor: ['behavior-change', 'bugfix'],
+            exempt: ['docs-only', 'copy-only', 'config-only']
+          }
+        }
+      },
+      sources: {
+        proposal: '## Why\nNeed behavior-change checkpoint coverage.',
+        specs: [
+          '## ADDED Requirements',
+          '### Requirement: Behavior-change checkpoint',
+          'The system SHALL support behavior-change checkpoint coverage.'
+        ].join('\n'),
+        design: [
+          '## Context',
+          'Runtime behavior-change checkpoint design.'
+        ].join('\n'),
+        tasks: [
+          '## Test Plan',
+          '- Behavior: behavior-change task group coverage.',
+          '- Requirement/Scenario: TDD-03 runtime checkpoint requirement.',
+          '- Verification: automated runtime checks.',
+          '- TDD Mode: off',
+          '- Exemption Reason: none',
+          '',
+          '## 1. Runtime behavior-change update',
+          '- TDD Class: behavior-change',
+          '- [ ] GREEN: Implement runtime checkpoint behavior.'
+        ].join('\n')
+      }
+    });
+
+    assert(!checkpoint.findings.some((finding) => finding.code.startsWith('tdd-')));
+  });
+
+  test('task checkpoint prefers explicit TDD Exemption over heuristic classification', () => {
+    const checkpoint = runTaskCheckpoint({
+      config: {
+        rules: {
+          tdd: {
+            mode: 'strict',
+            requireFor: ['behavior-change', 'bugfix'],
+            exempt: ['docs-only', 'copy-only', 'config-only']
+          }
+        }
+      },
+      sources: {
+        proposal: '## Why\nNeed bugfix wording cleanup in docs.',
+        specs: [
+          '## ADDED Requirements',
+          '### Requirement: Bugfix wording',
+          'The system SHALL keep bugfix wording consistent.'
+        ].join('\n'),
+        design: [
+          '## Context',
+          'Bugfix wording update.',
+          '## Migration Plan',
+          'No migration required.'
+        ].join('\n'),
+        tasks: [
+          '## Test Plan',
+          '- Behavior: docs-only update for bugfix naming.',
+          '- Requirement/Scenario: TDD-03 exemption precedence check.',
+          '- Verification: manual — checklist reviewed by maintainer.',
+          '- TDD Mode: strict',
+          '- Exemption Reason: docs-only wording pass.',
+          '',
+          '## 1. Runtime bugfix wording refresh',
+          '- TDD Exemption: docs-only — wording-only updates with no behavior logic change.',
+          '- [ ] Update runtime bugfix wording references.',
+          '- [ ] VERIFY: manual — release manager review completed.'
+        ].join('\n')
+      }
+    });
+
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-red-missing'));
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-verify-missing'));
+  });
+
+  test('apply instructions surface tdd mode and blocker codes', () => {
+    const changeName = 'apply-instructions-tdd-mode';
+    createChange(fixtureRoot, changeName, {
+      'proposal.md': '## Why\nNeed apply checkpoint TDD blockers.',
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Apply checkpoint TDD blockers',
+        'The system SHALL surface TDD blocker findings in apply guidance.'
+      ].join('\n'),
+      'design.md': [
+        '## Context',
+        'Apply checkpoint TDD blocker design.'
+      ].join('\n'),
+      'tasks.md': [
+        '## Test Plan',
+        '- Behavior: apply guidance should expose TDD checkpoint blockers.',
+        '- Requirement/Scenario: TDD-03 / apply guidance payload.',
+        '- Verification: automated runtime checks.',
+        '- TDD Mode: strict',
+        '- Exemption Reason: none',
+        '',
+        '## 1. Runtime checkpoint blocker group',
+        '- TDD Class: behavior-change',
+        '- [ ] GREEN: Implement runtime checkpoint blocker behavior.'
+      ].join('\n')
+    });
+
+    const apply = buildApplyInstructions({ repoRoot: fixtureRoot, changeName });
+    assert.strictEqual(apply.tddMode, 'strict');
+    assert.strictEqual(apply.nextTaskGroupClass, 'behavior-change');
+    assert.strictEqual(apply.nextTaskGroupExempt, false);
+    assert(apply.checkpoint.findings.some((finding) => finding.code === 'tdd-red-missing'));
+    assert(apply.checkpoint.findings.some((finding) => finding.code === 'tdd-verify-missing'));
   });
 
   test('status and apply instructions preserve caller-provided request text for review heuristics', () => {
