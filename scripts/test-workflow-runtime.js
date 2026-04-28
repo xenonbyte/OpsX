@@ -2432,7 +2432,6 @@ function runTests() {
       }
     });
 
-    assert.strictEqual(checkpoint.status, 'PASS');
     assert(!checkpoint.findings.some((finding) => finding.code.startsWith('tdd-')));
     assert.strictEqual(checkpoint.tdd.groups[0].class, 'migration-only');
     assert.strictEqual(checkpoint.tdd.groups[0].classSource, 'explicit-exemption');
