@@ -215,8 +215,8 @@ Plans:
 Plans:
 - [x] `08-01-PLAN.md` — Extract the shared workflow-test harness, create topic seams, and move package/generation coverage behind `npm test`.
 - [x] `08-02-PLAN.md` — Implement `opsx status --json` and move migration/state/status coverage into the state topic script.
-- [ ] `08-03-PLAN.md` — Add repo-local path/glob utilities and refactor read-only path surfaces into the path topic script.
-- [ ] `08-04-PLAN.md` — Migrate write-sensitive migrate/sync guards onto the shared path utilities and extend path fixtures.
+- [x] `08-03-PLAN.md` — Add repo-local path/glob utilities and refactor read-only path surfaces into the path topic script.
+- [x] `08-04-PLAN.md` — Migrate write-sensitive migrate/sync guards onto the shared path utilities and extend path fixtures.
 - [ ] `08-05-PLAN.md` — Move spec/TDD/verify/sync/archive/batch assertions into the gates topic script and finish the aggregate runner split.
 - [ ] `08-06-PLAN.md` — Add tarball, CLI smoke, parity, and legacy public-surface release gates to the split topic scripts, while preserving schema-drift/code-review/final-verification handoff.
 - [ ] `08-07-PLAN.md` — Refresh README/docs/changelog, add `docs/release-checklist.md`, and verify the documented final release gate including schema drift, code review, and final phase verification.

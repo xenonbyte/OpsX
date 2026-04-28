@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 08-03-PLAN.md
-last_updated: "2026-04-28T19:23:24.236Z"
+stopped_at: Completed 08-04-PLAN.md
+last_updated: "2026-04-28T19:34:36.903Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 7
   total_plans: 61
-  completed_plans: 57
-  percent: 93
+  completed_plans: 58
+  percent: 95
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-28)
 ## Current Position
 
 Phase: 8 (Stability, JSON, and Release Coverage) — EXECUTING
-Plan: 4 of 7
+Plan: 5 of 7
 Status: Ready to execute
 Last activity: 2026-04-28
 
@@ -157,6 +157,9 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 - Refactor only read-only surfaces in 08-03; write-sensitive migrate/sync guards remain for later plans.
 - Keep picomatch@4.0.4 as the single matcher backend and avoid adding new glob dependencies.
 - Move path-scope and tracked-artifact hash assertions to scripts/test-workflow-paths.js while keeping runtime aggregate delegation.
+- Phase 08 Plan 04 keeps sync canonicalSpecsDir equality guard text while reusing shared ensureWithinBase path containment.
+- Phase 08 Plan 04 preserves migration repo/home base diagnostics by labeling shared path-utils guards as 'repo base' and 'home base'.
+- Phase 08 Plan 04 moves sync write-sensitive path guard regressions to scripts/test-workflow-paths.js and keeps runtime aggregate delegation-only.
 
 ## Blockers
 
@@ -225,11 +228,12 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 | Phase 08 P01 | 6 min | 2 tasks | 8 files |
 | Phase 08 P02 | 10 min | 2 tasks | 3 files |
 | Phase 08 P03 | 6 min | 2 tasks | 7 files |
+| Phase 08 P04 | 6 min | 2 tasks | 4 files |
 
 ## Session
 
-Last session: 2026-04-28T19:23:24.231Z
-Stopped At: Completed 08-03-PLAN.md
+Last session: 2026-04-28T19:34:36.900Z
+Stopped At: Completed 08-04-PLAN.md
 Resume File: None
 
 **Next Phase:** 8 (Stability, JSON, and Release Coverage)
