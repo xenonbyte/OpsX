@@ -69,8 +69,10 @@
 **: `opsx-verify` checks proposal/specs/design/tasks/code/test alignment, TDD-light records, execution checkpoint completeness, changed-file scope, drift, and configured verification commands.
 - [x] **QUAL-02
 **: `opsx-sync` merges change specs into `.opsx/specs/**` while checking for omissions and requirement conflicts.
-- [ ] **QUAL-03**: `opsx-archive` blocks unless the change is verified or synced, tasks are complete, execution checkpoints are complete, specs are synced, and drift has no unresolved blockers.
-- [ ] **QUAL-04**: `opsx-batch-apply` and `opsx-bulk-archive` process each change independently without mixing state or context.
+- [x] **QUAL-03
+**: `opsx-archive` blocks unless the change is verified or synced, tasks are complete, execution checkpoints are complete, specs are synced, and drift has no unresolved blockers.
+- [x] **QUAL-04
+**: `opsx-batch-apply` and `opsx-bulk-archive` process each change independently without mixing state or context.
 - [ ] **QUAL-05**: `opsx status --json` writes clean JSON to stdout without spinner/progress noise.
 - [ ] **QUAL-06**: Path and glob utilities canonicalize artifact paths, escape glob-special paths, and handle glob artifact outputs predictably.
 
