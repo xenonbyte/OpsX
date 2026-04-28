@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-04-28T18:55:05.995Z"
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-04-28T19:10:31.273Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 7
   total_plans: 61
-  completed_plans: 55
-  percent: 90
+  completed_plans: 56
+  percent: 92
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-28)
 ## Current Position
 
 Phase: 8 (Stability, JSON, and Release Coverage) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Status: Ready to execute
 Last activity: 2026-04-28
 
@@ -151,6 +151,9 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 - 08-01 keeps scripts/test-workflow-runtime.js as the compatibility aggregate while registering topic scripts in deterministic order.
 - 08-01 moves TEST-01 and TEST-02 assertions into dedicated package and generation topic scripts with standalone runners.
 - 08-01 promotes npm test to the same aggregate entrypoint as npm run test:workflow-runtime.
+- 08-02: Keep status --json as transport-only adapter over getMigrationStatus/loadActiveChangePointer/buildStatus.
+- 08-02: Lock deterministic top-level key order for status JSON envelope to protect machine consumers.
+- 08-02: Treat missing workspace, missing active change, and blocked states as expected exit-0 JSON states with ok=true.
 
 ## Blockers
 
@@ -217,11 +220,12 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 | Phase 07 P07 | 4 min | 1 tasks | 5 files |
 | Phase 07 P08 | 6 | 1 tasks | 1 files |
 | Phase 08 P01 | 6 min | 2 tasks | 8 files |
+| Phase 08 P02 | 10 min | 2 tasks | 3 files |
 
 ## Session
 
-Last session: 2026-04-28T18:55:05.991Z
-Stopped At: Completed 08-01-PLAN.md
+Last session: 2026-04-28T19:10:31.269Z
+Stopped At: Completed 08-02-PLAN.md
 Resume File: None
 
 **Next Phase:** 8 (Stability, JSON, and Release Coverage)

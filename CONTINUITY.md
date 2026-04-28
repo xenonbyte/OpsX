@@ -14,6 +14,7 @@
 - 2026-04-29 [CODE] Phase 8 research is captured; next expected milestone step is `$gsd-plan-phase 8`.
 - 2026-04-29 [CODE] Phase 8 planning is complete: `.planning/phases/08-stability-json-and-release-coverage/08-01-PLAN.md` through `08-07-PLAN.md` define the release-hardening execution waves.
 - 2026-04-29 [CODE] Phase 8 revision locked `docs/release-checklist.md`, `ok: true` transport semantics, and the full release gate steps `gsd-sdk query verify.schema-drift 08`, `$gsd-code-review 8`, and `$gsd-verify-work 8`.
+- 2026-04-29 [CODE] Phase 8 plan `08-02` completed: `opsx status --json` now emits deterministic transport envelopes and state-topic TEST-03 coverage is active.
 
 ## Done (recent)
 - 2026-04-28 [CODE] Executed all Phase 7 plans `07-01` through `07-08`.
@@ -24,6 +25,7 @@
 - 2026-04-29 [CODE] Captured Phase 8 context and discussion log in `.planning/phases/08-stability-json-and-release-coverage/`.
 - 2026-04-29 [CODE] Wrote `08-RESEARCH.md` with the recommended Phase 8 path: keep `picomatch`, avoid a new glob dependency, split tests by topic, and gate release with `npm test` plus `npm pack --dry-run --json`.
 - 2026-04-29 [CODE] Wrote Phase 8 plans `08-01` through `08-07`, covering test split, `status --json`, shared path/glob utilities, release gates, and docs/checklist updates.
+- 2026-04-29 [CODE] Executed Phase 8 plan `08-02` with commits `16d39be` and `6f40d4e`; runtime suite now passes 111/111 with status JSON matrix assertions.
 
 ## Working set
 - /Users/xubo/x-skills/openspec/.planning/ROADMAP.md
@@ -68,6 +70,7 @@
 - 2026-04-29 [TOOL] Phase 8 context committed as `d72dd54`; locked decisions include full `status --json` envelope, JSON-only stdout with exit 0 for expected states, researched path/glob dependency, full path surface coverage, split test scripts with `npm test`, complete release gate, `npm pack --dry-run --json`, and release docs updates.
 - 2026-04-29 [TOOL] Phase 8 research probes: `npm run test:workflow-runtime` passed 109/109, `node bin/opsx.js status --json` still prints text, and `npm_config_cache=.npm-cache npm pack --dry-run --json` succeeded while the default `~/.npm` cache failed with `EPERM`.
 - 2026-04-29 [TOOL] Phase 8 planning outputs created locally: 7 PLAN.md files plus Roadmap plan index updates for Phase 8.
+- 2026-04-29 [TOOL] Phase 8 plan `08-02` verification passed: `node scripts/test-workflow-state.js` (13/13), `npm run test:workflow-runtime` (111/111), and `npm test` (111/111).
 - 2026-04-28 [TOOL] `gsd-sdk query verify.schema-drift 07` returned valid with 0 issues across 8 checked plans.
 - 2026-04-28 [TOOL] Phase 7 verification report committed as `f32d323` with `status: passed` and 4/4 must-haves verified.
 - 2026-04-28 [TOOL] `workflow.security_enforcement` is true; no `07-SECURITY.md` exists yet, so run `$gsd-secure-phase 7` before advancing if a dedicated security gate is required.
