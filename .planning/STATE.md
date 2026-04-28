@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-04-28T06:46:11.741Z"
+stopped_at: Completed 05-03-PLAN.md
+last_updated: "2026-04-28T06:52:09.299Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 37
-  completed_plans: 32
-  percent: 86
+  completed_plans: 33
+  percent: 89
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 05 (spec-split-checkpoint) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-04-28
 
@@ -96,6 +96,8 @@ Run `$gsd-execute-phase 5` to continue executing Phase 5 from the first incomple
 - Phase 05 Plan 01 reuses Phase 4 checkpoint persistence/validator contracts without adding new artifact types.
 - Phase 05 Plan 02 implements deterministic split-spec validation in lib/spec-validator.js with no new parser dependency.
 - Phase 05 Plan 02 locks SPEC-02 finding codes and concrete patch targets through fixture-based workflow-runtime tests.
+- Phase 05 Plan 03 keeps split-spec escalation read-only within checkpoint findings/nextStep; no new routes or spec-review artifact.
+- Phase 05 Plan 03 scopes split-spec planning note updates to propose/continue/ff and gates checked-in drift with a temporary 9-file parity exemption.
 
 ## Blockers
 
@@ -136,11 +138,12 @@ Run `$gsd-execute-phase 5` to continue executing Phase 5 from the first incomple
 | Phase 04 P09 | 6m | 1 tasks | 1 files |
 | Phase 05 P01 | 5m | 2 tasks | 4 files |
 | Phase 05 P02 | 3m | 2 tasks | 2 files |
+| Phase 05 P03 | 2m | 2 tasks | 6 files |
 
 ## Session
 
-Last session: 2026-04-28T06:46:11.734Z
-Stopped At: Completed 05-02-PLAN.md
+Last session: 2026-04-28T06:52:09.295Z
+Stopped At: Completed 05-03-PLAN.md
 Resume File: None
 
 **Planned Phase:** 05 (spec-split-checkpoint) — 7 plans — 2026-04-27T19:16:27.225Z

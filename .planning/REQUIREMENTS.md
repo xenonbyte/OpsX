@@ -47,8 +47,10 @@
 - [x] **SPEC-01**: The schema defines `spec-split-checkpoint` with trigger `after-specs-before-design` and states `PASS`, `WARN`, and `BLOCK`.
 - [x] **SPEC-02
 **: Spec review checks proposal coverage, unapproved scope expansion, duplicate requirements, conflicting requirements, empty specs, missing scenarios, and requirements hidden in fenced code blocks.
-- [ ] **SPEC-03**: Spec review can run inline for simple changes and can escalate to read-only reviewer behavior for multi-spec, cross-capability, security-sensitive, or larger requirement sets.
-- [ ] **SPEC-04**: Checkpoint output follows the existing contract: checkpoint, phase, status, findings, patch targets, and next step.
+- [x] **SPEC-03
+**: Spec review can run inline for simple changes and can escalate to read-only reviewer behavior for multi-spec, cross-capability, security-sensitive, or larger requirement sets.
+- [x] **SPEC-04
+**: Checkpoint output follows the existing contract: checkpoint, phase, status, findings, patch targets, and next step.
 
 ### TDD-Light
 
