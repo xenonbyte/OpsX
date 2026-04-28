@@ -2103,6 +2103,106 @@ function runTests() {
 
     assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-red-missing'));
     assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-verify-missing'));
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-exemption-reason-missing'));
+    assert.strictEqual(checkpoint.tdd.groups[0].exempt, true);
+  });
+
+  test('task checkpoint strict mode blocks exempt TDD Class without exemption reason', () => {
+    const checkpoint = runTaskCheckpoint({
+      config: {
+        rules: {
+          tdd: {
+            mode: 'strict',
+            requireFor: ['behavior-change', 'bugfix'],
+            exempt: ['docs-only', 'copy-only', 'config-only']
+          }
+        }
+      },
+      sources: {
+        proposal: '## Why\nNeed docs-only guidance refresh.',
+        specs: [
+          '## ADDED Requirements',
+          '### Requirement: Docs guidance',
+          'The system SHALL keep docs guidance aligned with runtime behavior.'
+        ].join('\n'),
+        design: [
+          '## Context',
+          'Docs-only guidance refresh.',
+          '## Migration Plan',
+          'No migration required.'
+        ].join('\n'),
+        tasks: [
+          '## Test Plan',
+          '- Behavior: docs-only guidance refresh.',
+          '- Requirement/Scenario: TDD-03 exemption reason check.',
+          '- Verification: automated runtime checks.',
+          '- TDD Mode: strict',
+          '- Exemption Reason: docs-only wording pass.',
+          '',
+          '## 1. Docs guidance refresh',
+          '- TDD Class: docs-only',
+          '- [ ] Update docs guidance wording.',
+          '- [ ] VERIFY: Run npm run test:workflow-runtime.'
+        ].join('\n')
+      }
+    });
+
+    assert.strictEqual(checkpoint.status, 'BLOCK');
+    assert(checkpoint.findings.some((finding) => finding.code === 'tdd-exemption-reason-missing' && finding.severity === 'BLOCK'));
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-red-missing'));
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-verify-missing'));
+    assert.strictEqual(checkpoint.tdd.groups[0].class, 'docs-only');
+    assert.strictEqual(checkpoint.tdd.groups[0].classSource, 'explicit-class');
+    assert.strictEqual(checkpoint.tdd.groups[0].exempt, false);
+    assert.strictEqual(checkpoint.tdd.groups[0].exemptionReasonMissing, true);
+  });
+
+  test('task checkpoint light mode warns heuristic exempt class without exemption reason', () => {
+    const checkpoint = runTaskCheckpoint({
+      config: {
+        rules: {
+          tdd: {
+            mode: 'light',
+            requireFor: ['behavior-change', 'bugfix'],
+            exempt: ['docs-only', 'copy-only', 'config-only']
+          }
+        }
+      },
+      sources: {
+        proposal: '## Why\nNeed docs-only guidance refresh.',
+        specs: [
+          '## ADDED Requirements',
+          '### Requirement: Docs guidance',
+          'The system SHALL keep docs guidance aligned with runtime behavior.'
+        ].join('\n'),
+        design: [
+          '## Context',
+          'Docs-only guidance refresh.',
+          '## Migration Plan',
+          'No migration required.'
+        ].join('\n'),
+        tasks: [
+          '## Test Plan',
+          '- Behavior: docs-only guidance refresh.',
+          '- Requirement/Scenario: TDD-03 exemption reason check.',
+          '- Verification: automated runtime checks.',
+          '- TDD Mode: light',
+          '- Exemption Reason: docs-only wording pass.',
+          '',
+          '## 1. Docs guidance refresh',
+          '- [ ] Update docs guidance wording.',
+          '- [ ] VERIFY: Run npm run test:workflow-runtime.'
+        ].join('\n')
+      }
+    });
+
+    assert.strictEqual(checkpoint.status, 'WARN');
+    assert(checkpoint.findings.some((finding) => finding.code === 'tdd-exemption-reason-missing' && finding.severity === 'WARN'));
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-classification-missing'));
+    assert.strictEqual(checkpoint.tdd.groups[0].class, 'docs-only');
+    assert.strictEqual(checkpoint.tdd.groups[0].classSource, 'heuristic');
+    assert.strictEqual(checkpoint.tdd.groups[0].exempt, false);
+    assert.strictEqual(checkpoint.tdd.groups[0].exemptionReasonMissing, true);
   });
 
   test('task checkpoint strict mode blocks TDD Exemption without reason', () => {
