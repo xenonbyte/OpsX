@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 08-04-PLAN.md
-last_updated: "2026-04-28T19:34:36.903Z"
+stopped_at: Completed 08-05-PLAN.md
+last_updated: "2026-04-28T19:44:33.882Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 7
   total_plans: 61
-  completed_plans: 58
-  percent: 95
+  completed_plans: 59
+  percent: 97
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-28)
 ## Current Position
 
 Phase: 8 (Stability, JSON, and Release Coverage) — EXECUTING
-Plan: 5 of 7
+Plan: 6 of 7
 Status: Ready to execute
 Last activity: 2026-04-28
 
@@ -160,6 +160,9 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 - Phase 08 Plan 04 keeps sync canonicalSpecsDir equality guard text while reusing shared ensureWithinBase path containment.
 - Phase 08 Plan 04 preserves migration repo/home base diagnostics by labeling shared path-utils guards as 'repo base' and 'home base'.
 - Phase 08 Plan 04 moves sync write-sensitive path guard regressions to scripts/test-workflow-paths.js and keeps runtime aggregate delegation-only.
+- 08-05: Move remaining gate-domain assertions into scripts/test-workflow-gates.js as source of truth.
+- 08-05: Preserve Node >=14.14.0 CommonJS compatibility assertion by retaining require('crypto') in runtime aggregate file.
+- 08-05: Keep scripts/test-workflow-runtime.js aggregate-only with fixed topic order package->generation->state->paths->gates.
 
 ## Blockers
 
@@ -229,11 +232,12 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 | Phase 08 P02 | 10 min | 2 tasks | 3 files |
 | Phase 08 P03 | 6 min | 2 tasks | 7 files |
 | Phase 08 P04 | 6 min | 2 tasks | 4 files |
+| Phase 08 P05 | 8 min | 2 tasks | 2 files |
 
 ## Session
 
-Last session: 2026-04-28T19:34:36.900Z
-Stopped At: Completed 08-04-PLAN.md
+Last session: 2026-04-28T19:43:41.652Z
+Stopped At: Completed 08-05-PLAN.md
 Resume File: None
 
 **Next Phase:** 8 (Stability, JSON, and Release Coverage)

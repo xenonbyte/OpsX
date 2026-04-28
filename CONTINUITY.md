@@ -16,6 +16,7 @@
 - 2026-04-29 [CODE] Phase 8 revision locked `docs/release-checklist.md`, `ok: true` transport semantics, and the full release gate steps `gsd-sdk query verify.schema-drift 08`, `$gsd-code-review 8`, and `$gsd-verify-work 8`.
 - 2026-04-29 [CODE] Phase 8 plan `08-02` completed: `opsx status --json` now emits deterministic transport envelopes and state-topic TEST-03 coverage is active.
 - 2026-04-29 [CODE] Phase 8 plan `08-03` completed: shared `lib/path-utils.js` + `lib/glob-utils.js` are live, read-only path surfaces are migrated, and path-topic tests now own scope/hash/literal-glob assertions.
+- 2026-04-29 [CODE] Phase 8 plan `08-05` completed: remaining gate-domain tests moved to `scripts/test-workflow-gates.js`, and `scripts/test-workflow-runtime.js` is now a pure aggregate runner.
 
 ## Done (recent)
 - 2026-04-28 [CODE] Executed all Phase 7 plans `07-01` through `07-08`.
@@ -28,6 +29,7 @@
 - 2026-04-29 [CODE] Wrote Phase 8 plans `08-01` through `08-07`, covering test split, `status --json`, shared path/glob utilities, release gates, and docs/checklist updates.
 - 2026-04-29 [CODE] Executed Phase 8 plan `08-02` with commits `16d39be` and `6f40d4e`; runtime suite now passes 111/111 with status JSON matrix assertions.
 - 2026-04-29 [CODE] Executed Phase 8 plan `08-03` with commits `ead4236`, `8c518cf`, `fd4816e`, and `aeedaa9`; runtime suite now passes 117/117 with dedicated path-topic coverage.
+- 2026-04-29 [CODE] Executed Phase 8 plan `08-05` with commits `43eac6b` and `10df15a`; runtime suite now passes 121/121 with gate-domain ownership moved to `scripts/test-workflow-gates.js`.
 
 ## Working set
 - /Users/xubo/x-skills/openspec/.planning/ROADMAP.md
@@ -74,6 +76,7 @@
 - 2026-04-29 [TOOL] Phase 8 planning outputs created locally: 7 PLAN.md files plus Roadmap plan index updates for Phase 8.
 - 2026-04-29 [TOOL] Phase 8 plan `08-02` verification passed: `node scripts/test-workflow-state.js` (13/13), `npm run test:workflow-runtime` (111/111), and `npm test` (111/111).
 - 2026-04-29 [TOOL] Phase 8 plan `08-03` verification passed: `node scripts/test-workflow-paths.js` (9/9), `npm run test:workflow-runtime` (117/117), and `npm test` (117/117).
+- 2026-04-29 [TOOL] Phase 8 plan `08-05` verification passed: `node scripts/test-workflow-gates.js` (82/82), `npm run test:workflow-runtime` (121/121), and `npm test` (121/121).
 - 2026-04-28 [TOOL] `gsd-sdk query verify.schema-drift 07` returned valid with 0 issues across 8 checked plans.
 - 2026-04-28 [TOOL] Phase 7 verification report committed as `f32d323` with `status: passed` and 4/4 must-haves verified.
 - 2026-04-28 [TOOL] `workflow.security_enforcement` is true; no `07-SECURITY.md` exists yet, so run `$gsd-secure-phase 7` before advancing if a dedicated security gate is required.
