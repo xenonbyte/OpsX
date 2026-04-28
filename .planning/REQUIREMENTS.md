@@ -75,7 +75,8 @@
 **: `opsx-batch-apply` and `opsx-bulk-archive` process each change independently without mixing state or context.
 - [x] **QUAL-05
 **: `opsx status --json` writes clean JSON to stdout without spinner/progress noise.
-- [ ] **QUAL-06**: Path and glob utilities canonicalize artifact paths, escape glob-special paths, and handle glob artifact outputs predictably.
+- [x] **QUAL-06
+**: Path and glob utilities canonicalize artifact paths, escape glob-special paths, and handle glob artifact outputs predictably.
 
 ### Test Coverage
 
@@ -85,7 +86,8 @@
 **: Tests verify command generation only exposes `/opsx-*` and `$opsx-*` public entrypoints.
 - [x] **TEST-03
 **: Tests cover migration, state-machine transitions, artifact hash drift, resume/continue behavior, and status JSON output.
-- [ ] **TEST-04**: Tests cover spec-split review, hidden requirement detection, TDD-light warnings/blocks, allowed/forbidden path checks, and archive blocking.
+- [x] **TEST-04
+**: Tests cover spec-split review, hidden requirement detection, TDD-light warnings/blocks, allowed/forbidden path checks, and archive blocking.
 
 ## Future Requirements
 

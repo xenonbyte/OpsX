@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-04-28T19:10:31.273Z"
+stopped_at: Completed 08-03-PLAN.md
+last_updated: "2026-04-28T19:23:24.236Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 7
   total_plans: 61
-  completed_plans: 56
-  percent: 92
+  completed_plans: 57
+  percent: 93
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-28)
 ## Current Position
 
 Phase: 8 (Stability, JSON, and Release Coverage) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-04-28
 
@@ -154,6 +154,9 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 - 08-02: Keep status --json as transport-only adapter over getMigrationStatus/loadActiveChangePointer/buildStatus.
 - 08-02: Lock deterministic top-level key order for status JSON envelope to protect machine consumers.
 - 08-02: Treat missing workspace, missing active change, and blocked states as expected exit-0 JSON states with ok=true.
+- Refactor only read-only surfaces in 08-03; write-sensitive migrate/sync guards remain for later plans.
+- Keep picomatch@4.0.4 as the single matcher backend and avoid adding new glob dependencies.
+- Move path-scope and tracked-artifact hash assertions to scripts/test-workflow-paths.js while keeping runtime aggregate delegation.
 
 ## Blockers
 
@@ -221,11 +224,12 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 | Phase 07 P08 | 6 | 1 tasks | 1 files |
 | Phase 08 P01 | 6 min | 2 tasks | 8 files |
 | Phase 08 P02 | 10 min | 2 tasks | 3 files |
+| Phase 08 P03 | 6 min | 2 tasks | 7 files |
 
 ## Session
 
-Last session: 2026-04-28T19:10:31.269Z
-Stopped At: Completed 08-02-PLAN.md
+Last session: 2026-04-28T19:23:24.231Z
+Stopped At: Completed 08-03-PLAN.md
 Resume File: None
 
 **Next Phase:** 8 (Stability, JSON, and Release Coverage)
