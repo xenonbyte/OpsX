@@ -143,8 +143,8 @@
 | TDD-04 | Phase 6 | Completed |
 | QUAL-01 | Phase 7 | Completed |
 | QUAL-02 | Phase 7 | Completed |
-| QUAL-03 | Phase 7 | Pending |
-| QUAL-04 | Phase 7 | Pending |
+| QUAL-03 | Phase 7 | Completed |
+| QUAL-04 | Phase 7 | Completed |
 | QUAL-05 | Phase 8 | Pending |
 | QUAL-06 | Phase 8 | Pending |
 | TEST-01 | Phase 8 | Pending |
