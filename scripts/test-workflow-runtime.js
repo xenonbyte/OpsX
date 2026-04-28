@@ -1228,6 +1228,223 @@ function runTests() {
     assert.strictEqual(fs.existsSync(path.join(fixtureRoot, '.opsx', 'archive', `${changeName}-`)), false);
   });
 
+  test('runBatchApply isolates per-change readiness and skip reasons', () => {
+    const { runBatchApply } = require('../lib/batch');
+    const { writeChangeState } = require('../lib/change-store');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const now = new Date().toISOString();
+
+    const readyChangeName = 'batch-ready-change';
+    const readyChangeDir = createChange(fixtureRoot, readyChangeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Batch apply readiness',
+        'The system SHALL report per-change apply readiness without shared mutable state.'
+      ].join('\n'),
+      'tasks.md': [
+        '## 1. Ready group',
+        '- TDD Class: behavior-change',
+        '- [ ] RED: add batch apply coverage',
+        '- [ ] GREEN: implement batch apply flow',
+        '- [ ] VERIFY: run workflow runtime regression'
+      ].join('\n')
+    });
+    writeChangeState(readyChangeDir, {
+      change: readyChangeName,
+      stage: 'TASKS_READY',
+      hashes: hashTrackedArtifacts(readyChangeDir),
+      checkpoints: {
+        execution: {
+          status: 'PASS',
+          updatedAt: now
+        }
+      }
+    });
+
+    const skippedChangeName = 'batch-skipped-change';
+    createChange(fixtureRoot, skippedChangeName, {
+      'proposal.md': '# Proposal\n'
+    });
+
+    const result = runBatchApply({
+      repoRoot: fixtureRoot,
+      changeNames: [readyChangeName, skippedChangeName]
+    });
+
+    assert.strictEqual(result.status, 'PASS');
+    assert.strictEqual(result.summary.ready, 1);
+    assert.strictEqual(result.summary.skipped, 1);
+    assert.strictEqual(result.summary.blocked, 0);
+
+    const readyEntry = result.results.find((entry) => entry.change === readyChangeName);
+    const skippedEntry = result.results.find((entry) => entry.change === skippedChangeName);
+    assert(readyEntry, 'Expected ready entry for ready change.');
+    assert(skippedEntry, 'Expected skipped entry for skipped change.');
+    assert.strictEqual(readyEntry.status, 'ready');
+    assert.strictEqual(typeof readyEntry.nextTaskGroup, 'string');
+    assert.strictEqual(skippedEntry.status, 'skipped');
+    assert(skippedEntry.reason && skippedEntry.reason.length > 0);
+    assert(Array.isArray(skippedEntry.findings));
+  });
+
+  test('runBulkArchive continues past blocked changes and preserves per-change reasons', () => {
+    const { runBulkArchive } = require('../lib/batch');
+    const { writeChangeState } = require('../lib/change-store');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const now = new Date().toISOString();
+
+    const blockedChangeName = 'bulk-archive-blocked';
+    const blockedChangeDir = createChange(fixtureRoot, blockedChangeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Blocked archive candidate',
+        'The system SHALL block archive candidates with invalid lifecycle state.'
+      ].join('\n'),
+      'tasks.md': [
+        '## 1. Blocked group',
+        '- TDD Class: behavior-change',
+        '- [x] RED: add blocked archive test',
+        '- [x] GREEN: implement blocked archive behavior',
+        '- [x] VERIFY: run workflow runtime regression'
+      ].join('\n')
+    });
+    writeChangeState(blockedChangeDir, {
+      change: blockedChangeName,
+      stage: 'TASKS_READY',
+      hashes: hashTrackedArtifacts(blockedChangeDir),
+      checkpoints: {
+        execution: {
+          status: 'PASS',
+          updatedAt: now
+        }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Blocked group',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        changedFiles: ['specs/runtime/spec.md'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Blocked archive candidate proof.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['specs/**'],
+      forbiddenPaths: ['*.pem']
+    });
+    writeText(path.join(blockedChangeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+
+    const archivedChangeName = 'bulk-archive-success';
+    const archivedChangeDir = createChange(fixtureRoot, archivedChangeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Bulk archive success candidate',
+        'The system SHALL archive eligible synced changes while reporting per-change outcomes.'
+      ].join('\n'),
+      'tasks.md': [
+        '## 1. Archive success group',
+        '- TDD Class: behavior-change',
+        '- [x] RED: add successful archive test',
+        '- [x] GREEN: implement successful archive behavior',
+        '- [x] VERIFY: run workflow runtime regression'
+      ].join('\n')
+    });
+    writeText(path.join(archivedChangeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+    writeChangeState(archivedChangeDir, {
+      change: archivedChangeName,
+      stage: 'SYNCED',
+      hashes: hashTrackedArtifacts(archivedChangeDir),
+      checkpoints: {
+        execution: {
+          status: 'PASS',
+          updatedAt: now
+        }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Archive success group',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        changedFiles: ['specs/runtime/spec.md'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Successful archive candidate proof.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['specs/**'],
+      forbiddenPaths: ['*.pem']
+    });
+
+    const result = runBulkArchive({
+      repoRoot: fixtureRoot,
+      changeNames: [blockedChangeName, archivedChangeName]
+    });
+    assert.strictEqual(result.status, 'PASS');
+    assert.strictEqual(result.summary.archived, 1);
+    assert.strictEqual(result.summary.blocked, 1);
+    assert.strictEqual(result.summary.skipped, 0);
+
+    const blockedEntry = result.results.find((entry) => entry.change === blockedChangeName);
+    const archivedEntry = result.results.find((entry) => entry.change === archivedChangeName);
+    assert(blockedEntry, 'Expected blocked result for blocked change.');
+    assert(archivedEntry, 'Expected archived result for successful change.');
+    assert.strictEqual(blockedEntry.status, 'blocked');
+    assert(blockedEntry.reason && blockedEntry.reason.length > 0);
+    assert(Array.isArray(blockedEntry.findings));
+    assert.strictEqual(archivedEntry.status, 'archived');
+    assert(fs.existsSync(path.join(fixtureRoot, '.opsx', 'archive', archivedChangeName)));
+  });
+
+  test('runBulkArchive stops on missing workspace before iterating targets', () => {
+    const { runBulkArchive } = require('../lib/batch');
+    const missingWorkspaceRoot = path.join(fixtureRoot, 'missing-workspace-root');
+    ensureDir(missingWorkspaceRoot);
+
+    const result = runBulkArchive({
+      repoRoot: missingWorkspaceRoot,
+      changeNames: ['demo-a', 'demo-b']
+    });
+
+    assert.strictEqual(result.status, 'BLOCK');
+    assert.strictEqual(result.code, 'workspace-missing');
+    assert.strictEqual(result.summary.archived, 0);
+    assert.strictEqual(result.summary.blocked, 0);
+    assert.strictEqual(result.summary.skipped, 0);
+    assert.deepStrictEqual(result.results, []);
+  });
+
   test('change-store normalizes sparse Phase 2 state to Phase 4 defaults', () => {
     const { normalizeChangeState } = require('../lib/change-store');
     const normalized = normalizeChangeState({
