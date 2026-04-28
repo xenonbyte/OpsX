@@ -81,7 +81,7 @@
 - 读取 proposal、specs、可选 design、tasks。
 - 默认只执行一个一级任务组（one top-level task group）。
 - 完成该一级任务组后运行 `execution checkpoint`。
-- 记录 verification command/result 与 changed files，刷新 `context.md` / `drift.md`，然后停止等待下一次执行。
+- 记录 completed TDD steps、verification command/result、changed files、diff summary、drift status；刷新 `context.md` / `drift.md`，然后停止等待下一次执行。
 - 如果 `execution checkpoint` 返回 `WARN` 或 `BLOCK`，先回写已有工件再继续。
 - 仅将本次执行的任务组条目标记为 `- [x]`。
 - `allowedPaths` / `forbiddenPaths` 在 Phase 4 仅作为告警，不是硬阻塞；verify/archive 的硬门禁延后到 Phase 7。

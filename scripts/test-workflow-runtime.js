@@ -3067,7 +3067,19 @@ function runTests() {
     [
       'skills/opsx/references/action-playbooks.md',
       'skills/opsx/references/action-playbooks-zh.md'
-    ].forEach(assertPlatformLabeledCodexRouteLines);
+    ].forEach((relativePath) => {
+      assertPlatformLabeledCodexRouteLines(relativePath);
+      const playbookContent = fs.readFileSync(path.join(REPO_ROOT, relativePath), 'utf8');
+      [
+        'completed TDD steps',
+        'verification command/result',
+        'changed files',
+        'diff summary',
+        'drift status'
+      ].forEach((token) => {
+        assert(playbookContent.includes(token), `${relativePath} apply guidance must include ${token}`);
+      });
+    });
   });
 
   test('opsx check/doc/language work as subcommands and compatibility aliases', () => {

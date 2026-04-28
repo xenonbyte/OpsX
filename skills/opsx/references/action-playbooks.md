@@ -81,7 +81,7 @@ Use these when the active workflow action is explicit.
 - Read proposal, specs, design if present, and tasks.
 - Execute exactly one top-level task group by default.
 - Run `execution checkpoint` after that one top-level task group.
-- Record verification command/result plus changed files, refresh `context.md` / `drift.md`, and stop for the next run.
+- Record completed TDD steps, verification command/result, changed files, diff summary, and drift status; refresh `context.md` / `drift.md`, then stop for the next run.
 - If `execution checkpoint` returns `WARN` or `BLOCK`, patch existing artifacts before continuing.
 - Mark completed tasks with `- [x]` for the executed group only.
 - Surface `allowedPaths` / `forbiddenPaths` as warnings only in Phase 4; hard-block verify/archive enforcement is deferred to Phase 7.
