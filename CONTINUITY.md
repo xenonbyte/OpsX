@@ -8,11 +8,13 @@
 - 2026-04-28 [TOOL] Phase 5 (`spec-split-checkpoint`) verification passed; `05-VERIFICATION.md` is written and `npm run test:workflow-runtime` passed 66/66.
 - 2026-04-28 [CODE] Phase 6 context is captured; TDD mode default decision is `strict` for behavior-change and bugfix work.
 - 2026-04-28 [CODE] Phase 6 planning is complete and independently verified: 9 plans across 6 waves, with a temporary 12-prompt parity window for `apply` / `propose` / `continue` / `ff` before final strict parity restore.
+- 2026-04-28 [TOOL] Phase 6 verification passed; `06-VERIFICATION.md` is written, `npm run test:workflow-runtime` passed 80/80, and prompt parity is strict again.
 
 ## Done (recent)
 - 2026-04-28 [TOOL] Verified Phase 5 goal achievement: schema, state store, validator, workflow facade, generator, docs, and prompt parity all match the split-spec checkpoint contract.
 - 2026-04-28 [CODE] Captured Phase 6 context and discussion log in `.planning/phases/06-tdd-light-workflow/`.
 - 2026-04-28 [CODE] Created `06-01-PLAN.md` through `06-09-PLAN.md`; independent plan checker passed after resolving Phase 6 research questions.
+- 2026-04-28 [TOOL] Verified Phase 6 goal achievement: strict TDD-light behavior, execution evidence persistence, and 12-file prompt parity closure all pass.
 - 2026-04-27 [CODE] Executed all Phase 4 plans `04-01` through `04-09`; summaries exist for every plan.
 - 2026-04-27 [CODE] Fixed Phase 4 review findings in commit `7282e57`: lifecycle route gaps, fresh/migrated hash baselines, lowercase legacy stage normalization, and active task group apply selection.
 - 2026-04-27 [CODE] Committed clean Phase 4 review report in `535df3b`.
@@ -64,6 +66,7 @@
 - 2026-04-28 [TOOL] Independent `gsd-plan-checker` returned `## VERIFICATION PASSED` for all 9 Phase 6 plans; TDD-01 through TDD-04 are covered after research questions were resolved in commit `2834516`.
 - 2026-04-28 [TOOL] Phase 6 context committed as `e633a9e`; STATE session record committed as `5f0249f`.
 - 2026-04-28T08:55:43Z [TOOL] Phase 6 plans `06-01` through `06-09` passed `frontmatter.validate` and `verify.plan-structure`; planning docs did not require a runtime-code test run.
+- 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 80/80; parity probe returned `PHASE6_PROMPT_PARITY_OK`; no Phase 6 mismatch allowlist terms remain in `scripts/test-workflow-runtime.js`.
 - 2026-04-28 [TOOL] Phase 5 context committed as `08235de`; STATE session record committed as `8aa329d`.
 - 2026-04-28 [TOOL] Phase 5 planning artifacts committed as `738a8a9` (research/validation), `c913212` (patterns), `6986346` (plans), and `b51b74f` (STATE planned-phase).
 - 2026-04-28 [TOOL] Independent `gsd-plan-checker` returned `## VERIFICATION PASSED` for all 7 Phase 5 plans; SPEC-01 through SPEC-04 are covered.
