@@ -231,33 +231,6 @@ function collectBundleParity(platform, generatedBundle) {
   };
 }
 
-function splitScopedPromptPaths(paths = []) {
-  const scoped = {
-    claude: new Set(),
-    codex: new Set(),
-    gemini: new Set()
-  };
-
-  paths.forEach((promptPath) => {
-    const normalizedPath = toPosixPath(promptPath);
-    if (normalizedPath.startsWith('commands/claude/')) {
-      scoped.claude.add(normalizedPath.slice('commands/claude/'.length));
-      return;
-    }
-    if (normalizedPath.startsWith('commands/codex/')) {
-      scoped.codex.add(normalizedPath.slice('commands/codex/'.length));
-      return;
-    }
-    if (normalizedPath.startsWith('commands/gemini/')) {
-      scoped.gemini.add(normalizedPath.slice('commands/gemini/'.length));
-      return;
-    }
-    throw new Error(`Unsupported scoped prompt path: ${promptPath}`);
-  });
-
-  return scoped;
-}
-
 function collectFallbackCopyCoverage(generatedBundles) {
   const coverage = {};
   const actions = Object.keys(EMPTY_STATE_FALLBACK_MATCHERS);
@@ -4438,7 +4411,6 @@ function runTests() {
         );
       }
     });
-    const phase7ScopedPromptPaths = splitScopedPromptPaths(PHASE7_GATE_PROMPT_PATHS);
     assert.strictEqual(PHASE7_GATE_PROMPT_PATHS.length, 15, 'Phase 7 prompt assertions must stay scoped to exactly 15 checked-in files');
     PHASE7_GATE_PROMPT_PATHS.forEach((promptPath) => {
       const normalizedPath = toPosixPath(promptPath);
@@ -4458,15 +4430,24 @@ function runTests() {
       const generatedPrompt = generatedBundles[platform][relativePath] || '';
       const checkedInPath = path.join(REPO_ROOT, normalizedPath);
       assert(fs.existsSync(checkedInPath), `Missing checked-in Phase 7 prompt: ${checkedInPath}`);
+      const checkedInPrompt = fs.readFileSync(checkedInPath, 'utf8');
 
       assert(
         generatedPrompt.includes('PASS') && generatedPrompt.includes('WARN') && generatedPrompt.includes('BLOCK'),
         `${platform}:${relativePath} source output must mention PASS/WARN/BLOCK`
       );
+      assert(
+        checkedInPrompt.includes('PASS') && checkedInPrompt.includes('WARN') && checkedInPrompt.includes('BLOCK'),
+        `${platform}:${relativePath} checked-in prompt must mention PASS/WARN/BLOCK`
+      );
       if (relativePath.includes('sync')) {
         assert(
           generatedPrompt.includes('do not write partial sync'),
           `${platform}:${relativePath} source output must mention no partial sync writes`
+        );
+        assert(
+          checkedInPrompt.includes('do not write partial sync'),
+          `${platform}:${relativePath} checked-in prompt must mention no partial sync writes`
         );
       }
       if (relativePath.includes('/archive.') || relativePath.includes('opsx-archive.')) {
@@ -4478,6 +4459,14 @@ function runTests() {
           generatedPrompt.includes('VERIFIED'),
           `${platform}:${relativePath} source output must mention VERIFIED safe-sync path`
         );
+        assert(
+          checkedInPrompt.includes('.opsx/archive/<change-name>'),
+          `${platform}:${relativePath} checked-in prompt must mention .opsx/archive/<change-name>`
+        );
+        assert(
+          checkedInPrompt.includes('VERIFIED'),
+          `${platform}:${relativePath} checked-in prompt must mention VERIFIED safe-sync path`
+        );
       }
       if (relativePath.includes('batch-apply') || relativePath.includes('bulk-archive')) {
         assert(
@@ -4487,6 +4476,14 @@ function runTests() {
         assert(
           generatedPrompt.includes('skip') && generatedPrompt.includes('blocked'),
           `${platform}:${relativePath} source output must mention skip and blocked reporting`
+        );
+        assert(
+          checkedInPrompt.includes('per-change isolation'),
+          `${platform}:${relativePath} checked-in prompt must mention per-change isolation`
+        );
+        assert(
+          checkedInPrompt.includes('skip') && checkedInPrompt.includes('blocked'),
+          `${platform}:${relativePath} checked-in prompt must mention skip and blocked reporting`
         );
       }
     });
@@ -4541,9 +4538,6 @@ function runTests() {
       ])
     );
     Object.entries(bundleParity).forEach(([platform, parity]) => {
-      const scopedPaths = phase7ScopedPromptPaths[platform] || new Set();
-      const scopedMismatched = parity.mismatched.filter((relativePath) => scopedPaths.has(relativePath));
-      const outOfScopeMismatched = parity.mismatched.filter((relativePath) => !scopedPaths.has(relativePath));
       assert(parity.totalGenerated > 0, `${platform} generated bundle must not be empty`);
       assert(Array.isArray(parity.missing), `${platform} parity record must expose missing array`);
       assert(Array.isArray(parity.mismatched), `${platform} parity record must expose mismatched array`);
@@ -4551,11 +4545,7 @@ function runTests() {
       assert(Array.isArray(parity.generatedEntries), `${platform} parity record must expose generated entries`);
       assert(Array.isArray(parity.checkedInEntries), `${platform} parity record must expose checked-in entries`);
       assert.deepStrictEqual(parity.missing, [], `${platform} checked-in bundle is missing generated files`);
-      assert.deepStrictEqual(outOfScopeMismatched, [], `${platform} checked-in bundle has generated mismatches outside the Phase 7 scoped prompt set`);
-      assert(
-        scopedMismatched.length <= scopedPaths.size,
-        `${platform} Phase 7 prompt mismatches must stay within the declared prompt set`
-      );
+      assert.deepStrictEqual(parity.mismatched, [], `${platform} checked-in bundle has generated mismatches`);
       assert.deepStrictEqual(parity.extra, [], `${platform} checked-in bundle has extra tracked files outside generated output`);
       assert.strictEqual(parity.totalGenerated, parity.totalCheckedIn, `${platform} tracked checked-in count must match generated count`);
       assert.deepStrictEqual(parity.checkedInEntries, parity.generatedEntries, `${platform} checked-in entries must exactly match generated entries`);
