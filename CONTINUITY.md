@@ -1,18 +1,16 @@
 ## Snapshot
 - 2026-04-27 [USER] Goal: Start a new GSD milestone from the supplied OpsX optimization report.
 - 2026-04-27 [CODE] Current milestone: `v3.0 OpsX migration and state-machine workflow`.
-- 2026-04-27 [CODE] Phase 1, Phase 2, Phase 3, and Phase 4 are complete and verified.
-- 2026-04-27T17:04Z [TOOL] Phase 4 verifier passed 5/5 must-haves; `04-VERIFICATION.md` was written with `status: passed`.
-- 2026-04-27 [TOOL] Phase 4 final code review `04-REVIEW.md` is clean after refreshed review commit `27d8438`.
-- 2026-04-27 [TOOL] Final Phase 4 checks passed: `npm run test:workflow-runtime` 49/49 and `gsd-sdk query verify.schema-drift 04`.
-- 2026-04-27 [CODE] Phase 3 code review is clean after remediation commits `9690fac` and `c719ba1`.
+- 2026-04-28 [CODE] Phase 1 through Phase 5 are complete and verified.
 - 2026-04-27 [CODE] Public current UX must not expose legacy OpenSpec routes/paths, `/prompts:*`, `/opsx:*`, standalone `$opsx`, or `$opsx <request>`.
 - 2026-04-27 [CODE] `commands/codex/prompts/opsx.md` remains only as an internal generated route catalog; public Codex entrypoints are explicit `$opsx-*`.
 - 2026-04-27 [CODE] `AGENTS.md` preserves repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
 - 2026-04-28 [TOOL] Phase 5 (`spec-split-checkpoint`) verification passed; `05-VERIFICATION.md` is written and `npm run test:workflow-runtime` passed 66/66.
+- 2026-04-28 [CODE] Phase 6 context is captured; TDD mode default decision is `strict` for behavior-change and bugfix work.
 
 ## Done (recent)
 - 2026-04-28 [TOOL] Verified Phase 5 goal achievement: schema, state store, validator, workflow facade, generator, docs, and prompt parity all match the split-spec checkpoint contract.
+- 2026-04-28 [CODE] Captured Phase 6 context and discussion log in `.planning/phases/06-tdd-light-workflow/`.
 - 2026-04-27 [CODE] Executed all Phase 4 plans `04-01` through `04-09`; summaries exist for every plan.
 - 2026-04-27 [CODE] Fixed Phase 4 review findings in commit `7282e57`: lifecycle route gaps, fresh/migrated hash baselines, lowercase legacy stage normalization, and active task group apply selection.
 - 2026-04-27 [CODE] Committed clean Phase 4 review report in `535df3b`.
@@ -28,17 +26,13 @@
 - /Users/xubo/x-skills/openspec/.planning/STATE.md
 - /Users/xubo/x-skills/openspec/.planning/PROJECT.md
 - /Users/xubo/x-skills/openspec/CONTINUITY.md
-- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-CONTEXT.md
-- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-RESEARCH.md
-- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-VALIDATION.md
-- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-PATTERNS.md
-- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-01-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-02-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-03-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-04-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-05-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-06-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/05-spec-split-checkpoint/05-07-PLAN.md
+- /Users/xubo/x-skills/openspec/.planning/phases/06-tdd-light-workflow/06-CONTEXT.md
+- /Users/xubo/x-skills/openspec/.planning/phases/06-tdd-light-workflow/06-DISCUSSION-LOG.md
+- /Users/xubo/x-skills/openspec/templates/project/config.yaml.tmpl
+- /Users/xubo/x-skills/openspec/skills/opsx/references/artifact-templates.md
+- /Users/xubo/x-skills/openspec/skills/opsx/references/artifact-templates-zh.md
+- /Users/xubo/x-skills/openspec/skills/opsx/references/action-playbooks.md
+- /Users/xubo/x-skills/openspec/skills/opsx/references/action-playbooks-zh.md
 - /Users/xubo/x-skills/openspec/schemas/spec-driven/schema.json
 - /Users/xubo/x-skills/openspec/lib/workflow.js
 - /Users/xubo/x-skills/openspec/lib/change-store.js
@@ -60,9 +54,11 @@
 - 2026-04-27 [CODE] D013 ACTIVE: Phase 4 uses strict mutation transitions, readable status/resume, warn-and-reload hash drift, and one-top-level-task-group apply guidance.
 - 2026-04-27 [CODE] D014 ACTIVE: Phase 4 research recommends `xstate` pure transitions for mutations and `yaml` for persisted state files because the local YAML helper cannot represent the required array-heavy schema.
 - 2026-04-27 [CODE] D015 ACTIVE: Phase 4 plans pin `yaml@2.8.3`, do not add `xstate`, and instead schedule a local transition-table module in `lib/change-state.js` to keep the implementation bounded and library-first.
+- 2026-04-28 [USER] D016 ACTIVE: Phase 6 `rules.tdd.mode` defaults to `strict`, enforcing RED and VERIFY for behavior-change and bugfix work while keeping REFACTOR optional and allowing visible exemptions for non-behavior work.
 
 ## Receipts
 - 2026-04-28 [TOOL] Phase 5 verification completed: `npm run test:workflow-runtime` passed 66/66; direct spot-checks for `runSpecSplitCheckpoint()` and `validateCheckpointContracts()` passed; `05-VERIFICATION.md` was written.
+- 2026-04-28 [TOOL] Phase 6 context committed as `e633a9e`; STATE session record committed as `5f0249f`.
 - 2026-04-28 [TOOL] Phase 5 context committed as `08235de`; STATE session record committed as `8aa329d`.
 - 2026-04-28 [TOOL] Phase 5 planning artifacts committed as `738a8a9` (research/validation), `c913212` (patterns), `6986346` (plans), and `b51b74f` (STATE planned-phase).
 - 2026-04-28 [TOOL] Independent `gsd-plan-checker` returned `## VERIFICATION PASSED` for all 7 Phase 5 plans; SPEC-01 through SPEC-04 are covered.
