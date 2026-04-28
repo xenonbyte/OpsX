@@ -2991,6 +2991,7 @@ function runTests() {
         );
       });
     });
+    assert.strictEqual(PHASE6_TDD_PROMPT_PATHS.length, 12, 'Phase 6 prompt assertions must stay scoped to exactly 12 checked-in files');
     PHASE6_TDD_PROMPT_PATHS.forEach((promptPath) => {
       const normalizedPath = toPosixPath(promptPath);
       let platform = null;
@@ -3007,6 +3008,9 @@ function runTests() {
       }
       assert(platform, `Unsupported Phase 6 prompt path target: ${promptPath}`);
       const generatedPrompt = generatedBundles[platform][relativePath] || '';
+      const checkedInPath = path.join(REPO_ROOT, normalizedPath);
+      assert(fs.existsSync(checkedInPath), `Missing checked-in Phase 6 prompt: ${checkedInPath}`);
+      const checkedInPrompt = fs.readFileSync(checkedInPath, 'utf8');
       assert(
         generatedPrompt.includes('rules.tdd.mode'),
         `${platform}:${relativePath} source output must mention rules.tdd.mode`
@@ -3023,10 +3027,30 @@ function runTests() {
         generatedPrompt.includes('TDD Exemption:'),
         `${platform}:${relativePath} source output must mention TDD Exemption:`
       );
+      assert(
+        checkedInPrompt.includes('rules.tdd.mode'),
+        `${platform}:${relativePath} checked-in prompt must mention rules.tdd.mode`
+      );
+      assert(
+        checkedInPrompt.includes('TDD Exemption:'),
+        `${platform}:${relativePath} checked-in prompt must mention TDD Exemption:`
+      );
       if (relativePath.includes('apply')) {
         assert(
           generatedPrompt.includes('completed TDD steps'),
           `${platform}:${relativePath} source output must mention completed TDD steps`
+        );
+        assert(
+          generatedPrompt.includes('diff summary'),
+          `${platform}:${relativePath} source output must mention diff summary`
+        );
+        assert(
+          checkedInPrompt.includes('completed TDD steps'),
+          `${platform}:${relativePath} checked-in prompt must mention completed TDD steps`
+        );
+        assert(
+          checkedInPrompt.includes('diff summary'),
+          `${platform}:${relativePath} checked-in prompt must mention diff summary`
         );
       }
     });
@@ -3081,11 +3105,6 @@ function runTests() {
       ])
     );
     Object.entries(bundleParity).forEach(([platform, parity]) => {
-      const allowedMismatches = PHASE6_TDD_PROMPT_PATHS
-        .filter((checkedInPath) => checkedInPath.startsWith(`commands/${platform}/`))
-        .map((checkedInPath) => checkedInPath.replace(`commands/${platform}/`, ''))
-        .sort((left, right) => left.localeCompare(right));
-      const unexpectedMismatches = parity.mismatched.filter((relativePath) => !allowedMismatches.includes(relativePath));
       assert(parity.totalGenerated > 0, `${platform} generated bundle must not be empty`);
       assert(Array.isArray(parity.missing), `${platform} parity record must expose missing array`);
       assert(Array.isArray(parity.mismatched), `${platform} parity record must expose mismatched array`);
@@ -3093,7 +3112,7 @@ function runTests() {
       assert(Array.isArray(parity.generatedEntries), `${platform} parity record must expose generated entries`);
       assert(Array.isArray(parity.checkedInEntries), `${platform} parity record must expose checked-in entries`);
       assert.deepStrictEqual(parity.missing, [], `${platform} checked-in bundle is missing generated files`);
-      assert.deepStrictEqual(unexpectedMismatches, [], `${platform} checked-in bundle has non-phase6 mismatches`);
+      assert.deepStrictEqual(parity.mismatched, [], `${platform} checked-in bundle has generated mismatches`);
       assert.deepStrictEqual(parity.extra, [], `${platform} checked-in bundle has extra tracked files outside generated output`);
       assert.strictEqual(parity.totalGenerated, parity.totalCheckedIn, `${platform} tracked checked-in count must match generated count`);
       assert.deepStrictEqual(parity.checkedInEntries, parity.generatedEntries, `${platform} checked-in entries must exactly match generated entries`);
