@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
-status: ready_to_plan
-stopped_at: Phase 7 verified; ready to plan Phase 8
-last_updated: "2026-04-28T16:00:46Z"
+status: review_issues
+stopped_at: Phase 7 re-review found 4 warnings; ready for code-review fix
+last_updated: "2026-04-28T16:12:01Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
@@ -21,18 +21,18 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-04-28)
 
 **Core value:** Agents can reliably continue spec-driven work from disk-backed OpsX artifacts instead of relying on fragile chat history.
-**Current focus:** Phase 08 — Stability, JSON, and Release Coverage
+**Current focus:** Phase 07 — Code Review Fixes
 
 ## Current Position
 
-Phase: 8
-Plan: Not started
-Status: Ready to plan
+Phase: 7
+Plan: Review follow-up
+Status: Code review found 4 warnings
 Last activity: 2026-04-28
 
 ## Next Action
 
-Run `$gsd-discuss-phase 8` to gather Phase 8 context before planning the release-hardening pass.
+Run `$gsd-code-review-fix 7` to address the four Phase 7 review warnings before advancing to Phase 8.
 
 ## Accumulated Context
 
@@ -49,7 +49,8 @@ Run `$gsd-discuss-phase 8` to gather Phase 8 context before planning the release
 - 2026-04-28: Phase 6 planned into 9 plans across 6 waves; Wave 1 covers `rules.tdd` defaults and task guidance, Waves 2-4 implement checkpoint/persistence/generator source work, Wave 5 refreshes the 12 route prompts for `apply` / `propose` / `continue` / `ff`, and Wave 6 restores strict parity.
 - 2026-04-28: Phase 6 execution and verification completed; `npm run test:workflow-runtime` passed 80/80, code review is clean, and `06-VERIFICATION.md` passed 6/6 must-haves.
 - 2026-04-28: Phase 7 planning completed with 8 plans across 6 waves; the locked implementation path uses `picomatch@4.0.4` for Node-14-compatible path-scope matching and exact `.opsx/archive/<change-name>/` archive moves.
-- 2026-04-28: Phase 7 execution completed; `07-REVIEW.md` is clean after remediation commits `2712351` and `60d3420`, `07-VERIFICATION.md` passed 4/4 must-haves, and `npm run test:workflow-runtime` passed 104/104.
+- 2026-04-28: Phase 7 execution completed; `07-VERIFICATION.md` passed 4/4 must-haves and `npm run test:workflow-runtime` passed 104/104.
+- 2026-04-28T16:09Z: Phase 7 standard re-review superseded the prior clean report; `07-REVIEW.md` now has 4 warnings and 0 critical findings.
 
 ## Decisions
 
@@ -212,10 +213,10 @@ Run `$gsd-discuss-phase 8` to gather Phase 8 context before planning the release
 
 ## Session
 
-Last session: 2026-04-28T16:00:46Z
-Stopped At: Phase 7 verified; ready to plan Phase 8
-Resume File: `.planning/phases/07-verify-sync-archive-and-batch-gates/07-VERIFICATION.md`
+Last session: 2026-04-28T16:12:01Z
+Stopped At: Phase 7 re-review found 4 warnings
+Resume File: `.planning/phases/07-verify-sync-archive-and-batch-gates/07-REVIEW.md`
 
-**Next Phase:** 8 (Stability, JSON, and Release Coverage)
+**Next Phase:** 8 (Stability, JSON, and Release Coverage) after Phase 7 review fixes
 
 **Planned Phase:** None — Phase 8 has not been discussed or planned yet
