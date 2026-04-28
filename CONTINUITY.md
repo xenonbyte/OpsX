@@ -11,7 +11,7 @@
 - 2026-04-28T16:09Z [TOOL] Phase 7 standard re-review superseded the prior clean report: `07-REVIEW.md` is now `issues_found` with 4 warnings, 0 critical.
 - 2026-04-28T16:30Z [TOOL] Phase 7 review fixes applied all 4 warnings; `07-REVIEW-FIX.md` has `status: all_fixed`, and `npm run test:workflow-runtime` passed 109/109.
 - 2026-04-28T16:47Z [TOOL] Phase 7 post-fix re-review is clean: `07-REVIEW.md` has 0 findings across 30 files, and `npm run test:workflow-runtime` passed 109/109.
-- 2026-04-28 [CODE] Next expected milestone step: discuss and plan Phase 8, `Stability, JSON, and Release Coverage`.
+- 2026-04-29 [CODE] Phase 8 context is captured; next expected milestone step is `$gsd-plan-phase 8`.
 
 ## Done (recent)
 - 2026-04-28 [CODE] Executed all Phase 7 plans `07-01` through `07-08`.
@@ -22,6 +22,7 @@
 - 2026-04-28T16:47Z [TOOL] Phase 7 post-fix re-review is clean across 30 files.
 - 2026-04-28 [TOOL] Phase 7 verifier passed 4/4 must-haves in `07-VERIFICATION.md`.
 - 2026-04-28 [CODE] Updated `.planning/STATE.md` and this continuity ledger for Phase 8 readiness after clean post-fix re-review.
+- 2026-04-29 [CODE] Captured Phase 8 context and discussion log in `.planning/phases/08-stability-json-and-release-coverage/`.
 
 ## Working set
 - /Users/xubo/x-skills/openspec/.planning/ROADMAP.md
@@ -32,6 +33,8 @@
 - /Users/xubo/x-skills/openspec/.planning/phases/07-verify-sync-archive-and-batch-gates/07-REVIEW.md
 - /Users/xubo/x-skills/openspec/.planning/phases/07-verify-sync-archive-and-batch-gates/07-REVIEW-FIX.md
 - /Users/xubo/x-skills/openspec/.planning/phases/07-verify-sync-archive-and-batch-gates/07-VERIFICATION.md
+- /Users/xubo/x-skills/openspec/.planning/phases/08-stability-json-and-release-coverage/08-CONTEXT.md
+- /Users/xubo/x-skills/openspec/.planning/phases/08-stability-json-and-release-coverage/08-DISCUSSION-LOG.md
 
 ## Decisions
 - 2026-04-27 [CODE] D001 ACTIVE: Treat v3.0 as a breaking OpsX rename and workflow-state upgrade.
@@ -59,6 +62,7 @@
 - 2026-04-28T16:30Z [TOOL] Fix report `07-REVIEW-FIX.md` reports `findings_in_scope: 4`, `fixed: 4`, `skipped: 0`, `status: all_fixed`.
 - 2026-04-28 [TOOL] Local verification after fixes: `npm run test:workflow-runtime` passed 109/109.
 - 2026-04-28T16:47Z [TOOL] Phase 7 clean post-fix review superseded the issues report; current `07-REVIEW.md` has `status: clean`, files_reviewed=30, and critical/warning/info/total all 0.
+- 2026-04-29 [TOOL] Phase 8 context committed as `d72dd54`; locked decisions include full `status --json` envelope, JSON-only stdout with exit 0 for expected states, researched path/glob dependency, full path surface coverage, split test scripts with `npm test`, complete release gate, `npm pack --dry-run --json`, and release docs updates.
 - 2026-04-28 [TOOL] `gsd-sdk query verify.schema-drift 07` returned valid with 0 issues across 8 checked plans.
 - 2026-04-28 [TOOL] Phase 7 verification report committed as `f32d323` with `status: passed` and 4/4 must-haves verified.
 - 2026-04-28 [TOOL] `workflow.security_enforcement` is true; no `07-SECURITY.md` exists yet, so run `$gsd-secure-phase 7` before advancing if a dedicated security gate is required.

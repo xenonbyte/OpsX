@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
-status: ready_to_plan
-stopped_at: Phase 7 post-fix re-review clean; ready to plan Phase 8
-last_updated: "2026-04-28T16:48:19Z"
-last_activity: 2026-04-28
+status: planning
+stopped_at: Phase 8 context gathered
+last_updated: "2026-04-28T17:16:51.122Z"
+last_activity: 2026-04-29
 progress:
   total_phases: 8
   completed_phases: 7
@@ -28,11 +28,11 @@ See: `.planning/PROJECT.md` (updated 2026-04-28)
 Phase: 8
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-04-28
+Last activity: 2026-04-29
 
 ## Next Action
 
-Run `$gsd-discuss-phase 8` to gather Phase 8 context before planning the release-hardening pass.
+Run `$gsd-plan-phase 8` to plan the release-hardening pass from the captured Phase 8 context.
 
 ## Accumulated Context
 
@@ -53,6 +53,7 @@ Run `$gsd-discuss-phase 8` to gather Phase 8 context before planning the release
 - 2026-04-28T16:09Z: Phase 7 standard re-review superseded the prior clean report; `07-REVIEW.md` now has 4 warnings and 0 critical findings.
 - 2026-04-28T16:30Z: Phase 7 code-review fixes applied all 4 warning findings; `07-REVIEW-FIX.md` reports `status: all_fixed`, and `npm run test:workflow-runtime` passed 109/109.
 - 2026-04-28T16:47Z: Phase 7 post-fix re-review is clean across 30 files; `07-REVIEW.md` reports 0 findings and `npm run test:workflow-runtime` passed 109/109.
+- 2026-04-29: Phase 8 context gathered; decisions lock full `status --json` envelope semantics, researched path/glob dependency selection, full path-surface coverage, split test scripts with `npm test`, complete release gate, `npm pack --dry-run --json`, and release docs updates.
 
 ## Decisions
 
@@ -215,10 +216,10 @@ Run `$gsd-discuss-phase 8` to gather Phase 8 context before planning the release
 
 ## Session
 
-Last session: 2026-04-28T16:48:19Z
-Stopped At: Phase 7 post-fix re-review clean; ready to plan Phase 8
-Resume File: `.planning/phases/07-verify-sync-archive-and-batch-gates/07-REVIEW.md`
+Last session: 2026-04-28T17:16:51.116Z
+Stopped At: Phase 8 context gathered
+Resume File: .planning/phases/08-stability-json-and-release-coverage/08-CONTEXT.md
 
 **Next Phase:** 8 (Stability, JSON, and Release Coverage)
 
-**Planned Phase:** None — Phase 8 has not been discussed or planned yet
+**Planned Phase:** None — Phase 8 context is gathered; plans have not been created yet
