@@ -3,6 +3,16 @@
   "description": "Schema-driven OpenSpec workflow for proposal, specs, design, and tasks.",
   "checkpoints": [
     {
+      "id": "spec-split-checkpoint",
+      "phase": "planning",
+      "trigger": "after-specs-before-design",
+      "insertion": {
+        "after": ["specs"],
+        "before": ["design"]
+      },
+      "states": ["PASS", "WARN", "BLOCK"]
+    },
+    {
       "id": "spec-checkpoint",
       "phase": "planning",
       "trigger": "after-design-before-tasks",
