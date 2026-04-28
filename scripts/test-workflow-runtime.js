@@ -566,6 +566,55 @@ function runTests() {
     assert.strictEqual(resolveContinueAction({ stage: 'SYNCED' }), 'archive');
   });
 
+  test('matchPathScope uses picomatch globs for allowed and forbidden paths', () => {
+    const { matchPathScope } = require('../lib/path-scope');
+    const result = matchPathScope(
+      [
+        'lib/verify.js',
+        'lib\\windows\\gate.js',
+        'secrets/private.pem',
+        'src/index.js'
+      ],
+      {
+        allowedPaths: ['lib/**'],
+        forbiddenPaths: ['*.pem']
+      }
+    );
+
+    assert.strictEqual(result.hasAllowedScope, true);
+    assert.deepStrictEqual(result.allowedMatches.sort((left, right) => left.localeCompare(right)), [
+      'lib/verify.js',
+      'lib/windows/gate.js'
+    ]);
+    assert.deepStrictEqual(result.forbiddenMatches, ['secrets/private.pem']);
+    assert.deepStrictEqual(result.outOfScopeMatches, ['src/index.js']);
+    assert.deepStrictEqual(result.explainableExtraMatches, []);
+  });
+
+  test('matchPathScope distinguishes forbidden files from explainable docs or config extras', () => {
+    const { matchPathScope } = require('../lib/path-scope');
+    const result = matchPathScope(
+      [
+        'README.md',
+        'docs/opsx.md',
+        'config/runtime.yaml',
+        'secrets/blocked.pem'
+      ],
+      {
+        allowedPaths: ['lib/**'],
+        forbiddenPaths: ['*.pem']
+      }
+    );
+
+    assert.deepStrictEqual(result.forbiddenMatches, ['secrets/blocked.pem']);
+    assert.deepStrictEqual(result.explainableExtraMatches.sort((left, right) => left.localeCompare(right)), [
+      'README.md',
+      'config/runtime.yaml',
+      'docs/opsx.md'
+    ]);
+    assert.deepStrictEqual(result.outOfScopeMatches, []);
+  });
+
   test('change-store normalizes sparse Phase 2 state to Phase 4 defaults', () => {
     const { normalizeChangeState } = require('../lib/change-store');
     const normalized = normalizeChangeState({
