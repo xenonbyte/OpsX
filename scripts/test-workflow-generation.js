@@ -6,6 +6,12 @@ const { install } = require('../lib/install');
 const { buildPlatformBundle } = require('../lib/generator');
 const { runRegisteredTopicTests } = require('./test-workflow-shared');
 
+const RELEASE_GATE_POST_CHECKS = Object.freeze([
+  'gsd-sdk query verify.schema-drift 08',
+  '$gsd-code-review 8',
+  '$gsd-verify-work 8'
+]);
+
 function registerTests(test, helpers) {
   const {
     assert,
@@ -144,6 +150,15 @@ function registerTests(test, helpers) {
         assert(!content.includes(phrase), `${relativePath} must not include stale phrase: ${phrase}`);
       });
     });
+  });
+
+  test('release legacy allowlist gate keeps public surface free of stale openspec routes', () => {
+    const legacyGateResult = spawnSync(process.execPath, [path.join(REPO_ROOT, 'scripts', 'check-phase1-legacy-allowlist.js')], {
+      cwd: REPO_ROOT,
+      encoding: 'utf8'
+    });
+    assert.strictEqual(legacyGateResult.status, 0, legacyGateResult.stderr || legacyGateResult.stdout);
+    assert(legacyGateResult.stdout.includes('Phase 3 public-surface legacy token check passed.'));
   });
 
   test('runtime suite locks renamed skill targets, generated bundles, and checked-in command entries', () => {
@@ -465,6 +480,25 @@ function registerTests(test, helpers) {
     ];
     removedLegacyEntries.forEach((legacyPath) => {
       assert(!fs.existsSync(legacyPath), `Legacy command entry should be removed: ${legacyPath}`);
+    });
+  });
+
+  test('release gate keeps schema drift, code review, and final verification steps explicit after split-script checks', () => {
+    const planPath = path.join(
+      REPO_ROOT,
+      '.planning',
+      'phases',
+      '08-stability-json-and-release-coverage',
+      '08-06-PLAN.md'
+    );
+    assert(fs.existsSync(planPath), `Expected release plan to exist: ${planPath}`);
+    const planContent = fs.readFileSync(planPath, 'utf8');
+
+    RELEASE_GATE_POST_CHECKS.forEach((command) => {
+      assert(
+        planContent.includes(command),
+        `Release gate plan must preserve post-split verification step: ${command}`
+      );
     });
   });
 }
