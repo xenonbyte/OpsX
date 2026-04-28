@@ -4452,7 +4452,7 @@ function runTests() {
           `${platform}:${relativePath} source output must mention no partial sync writes`
         );
       }
-      if (relativePath.includes('archive')) {
+      if (relativePath.includes('/archive.') || relativePath.includes('opsx-archive.')) {
         assert(
           generatedPrompt.includes('.opsx/archive/<change-name>'),
           `${platform}:${relativePath} source output must mention .opsx/archive/<change-name>`
