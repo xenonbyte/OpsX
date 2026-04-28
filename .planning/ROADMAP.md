@@ -182,6 +182,20 @@ Plans:
 
 **Requirements:** QUAL-01, QUAL-02, QUAL-03, QUAL-04
 
+**Status:** Planned — 2026-04-28
+
+**Plans:** 8 plans (6 waves)
+
+Plans:
+- [ ] `07-01-PLAN.md` — Add Node-14-compatible path-scope matching and the hard verify gate with accepted `VERIFIED` transitions.
+- [ ] `07-02-PLAN.md` — Build conservative in-memory spec sync with no-partial-write semantics and accepted `SYNCED` transitions.
+- [ ] `07-03-PLAN.md` — Implement archive safe-sync gating, exact `.opsx/archive/<change-name>/` moves, and isolated batch orchestration.
+- [ ] `07-04-PLAN.md` — Update source-of-truth verify/sync/archive/batch guidance and stage a temporary 15-route prompt assertion scope.
+- [ ] `07-05-PLAN.md` — Refresh the bounded Claude verify/sync/archive/batch route slice from generator output.
+- [ ] `07-06-PLAN.md` — Refresh the bounded Codex verify/sync/archive/batch prompt slice from generator output.
+- [ ] `07-07-PLAN.md` — Refresh the bounded Gemini verify/sync/archive/batch route slice from generator output.
+- [ ] `07-08-PLAN.md` — Remove temporary Phase 7 prompt allowances and restore strict full-bundle parity.
+
 **Success criteria:**
 1. `opsx-verify` compares proposal, specs, design, tasks, code diff, tests, TDD records, execution checkpoints, drift, and allowed/forbidden paths.
 2. `opsx-sync` merges change specs into `.opsx/specs/**` and detects omitted or conflicting requirements.
