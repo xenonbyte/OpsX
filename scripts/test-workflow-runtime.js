@@ -806,6 +806,214 @@ function runTests() {
     assert(Array.isArray(findings));
   });
 
+  test('spec validator flags duplicate requirement titles and likely duplicate behavior', () => {
+    const { collectSpecSplitEvidence, reviewSpecSplitEvidence } = require('../lib/spec-validator');
+    const evidence = collectSpecSplitEvidence({
+      proposalText: [
+        '## What Changes',
+        '- enforce manager approval for invoice payouts',
+        '## Capabilities',
+        '### Modified Capabilities',
+        '- billing approvals'
+      ].join('\n'),
+      specFiles: [
+        {
+          path: 'specs/auth/spec.md',
+          text: [
+            '## ADDED Requirements',
+            '### Requirement: Enforce manager approval',
+            'The system SHALL require manager approval before invoice payout release.',
+            '#### Scenario: manager approval path',
+            '- **WHEN** a payout is requested',
+            '- **THEN** the manager must approve before release'
+          ].join('\n')
+        },
+        {
+          path: 'specs/billing/spec.md',
+          text: [
+            '## ADDED Requirements',
+            '### Requirement: Enforce manager approval',
+            'The system SHALL require manager approval before invoice payout release.',
+            '#### Scenario: mirrored title',
+            '- **WHEN** billing payout is requested',
+            '- **THEN** hold payout until manager approval',
+            '',
+            '### Requirement: Invoice payout needs manager authorization',
+            'The system SHALL require manager approval before invoice payout release.',
+            '#### Scenario: duplicate behavior',
+            '- **WHEN** payout is requested',
+            '- **THEN** manager approval is required'
+          ].join('\n')
+        }
+      ]
+    });
+
+    const findings = reviewSpecSplitEvidence(evidence);
+    const duplicateIdFinding = findings.find((finding) => finding.code === 'duplicate-requirement-id');
+    const duplicateBehaviorFinding = findings.find((finding) => finding.code === 'duplicate-behavior-likely');
+
+    assert(duplicateIdFinding, 'Expected duplicate requirement id finding.');
+    assert.deepStrictEqual(duplicateIdFinding.patchTargets, ['specs/auth/spec.md', 'specs/billing/spec.md']);
+
+    assert(duplicateBehaviorFinding, 'Expected likely duplicate behavior finding.');
+    assert.deepStrictEqual(duplicateBehaviorFinding.patchTargets, ['specs/auth/spec.md', 'specs/billing/spec.md']);
+  });
+
+  test('spec validator flags conflicting requirements', () => {
+    const { collectSpecSplitEvidence, reviewSpecSplitEvidence } = require('../lib/spec-validator');
+    const evidence = collectSpecSplitEvidence({
+      proposalText: [
+        '## What Changes',
+        '- align invoice delivery policy',
+        '## Capabilities',
+        '### Modified Capabilities',
+        '- invoicing'
+      ].join('\n'),
+      specFiles: [
+        {
+          path: 'specs/auth/spec.md',
+          text: [
+            '## ADDED Requirements',
+            '### Requirement: Invoice dispatch policy',
+            'The system SHALL send invoice emails automatically.',
+            '#### Scenario: dispatch enabled',
+            '- **WHEN** invoice is approved',
+            '- **THEN** send invoice email'
+          ].join('\n')
+        },
+        {
+          path: 'specs/billing/spec.md',
+          text: [
+            '## ADDED Requirements',
+            '### Requirement: Invoice dispatch policy',
+            'The system SHALL NOT send invoice emails automatically.',
+            '#### Scenario: dispatch blocked',
+            '- **WHEN** invoice is approved',
+            '- **THEN** do not send invoice email'
+          ].join('\n')
+        }
+      ]
+    });
+
+    const findings = reviewSpecSplitEvidence(evidence);
+    const conflictFinding = findings.find((finding) => finding.code === 'conflicting-requirements');
+    assert(conflictFinding, 'Expected conflicting requirements finding.');
+    assert.deepStrictEqual(conflictFinding.patchTargets, ['specs/auth/spec.md', 'specs/billing/spec.md']);
+  });
+
+  test('spec validator blocks empty specs and missing scenarios', () => {
+    const { collectSpecSplitEvidence, reviewSpecSplitEvidence } = require('../lib/spec-validator');
+    const evidence = collectSpecSplitEvidence({
+      proposalText: [
+        '## What Changes',
+        '- audit billing retention policy',
+        '## Capabilities',
+        '### Modified Capabilities',
+        '- billing retention'
+      ].join('\n'),
+      specFiles: [
+        {
+          path: 'specs/auth/spec.md',
+          text: '## ADDED Requirements\nNo valid requirement headings here.'
+        },
+        {
+          path: 'specs/billing/spec.md',
+          text: [
+            '## ADDED Requirements',
+            '### Requirement: Billing retention policy',
+            'The system SHALL retain billing records for seven years.'
+          ].join('\n')
+        }
+      ]
+    });
+
+    const findings = reviewSpecSplitEvidence(evidence);
+    const emptyFinding = findings.find((finding) => finding.code === 'spec-empty');
+    const missingScenarioFinding = findings.find((finding) => finding.code === 'scenario-missing');
+
+    assert(emptyFinding, 'Expected spec-empty finding.');
+    assert.deepStrictEqual(emptyFinding.patchTargets, ['specs/auth/spec.md']);
+
+    assert(missingScenarioFinding, 'Expected scenario-missing finding.');
+    assert.deepStrictEqual(missingScenarioFinding.patchTargets, ['specs/billing/spec.md']);
+  });
+
+  test('spec validator flags hidden fenced-code requirements', () => {
+    const { parseSpecFile, collectSpecSplitEvidence, reviewSpecSplitEvidence } = require('../lib/spec-validator');
+    const specText = [
+      '## ADDED Requirements',
+      '```md',
+      '### Requirement: Hidden requirement in fence',
+      'The implementation SHALL bypass review checks.',
+      '#### Scenario: hidden bypass',
+      '- **WHEN** emergency mode is active',
+      '- **THEN** bypass all checks',
+      '```',
+      '',
+      '### Requirement: Visible requirement',
+      'The system SHALL log review outcomes.',
+      '#### Scenario: visible scenario',
+      '- **WHEN** review completes',
+      '- **THEN** record the result'
+    ].join('\n');
+
+    const parsed = parseSpecFile('specs/auth/spec.md', specText);
+    assert.strictEqual(parsed.requirementCount, 1, 'Fenced requirement headings must not count as valid requirements.');
+
+    const evidence = collectSpecSplitEvidence({
+      proposalText: [
+        '## What Changes',
+        '- log review outcomes',
+        '## Capabilities',
+        '### Modified Capabilities',
+        '- review logging'
+      ].join('\n'),
+      specFiles: [{ path: 'specs/auth/spec.md', text: specText }]
+    });
+
+    const findings = reviewSpecSplitEvidence(evidence);
+    const hiddenFinding = findings.find((finding) => finding.code === 'hidden-requirement-in-fence');
+    assert(hiddenFinding, 'Expected hidden fenced-code requirement finding.');
+    assert.deepStrictEqual(hiddenFinding.patchTargets, ['specs/auth/spec.md']);
+  });
+
+  test('spec validator flags proposal coverage gaps and unapproved scope expansion', () => {
+    const { collectSpecSplitEvidence, reviewSpecSplitEvidence } = require('../lib/spec-validator');
+    const evidence = collectSpecSplitEvidence({
+      proposalText: [
+        '## What Changes',
+        '- improve tenant api throttling policy',
+        '## Capabilities',
+        '### Modified Capabilities',
+        '- tenant rate limiting',
+        '- gateway quotas'
+      ].join('\n'),
+      specFiles: [
+        {
+          path: 'specs/billing/spec.md',
+          text: [
+            '## ADDED Requirements',
+            '### Requirement: Blockchain settlement export',
+            'The system SHALL compute blockchain settlement ledger reconciliation snapshots.',
+            '#### Scenario: settlement snapshot',
+            '- **WHEN** settlement closes',
+            '- **THEN** generate the reconciliation snapshot'
+          ].join('\n')
+        }
+      ]
+    });
+
+    const findings = reviewSpecSplitEvidence(evidence);
+    const coverageFinding = findings.find((finding) => finding.code === 'proposal-coverage-gap');
+    const scopeFinding = findings.find((finding) => finding.code === 'scope-expansion-unapproved');
+
+    assert(coverageFinding, 'Expected proposal coverage gap finding.');
+    assert.deepStrictEqual(coverageFinding.patchTargets, ['proposal', 'specs']);
+
+    assert(scopeFinding, 'Expected unapproved scope expansion finding.');
+    assert.deepStrictEqual(scopeFinding.patchTargets, ['proposal', 'specs/billing/spec.md']);
+  });
+
   test('read-only drift detection warns without refreshing stored hashes', () => {
     const { loadChangeState, writeChangeState } = require('../lib/change-store');
     const changeName = 'read-only-drift';
