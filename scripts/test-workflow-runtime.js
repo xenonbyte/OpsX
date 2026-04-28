@@ -111,7 +111,7 @@ const PLATFORM_BUNDLE_TARGETS = Object.freeze({
   })
 });
 
-const PHASE5_PLANNING_PROMPT_PARITY_EXEMPTIONS = Object.freeze({
+const PHASE5_PLANNING_PROMPT_ASSERTION_TARGETS = Object.freeze({
   claude: Object.freeze([
     'opsx/continue.md',
     'opsx/ff.md',
@@ -2583,12 +2583,32 @@ function runTests() {
     assert(generatedBundles.gemini['opsx.toml'].includes('OpsX Workflow'));
     assert(generatedBundles.gemini['opsx.toml'].includes('Primary workflow entry: `/opsx-<action>`'));
     assert(!generatedBundles.gemini['opsx.toml'].includes('Primary workflow entry: `$opsx <request>`'));
-    Object.entries(PHASE5_PLANNING_PROMPT_PARITY_EXEMPTIONS).forEach(([platform, promptPaths]) => {
+    Object.entries(PHASE5_PLANNING_PROMPT_ASSERTION_TARGETS).forEach(([platform, promptPaths]) => {
       promptPaths.forEach((promptPath) => {
         const generatedPrompt = generatedBundles[platform][promptPath] || '';
         assert(
           generatedPrompt.includes('`spec-split-checkpoint`'),
           `${platform}:${promptPath} source output must mention spec-split-checkpoint`
+        );
+        assert(
+          !generatedPrompt.includes('spec-review.md'),
+          `${platform}:${promptPath} source output must not mention spec-review.md`
+        );
+      });
+    });
+    Object.entries(PHASE5_PLANNING_PROMPT_ASSERTION_TARGETS).forEach(([platform, promptPaths]) => {
+      const { checkedInRoot } = PLATFORM_BUNDLE_TARGETS[platform];
+      promptPaths.forEach((promptPath) => {
+        const checkedInPath = path.join(checkedInRoot, promptPath);
+        assert(fs.existsSync(checkedInPath), `Missing checked-in planning prompt: ${checkedInPath}`);
+        const checkedInPrompt = fs.readFileSync(checkedInPath, 'utf8');
+        assert(
+          checkedInPrompt.includes('`spec-split-checkpoint`'),
+          `${platform}:${promptPath} checked-in prompt must mention spec-split-checkpoint`
+        );
+        assert(
+          !checkedInPrompt.includes('spec-review.md'),
+          `${platform}:${promptPath} checked-in prompt must not mention spec-review.md`
         );
       });
     });
@@ -2650,11 +2670,7 @@ function runTests() {
       assert(Array.isArray(parity.generatedEntries), `${platform} parity record must expose generated entries`);
       assert(Array.isArray(parity.checkedInEntries), `${platform} parity record must expose checked-in entries`);
       assert.deepStrictEqual(parity.missing, [], `${platform} checked-in bundle is missing generated files`);
-      const phase5Exemptions = PHASE5_PLANNING_PROMPT_PARITY_EXEMPTIONS[platform];
-      assert(
-        parity.mismatched.every((relativePath) => phase5Exemptions.includes(relativePath)),
-        `${platform} checked-in bundle drift must stay bounded to Phase 5 planning prompts`
-      );
+      assert.deepStrictEqual(parity.mismatched, [], `${platform} checked-in bundle content must exactly match generated output`);
       assert.deepStrictEqual(parity.extra, [], `${platform} checked-in bundle has extra tracked files outside generated output`);
       assert.strictEqual(parity.totalGenerated, parity.totalCheckedIn, `${platform} tracked checked-in count must match generated count`);
       assert.deepStrictEqual(parity.checkedInEntries, parity.generatedEntries, `${platform} checked-in entries must exactly match generated entries`);
