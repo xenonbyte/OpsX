@@ -5,6 +5,22 @@ const { REPO_ROOT } = require('../lib/constants');
 const { ensureDir, writeText } = require('../lib/fs-utils');
 const { runRegisteredTopicTests } = require('./test-workflow-shared');
 
+const PACK_DRY_RUN_JSON_COMMAND = 'npm_config_cache=.npm-cache npm pack --dry-run --json';
+const REQUIRED_TARBALL_PREFIXES = Object.freeze([
+  'bin/',
+  'lib/',
+  'scripts/',
+  'commands/',
+  'skills/',
+  'schemas/',
+  'templates/',
+  'config/',
+  'docs/'
+]);
+const REQUIRED_TARBALL_FILES = Object.freeze([
+  'README.md'
+]);
+
 function registerTests(test, helpers) {
   const {
     assert,
@@ -12,7 +28,11 @@ function registerTests(test, helpers) {
     os,
     path,
     fixtureRoot,
-    cleanupTargets
+    spawnSync,
+    cleanupTargets,
+    createLegacyMigrationRepoFixture,
+    createLegacySharedHomeFixture,
+    runOpsxCli
   } = helpers;
 
   test('package metadata keeps opsx name, bin mapping, and aggregate test entrypoint', () => {
@@ -31,6 +51,132 @@ function registerTests(test, helpers) {
     assert(packageJson.files.includes('config/'));
     assert(packageJson.files.includes('docs/'));
     assert(packageJson.files.includes('README.md'));
+  });
+
+  test('release package gate validates npm_config_cache=.npm-cache npm pack --dry-run --json tarball metadata and surface', () => {
+    const packageJson = require('../package.json');
+    const packResult = spawnSync(PACK_DRY_RUN_JSON_COMMAND, {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+      shell: true
+    });
+
+    assert.strictEqual(packResult.status, 0, packResult.stderr || packResult.stdout);
+    assert(packResult.stdout.trim(), 'npm pack --dry-run --json must produce JSON output on stdout.');
+
+    let packEntries = null;
+    assert.doesNotThrow(
+      () => {
+        packEntries = JSON.parse(packResult.stdout);
+      },
+      `Failed to parse npm pack JSON output:\n${packResult.stdout}`
+    );
+
+    assert(Array.isArray(packEntries), 'npm pack --dry-run --json output must be a JSON array.');
+    assert(packEntries.length > 0, 'npm pack --dry-run --json output must include at least one pack result.');
+
+    const packEntry = packEntries[0];
+    assert.strictEqual(packEntry.name, '@xenonbyte/opsx');
+    assert.strictEqual(packEntry.version, packageJson.version);
+    assert(Array.isArray(packEntry.files), 'Pack JSON payload must include files array.');
+
+    const packedPaths = packEntry.files
+      .map((entry) => String(entry.path || ''))
+      .filter((entry) => Boolean(entry))
+      .sort((left, right) => left.localeCompare(right));
+
+    assert(packedPaths.includes('bin/opsx.js'), 'Packed files must include bin/opsx.js.');
+    REQUIRED_TARBALL_PREFIXES.forEach((prefix) => {
+      assert(
+        packedPaths.some((filePath) => filePath.startsWith(prefix)),
+        `Packed files must include at least one path under ${prefix}`
+      );
+    });
+    REQUIRED_TARBALL_FILES.forEach((filePath) => {
+      assert(packedPaths.includes(filePath), `Packed files must include ${filePath}`);
+    });
+    assert(fs.existsSync(path.join(REPO_ROOT, 'CHANGELOG.md')), 'Release docs surface must retain CHANGELOG.md at repository root.');
+  });
+
+  test('packaged CLI smoke covers --help, --version, opsx check, opsx doc, and opsx status', () => {
+    const cliHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-cli-smoke-home-'));
+    cleanupTargets.push(cliHome);
+
+    const helpOutput = runOpsxCli(['--help'], {
+      cwd: REPO_ROOT,
+      env: { HOME: cliHome }
+    });
+    assert.strictEqual(helpOutput.status, 0, helpOutput.stderr);
+    assert(helpOutput.stdout.includes('opsx check'));
+    assert(helpOutput.stdout.includes('opsx doc'));
+
+    const versionOutput = runOpsxCli(['--version'], {
+      cwd: REPO_ROOT,
+      env: { HOME: cliHome }
+    });
+    assert.strictEqual(versionOutput.status, 0, versionOutput.stderr);
+    assert(versionOutput.stdout.includes('OpsX v'));
+
+    const checkOutput = runOpsxCli(['check'], {
+      cwd: REPO_ROOT,
+      env: { HOME: cliHome }
+    });
+    assert.strictEqual(checkOutput.status, 0, checkOutput.stderr);
+    assert(checkOutput.stdout.includes('OpsX Installation Check'));
+
+    const docOutput = runOpsxCli(['doc'], {
+      cwd: REPO_ROOT,
+      env: { HOME: cliHome }
+    });
+    assert.strictEqual(docOutput.status, 0, docOutput.stderr);
+    assert(docOutput.stdout.includes('# OpsX Guide'));
+
+    const { fixtureRoot: statusFixture } = createLegacyMigrationRepoFixture({ changeName: 'cli-smoke-status' });
+    cleanupTargets.push(statusFixture);
+    createLegacySharedHomeFixture(cliHome, { platform: 'codex' });
+    const statusOutput = runOpsxCli(['status'], {
+      cwd: statusFixture,
+      env: { HOME: cliHome }
+    });
+    assert.strictEqual(statusOutput.status, 0, statusOutput.stderr);
+    assert(statusOutput.stdout.includes('Workspace not initialized: `.opsx/config.yaml` is missing.'));
+  });
+
+  test('status --json smoke parses JSON and treats ok=true as transport success, not workspace readiness', () => {
+    const { fixtureRoot: statusFixture } = createLegacyMigrationRepoFixture({ changeName: 'status-json-smoke' });
+    const statusHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-status-json-home-'));
+    cleanupTargets.push(statusFixture, statusHome);
+    createLegacySharedHomeFixture(statusHome, { platform: 'codex' });
+
+    const statusOutput = runOpsxCli(['status', '--json'], {
+      cwd: statusFixture,
+      env: { HOME: statusHome }
+    });
+
+    assert.strictEqual(statusOutput.status, 0, statusOutput.stderr);
+    assert.strictEqual(statusOutput.stderr.trim(), '', 'status --json should not write expected-state diagnostics to stderr.');
+
+    let envelope = null;
+    assert.doesNotThrow(
+      () => {
+        envelope = JSON.parse(statusOutput.stdout);
+      },
+      `status --json must emit parseable JSON stdout:\n${statusOutput.stdout}`
+    );
+
+    assert.strictEqual(envelope.ok, true, 'ok=true indicates transport success for status --json.');
+    assert.strictEqual(envelope.command, 'status');
+    assert(envelope.workspace, 'status --json payload must include workspace diagnostics.');
+    assert.strictEqual(envelope.workspace.initialized, false, 'Workspace readiness must be represented separately from ok=true.');
+    assert.strictEqual(envelope.activeChange, null);
+    assert.strictEqual(envelope.changeStatus, null);
+    assert(envelope.migration, 'status --json payload must include migration diagnostics.');
+    assert.strictEqual(typeof envelope.migration.pendingMoves, 'number');
+    assert.strictEqual(typeof envelope.migration.pendingCreates, 'number');
+    assert(Array.isArray(envelope.migration.legacyCandidates), 'status --json payload must include legacyCandidates array.');
+    assert(Array.isArray(envelope.warnings), 'status --json payload must include warnings array.');
+    assert(envelope.warnings.includes('workspace-not-initialized'));
+    assert(Array.isArray(envelope.errors), 'status --json payload must include errors array.');
   });
 
   test('declared Node 14 engine floor uses compatible CommonJS builtin imports', () => {
