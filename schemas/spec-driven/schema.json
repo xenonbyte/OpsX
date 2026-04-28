@@ -57,7 +57,7 @@
     {
       "id": "design",
       "path": "design.md",
-      "requires": ["proposal"]
+      "requires": ["proposal", "specs"]
     },
     {
       "id": "security-review",

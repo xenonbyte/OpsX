@@ -747,6 +747,10 @@ function runTests() {
       after: ['specs'],
       before: ['design']
     });
+
+    const designArtifact = schema.artifacts.find((artifact) => artifact.id === 'design');
+    assert(designArtifact, 'Expected schema artifacts to include design.');
+    assert.deepStrictEqual(designArtifact.requires, ['proposal', 'specs']);
   });
 
   test('change-store preserves specSplit checkpoint alias round-trip', () => {
@@ -1065,6 +1069,30 @@ function runTests() {
     assert.deepStrictEqual(result.findings, []);
     assert.deepStrictEqual(result.patchTargets, []);
     assert.deepStrictEqual(result.createsArtifacts, []);
+  });
+
+  test('runSpecSplitCheckpoint blocks missing specs before design', () => {
+    const emptyResult = runSpecSplitCheckpoint({ sources: {} });
+    const proposalOnlyResult = runSpecSplitCheckpoint({
+      sources: {
+        proposal: [
+          '## What Changes',
+          '- enforce billing hold',
+          '## Capabilities',
+          '### Modified Capabilities',
+          '- billing hold'
+        ].join('\n')
+      }
+    });
+
+    [emptyResult, proposalOnlyResult].forEach((result) => {
+      assert.strictEqual(result.checkpoint, 'spec-split-checkpoint');
+      assert.strictEqual(result.status, 'BLOCK');
+      assert(result.findings.some((finding) => finding.code === 'specs-missing'));
+      assert(result.patchTargets.includes('specs'));
+      assert.notStrictEqual(result.nextStep, 'Proceed to design.');
+      assert.deepStrictEqual(result.createsArtifacts, []);
+    });
   });
 
   test('runSpecSplitCheckpoint blocks invalid specs and stays on existing artifact patch targets only', () => {
@@ -1588,6 +1616,20 @@ function runTests() {
     assert.strictEqual(kernel.next.artifactId, 'specs');
     assert.strictEqual(kernel.progress.requiredDone, 2);
     assert.strictEqual(kernel.progress.requiredTotal, 4);
+  });
+
+  test('runtime blocks design until specs exist', () => {
+    const changeName = 'kernel-design-requires-specs';
+    createChange(fixtureRoot, changeName, {
+      'proposal.md': '## Why\nNeed runtime graph.'
+    });
+
+    const kernel = buildRuntimeKernel({ repoRoot: fixtureRoot, changeName });
+    assert.strictEqual(kernel.artifactStates.proposal.state, 'done');
+    assert.strictEqual(kernel.artifactStates.specs.state, 'ready');
+    assert.strictEqual(kernel.artifactStates.design.state, 'blocked');
+    assert.deepStrictEqual(kernel.artifactStates.design.missingDependencies, ['specs']);
+    assert.strictEqual(kernel.next.artifactId, 'specs');
   });
 
   test('runtime respects security-review hard gates, advisory review inactivity, and inactive optional steps', () => {
