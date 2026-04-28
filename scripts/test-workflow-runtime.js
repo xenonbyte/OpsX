@@ -939,6 +939,7 @@ function runTests() {
       'design.md': '# Design\n',
       'tasks.md': [
         '## 1. Incomplete task group',
+        '- TDD Class: behavior-change',
         '- [x] RED: add archive gate regression coverage',
         '- [ ] GREEN: implement archive precondition enforcement',
         '- [ ] VERIFY: run workflow runtime regression'
@@ -988,6 +989,7 @@ function runTests() {
       'design.md': '# Design\n',
       'tasks.md': [
         '## 1. Archive prerequisites',
+        '- TDD Class: behavior-change',
         '- [x] RED: add archive gate regression coverage',
         '- [x] GREEN: implement archive precondition enforcement',
         '- [x] VERIFY: run workflow runtime regression'
@@ -1077,6 +1079,7 @@ function runTests() {
       'design.md': '# Design\n',
       'tasks.md': [
         '## 1. Archive readiness',
+        '- TDD Class: behavior-change',
         '- [x] RED: add archive move regression coverage',
         '- [x] GREEN: implement archive move behavior',
         '- [x] VERIFY: run workflow runtime regression'
@@ -1162,6 +1165,7 @@ function runTests() {
       'design.md': '# Design\n',
       'tasks.md': [
         '## 1. Archive move',
+        '- TDD Class: behavior-change',
         '- [x] RED: add archive path regression coverage',
         '- [x] GREEN: implement archive path behavior',
         '- [x] VERIFY: run workflow runtime regression'
