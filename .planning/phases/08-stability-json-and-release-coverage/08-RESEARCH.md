@@ -422,17 +422,16 @@ If a later phase genuinely needs a shared filesystem glob walker, `tinyglobby` i
 |---|-------|---------|---------------|
 | A1 | Literal glob-special fixtures should include characters such as `[](){}!+@?*` because Phase 8 explicitly calls for glob-special coverage, but the exact filename set is not locked yet. [ASSUMED] | Common Pitfalls / Validation Architecture | Low: only affects fixture naming, not the recommended implementation structure. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Where should the release checklist live?**
    - What we know: the repo already has `CHANGELOG.md`, README files, and docs, but the current scan did not surface a dedicated release checklist file in the shipped documentation surface. [VERIFIED: repo code]
-   - What's unclear: whether planning should add a standalone `docs/release-checklist.md`, fold the checklist into Phase 8 verification docs, or extend an existing README/docs page. [VERIFIED: repo code]
-   - Recommendation: decide this in planning, but treat it as a documentation deliverable in the same wave as pack/grep/smoke gate wiring so the published commands and the release checklist cannot diverge. [VERIFIED: repo code; local command output]
+   - Resolved in revision: the release checklist lives at `docs/release-checklist.md`, and it stays in the same wave as the pack/grep/smoke gate wiring so the published commands and the checklist cannot diverge.
 
 2. **What should `ok` mean inside the JSON envelope?**
    - What we know: exit `0` is reserved for expected states, and the envelope must include `ok`, `warnings`, and `errors`. [VERIFIED: .planning/phases/08-stability-json-and-release-coverage/08-CONTEXT.md]
-   - What's unclear: whether `ok` should mean “command transport succeeded” or “workspace is ready for the next workflow step.” [VERIFIED: .planning/phases/08-stability-json-and-release-coverage/08-CONTEXT.md]
-   - Recommendation: lock `ok` to “command completed successfully and emitted valid JSON,” then express readiness and workflow problems in `workspace`, `migration`, `changeStatus`, `warnings`, and `errors`; that keeps exit codes, parseability, and domain readiness separate. [ASSUMED]
+   - Resolved in revision: `ok: true` means the command transport completed successfully and emitted valid JSON.
+   - Resolved in revision: workspace readiness and other domain problems must be expressed in `workspace`, `migration`, `changeStatus`, `warnings`, and `errors`, keeping transport success separate from workflow readiness.
 
 ## Environment Availability
 

@@ -29,7 +29,7 @@ created: 2026-04-29
 
 - **After every task commit:** Run the touched topic script plus `npm run test:workflow-runtime` until the compatibility runner delegates to the split scripts.
 - **After every plan wave:** Run `npm test` once available; before that entrypoint exists, run `npm run test:workflow-runtime` plus any new topic scripts introduced in the wave.
-- **Before `$gsd-verify-work`:** Run the full release gate: `npm test`, CLI smoke checks, generated command parity, legacy public-surface grep, `npm_config_cache=.npm-cache npm pack --dry-run --json`, schema drift, code review, and final phase verification.
+- **Before release sign-off:** Run the full release gate: `npm test`, CLI smoke checks, generated command parity, legacy public-surface grep, `npm_config_cache=.npm-cache npm pack --dry-run --json`, `gsd-sdk query verify.schema-drift 08`, `$gsd-code-review 8`, and `$gsd-verify-work 8`.
 - **Max feedback latency:** 60 seconds.
 
 ---

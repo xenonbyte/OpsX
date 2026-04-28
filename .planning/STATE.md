@@ -4,14 +4,14 @@ milestone: v3.0
 milestone_name: milestone
 status: planning
 stopped_at: Phase 8 context gathered
-last_updated: "2026-04-28T17:16:51.122Z"
+last_updated: "2026-04-28T18:27:53.101Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 8
   completed_phases: 7
-  total_plans: 54
+  total_plans: 61
   completed_plans: 54
-  percent: 100
+  percent: 89
 ---
 
 # State
@@ -26,13 +26,13 @@ See: `.planning/PROJECT.md` (updated 2026-04-28)
 ## Current Position
 
 Phase: 8
-Plan: Not started
-Status: Ready to plan
+Plan: 7 plans ready
+Status: Ready to execute
 Last activity: 2026-04-29
 
 ## Next Action
 
-Run `$gsd-plan-phase 8` to plan the release-hardening pass from the captured Phase 8 context.
+Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening plans.
 
 ## Accumulated Context
 
@@ -222,4 +222,4 @@ Resume File: .planning/phases/08-stability-json-and-release-coverage/08-CONTEXT.
 
 **Next Phase:** 8 (Stability, JSON, and Release Coverage)
 
-**Planned Phase:** None — Phase 8 context is gathered; plans have not been created yet
+**Planned Phase:** 8 (Stability, JSON, and Release Coverage) — 7 plans — 2026-04-28T18:27:53.096Z

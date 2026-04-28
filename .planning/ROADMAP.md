@@ -210,12 +210,23 @@ Plans:
 
 **Requirements:** QUAL-05, QUAL-06, TEST-01, TEST-02, TEST-03, TEST-04
 
+**Plans:** 7 plans (7 waves)
+
+Plans:
+- [ ] `08-01-PLAN.md` — Extract the shared workflow-test harness, create topic seams, and move package/generation coverage behind `npm test`.
+- [ ] `08-02-PLAN.md` — Implement `opsx status --json` and move migration/state/status coverage into the state topic script.
+- [ ] `08-03-PLAN.md` — Add repo-local path/glob utilities and refactor read-only path surfaces into the path topic script.
+- [ ] `08-04-PLAN.md` — Migrate write-sensitive migrate/sync guards onto the shared path utilities and extend path fixtures.
+- [ ] `08-05-PLAN.md` — Move spec/TDD/verify/sync/archive/batch assertions into the gates topic script and finish the aggregate runner split.
+- [ ] `08-06-PLAN.md` — Add tarball, CLI smoke, parity, and legacy public-surface release gates to the split topic scripts, while preserving schema-drift/code-review/final-verification handoff.
+- [ ] `08-07-PLAN.md` — Refresh README/docs/changelog, add `docs/release-checklist.md`, and verify the documented final release gate including schema drift, code review, and final phase verification.
+
 **Success criteria:**
 1. Path utilities canonicalize artifact paths and escape glob-special paths.
 2. Glob artifact output parsing works for generated artifact sets.
 3. `opsx status --json` emits parseable JSON on stdout with progress or diagnostics kept out of stdout.
 4. Test scripts cover metadata, command generation, migration, state machine, TDD checkpointing, spec review, path guards, archive blocking, and status JSON.
-5. Final verification runs the expanded test suite, CLI help/version/check/doc/status smoke tests, and package dry-run.
+5. Final verification runs the expanded test suite, CLI help/version/check/doc/status smoke tests, package dry-run, schema drift, code review, and final phase verification.
 
 ## Dependency Notes
 
