@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 07-08-PLAN.md
-last_updated: "2026-04-28T15:28:06.102Z"
+status: ready_to_plan
+stopped_at: Phase 7 verified; ready to plan Phase 8
+last_updated: "2026-04-28T16:00:46Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
@@ -18,21 +18,21 @@ progress:
 
 ## Project Reference
 
-See: `.planning/PROJECT.md` (updated 2026-04-27)
+See: `.planning/PROJECT.md` (updated 2026-04-28)
 
 **Core value:** Agents can reliably continue spec-driven work from disk-backed OpsX artifacts instead of relying on fragile chat history.
-**Current focus:** Phase 07 — Verify, Sync, Archive, and Batch Gates
+**Current focus:** Phase 08 — Stability, JSON, and Release Coverage
 
 ## Current Position
 
-Phase: 07 (Verify, Sync, Archive, and Batch Gates) — EXECUTING
-Plan: 8 of 8
-Status: Phase complete — ready for verification
+Phase: 8
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-04-28
 
 ## Next Action
 
-Run `$gsd-execute-phase 7` to execute the eight planned Phase 7 plans.
+Run `$gsd-discuss-phase 8` to gather Phase 8 context before planning the release-hardening pass.
 
 ## Accumulated Context
 
@@ -49,7 +49,7 @@ Run `$gsd-execute-phase 7` to execute the eight planned Phase 7 plans.
 - 2026-04-28: Phase 6 planned into 9 plans across 6 waves; Wave 1 covers `rules.tdd` defaults and task guidance, Waves 2-4 implement checkpoint/persistence/generator source work, Wave 5 refreshes the 12 route prompts for `apply` / `propose` / `continue` / `ff`, and Wave 6 restores strict parity.
 - 2026-04-28: Phase 6 execution and verification completed; `npm run test:workflow-runtime` passed 80/80, code review is clean, and `06-VERIFICATION.md` passed 6/6 must-haves.
 - 2026-04-28: Phase 7 planning completed with 8 plans across 6 waves; the locked implementation path uses `picomatch@4.0.4` for Node-14-compatible path-scope matching and exact `.opsx/archive/<change-name>/` archive moves.
-- 2026-04-28: Phase 7 Plan 02 completed; `lib/sync.js` now enforces conservative in-memory sync planning, blocks omissions/conflicts, and advances `VERIFIED` to `SYNCED` only after accepted writes.
+- 2026-04-28: Phase 7 execution completed; `07-REVIEW.md` is clean after remediation commits `2712351` and `60d3420`, `07-VERIFICATION.md` passed 4/4 must-haves, and `npm run test:workflow-runtime` passed 104/104.
 
 ## Decisions
 
@@ -159,6 +159,7 @@ Run `$gsd-execute-phase 7` to execute the eight planned Phase 7 plans.
 **Completed Phase:** 4 (Change State Machine and Drift Control) — 9/9 plans — verification passed — 2026-04-27
 **Completed Phase:** 5 (Spec-Split Checkpoint) — 7/7 plans — verification passed — 2026-04-28
 **Completed Phase:** 6 (TDD-Light Workflow) — 9/9 plans — verification passed — 2026-04-28
+**Completed Phase:** 7 (Verify, Sync, Archive, and Batch Gates) — 8/8 plans — verification passed — 2026-04-28
 
 ## Performance Metrics
 
@@ -211,10 +212,10 @@ Run `$gsd-execute-phase 7` to execute the eight planned Phase 7 plans.
 
 ## Session
 
-Last session: 2026-04-28T15:28:06.098Z
-Stopped At: Completed 07-08-PLAN.md
-Resume File: None
+Last session: 2026-04-28T16:00:46Z
+Stopped At: Phase 7 verified; ready to plan Phase 8
+Resume File: `.planning/phases/07-verify-sync-archive-and-batch-gates/07-VERIFICATION.md`
 
-**Next Phase:** 7 (Verify, Sync, Archive, and Batch Gates)
+**Next Phase:** 8 (Stability, JSON, and Release Coverage)
 
-**Planned Phase:** 7 (Verify, Sync, Archive, and Batch Gates) — 8 
+**Planned Phase:** None — Phase 8 has not been discussed or planned yet

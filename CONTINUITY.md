@@ -1,46 +1,31 @@
 ## Snapshot
 - 2026-04-27 [USER] Goal: Start a new GSD milestone from the supplied OpsX optimization report.
 - 2026-04-27 [CODE] Current milestone: `v3.0 OpsX migration and state-machine workflow`.
-- 2026-04-28 [CODE] Phase 1 through Phase 5 are complete and verified.
+- 2026-04-28 [CODE] Phase 1 through Phase 7 are complete and verified.
 - 2026-04-27 [CODE] Public current UX must not expose legacy OpenSpec routes/paths, `/prompts:*`, `/opsx:*`, standalone `$opsx`, or `$opsx <request>`.
 - 2026-04-27 [CODE] `commands/codex/prompts/opsx.md` remains only as an internal generated route catalog; public Codex entrypoints are explicit `$opsx-*`.
 - 2026-04-27 [CODE] `AGENTS.md` preserves repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
-- 2026-04-28 [TOOL] Phase 5 (`spec-split-checkpoint`) verification passed; `05-VERIFICATION.md` is written and `npm run test:workflow-runtime` passed 66/66.
-- 2026-04-28 [CODE] Phase 6 context is captured; TDD mode default decision is `strict` for behavior-change and bugfix work.
-- 2026-04-28 [CODE] Phase 6 planning is complete and independently verified: 9 plans across 6 waves, with a temporary 12-prompt parity window for `apply` / `propose` / `continue` / `ff` before final strict parity restore.
-- 2026-04-28 [TOOL] Phase 6 verification passed; `06-VERIFICATION.md` is written, `npm run test:workflow-runtime` passed 80/80, and prompt parity is strict again.
-- 2026-04-28 [CODE] Phase 7 research and validation strategy are complete; next planning risks to resolve are path-scope matcher semantics under Node `>=14.14.0` and exact archive directory shape.
-- 2026-04-28 [CODE] Phase 7 planning is complete and independently verified: `07-01` through `07-08` are written across 6 waves, locking `picomatch@4.0.4` for path-scope matching and `.opsx/archive/<change-name>/` for deterministic archive layout.
+- 2026-04-28 [USER] Phase 6 TDD default decision: use `rules.tdd.mode: strict` for behavior-change and bugfix work.
+- 2026-04-28 [CODE] Phase 7 implements hard verify, sync, archive, drift/path-boundary, and batch isolation gates.
+- 2026-04-28 [TOOL] Phase 7 verification passed; `07-VERIFICATION.md` status is `passed`, score is 4/4, final review is clean, and `npm run test:workflow-runtime` passed 104/104.
+- 2026-04-28 [CODE] Next expected milestone step: discuss and plan Phase 8, `Stability, JSON, and Release Coverage`.
 
 ## Done (recent)
-- 2026-04-28 [TOOL] Verified Phase 5 goal achievement: schema, state store, validator, workflow facade, generator, docs, and prompt parity all match the split-spec checkpoint contract.
-- 2026-04-28 [CODE] Captured Phase 6 context and discussion log in `.planning/phases/06-tdd-light-workflow/`.
-- 2026-04-28 [CODE] Created `06-01-PLAN.md` through `06-09-PLAN.md`; independent plan checker passed after resolving Phase 6 research questions.
-- 2026-04-28 [CODE] Created `07-01-PLAN.md` through `07-08-PLAN.md`; `frontmatter.validate`, `verify.plan-structure`, and independent `gsd-plan-checker` passed for Phase 7.
-- 2026-04-28 [TOOL] Verified Phase 6 goal achievement: strict TDD-light behavior, execution evidence persistence, and 12-file prompt parity closure all pass.
-- 2026-04-28 [CODE] Wrote `.planning/phases/07-verify-sync-archive-and-batch-gates/07-RESEARCH.md` and `07-VALIDATION.md` with the recommended module split, sync strategy, prompt refresh scope, and validation map for QUAL-01 through QUAL-04.
-- 2026-04-27 [CODE] Executed all Phase 4 plans `04-01` through `04-09`; summaries exist for every plan.
-- 2026-04-27 [CODE] Fixed Phase 4 review findings in commit `7282e57`: lifecycle route gaps, fresh/migrated hash baselines, lowercase legacy stage normalization, and active task group apply selection.
-- 2026-04-27 [CODE] Committed clean Phase 4 review report in `535df3b`.
-- 2026-04-27 [TOOL] Phase 4 verifier wrote `04-VERIFICATION.md` with `status: passed`, `score: 5/5`, and `requirements_verified: 8/8`.
-- 2026-04-27 [CODE] Updated `.planning/STATE.md`, `.planning/ROADMAP.md`, `.planning/PROJECT.md`, and `CONTINUITY.md` for Phase 4 completion and Phase 5 readiness.
-- 2026-04-28 [CODE] Captured Phase 5 context and discussion log in `.planning/phases/05-spec-split-checkpoint/`.
-- 2026-04-28 [CODE] Created `05-01-PLAN.md` through `05-07-PLAN.md`; independent plan checker passed and STATE marks Phase 5 ready to execute.
-- 2026-04-27 [CODE] Executed all Phase 3 plans `03-01` through `03-11`; final review and verification passed.
+- 2026-04-28 [CODE] Executed all Phase 7 plans `07-01` through `07-08`.
+- 2026-04-28 [CODE] Added Phase 7 gate runtime modules and prompt/guidance refreshes for verify, sync, archive, batch-apply, and bulk-archive.
+- 2026-04-28 [CODE] Fixed Phase 7 review findings in commits `2712351` and `60d3420`: sync path/root trust, partial writes, verification log changed files, and per-change batch exception isolation.
+- 2026-04-28 [TOOL] Final Phase 7 code review is clean with 0 findings in `07-REVIEW.md`.
+- 2026-04-28 [TOOL] Phase 7 verifier passed 4/4 must-haves in `07-VERIFICATION.md`.
+- 2026-04-28 [CODE] Updated `.planning/ROADMAP.md`, `.planning/STATE.md`, `.planning/PROJECT.md`, and this continuity ledger for Phase 7 completion and Phase 8 readiness.
 
 ## Working set
 - /Users/xubo/x-skills/openspec/.planning/ROADMAP.md
-- /Users/xubo/x-skills/openspec/.planning/REQUIREMENTS.md
+- /Users/xubo/x-skills/openspec/.planning/PROJECT.md
 - /Users/xubo/x-skills/openspec/.planning/STATE.md
+- /Users/xubo/x-skills/openspec/.planning/REQUIREMENTS.md
 - /Users/xubo/x-skills/openspec/CONTINUITY.md
-- /Users/xubo/x-skills/openspec/.planning/phases/07-verify-sync-archive-and-batch-gates/07-CONTEXT.md
-- /Users/xubo/x-skills/openspec/.planning/phases/07-verify-sync-archive-and-batch-gates/07-RESEARCH.md
-- /Users/xubo/x-skills/openspec/.planning/phases/07-verify-sync-archive-and-batch-gates/07-VALIDATION.md
-- /Users/xubo/x-skills/openspec/.planning/phases/07-verify-sync-archive-and-batch-gates/07-PATTERNS.md
-- /Users/xubo/x-skills/openspec/.planning/phases/07-verify-sync-archive-and-batch-gates/07-01-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/07-verify-sync-archive-and-batch-gates/07-02-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/07-verify-sync-archive-and-batch-gates/07-03-PLAN.md
-- /Users/xubo/x-skills/openspec/.planning/phases/07-verify-sync-archive-and-batch-gates/07-04-PLAN.md
+- /Users/xubo/x-skills/openspec/.planning/phases/07-verify-sync-archive-and-batch-gates/07-REVIEW.md
+- /Users/xubo/x-skills/openspec/.planning/phases/07-verify-sync-archive-and-batch-gates/07-VERIFICATION.md
 
 ## Decisions
 - 2026-04-27 [CODE] D001 ACTIVE: Treat v3.0 as a breaking OpsX rename and workflow-state upgrade.
@@ -48,58 +33,22 @@
 - 2026-04-27 [CODE] D003 ACTIVE: Keep the full OpsX command set; do not add Lite/Advanced profiles.
 - 2026-04-27 [CODE] D004 ACTIVE: Use disk-backed state (`state.yaml`, `context.md`, `drift.md`, artifact hashes) as the anti-drift mechanism.
 - 2026-04-27 [CODE] D005 ACTIVE: Add TDD-light and `spec-split-checkpoint` as quality gates without turning OpsX into a full autonomous agent engine.
-- 2026-04-27 [CODE] D006 ACTIVE: Phase 1 should ship `opsx` identity without an `openspec` binary alias in `@xenonbyte/opsx@3.0.0`; any bridge belongs to a separate `@xenonbyte/openspec@2.x` compatibility package.
-- 2026-04-27 [CODE] D007 ACTIVE: Phase 1 may perform coarse generated asset/skill path renames for package coherence, while Phase 3 owns detailed command/skill preflight semantics.
 - 2026-04-27 [CODE] D008 ACTIVE: Phase 3 supersedes earlier migration/history allowlist assumptions; v3.0 should remove legacy OpenSpec surfaces rather than preserving historical compatibility wording/tests.
 - 2026-04-27 [CODE] D009 ACTIVE: Keep `commands/codex/prompts/opsx.md` only as an internal generated route catalog; public Codex entrypoints remain explicit `$opsx-*`.
-- 2026-04-27 [CODE] D010 ACTIVE: In `AGENTS.md`, preserve repo-local `openspec/` authoring-path guidance and change only stale route bullets to current OpsX routes.
-- 2026-04-27 [CODE] D011 ACTIVE: Shared playbooks may mention `$opsx-*` only when the same line labels Codex and gives the Claude/Gemini `/opsx-*` equivalent.
 - 2026-04-27 [CODE] D012 ACTIVE: Phase 4 is library-first state-machine infrastructure; do not build a full Node workflow execution engine.
-- 2026-04-27 [CODE] D013 ACTIVE: Phase 4 uses strict mutation transitions, readable status/resume, warn-and-reload hash drift, and one-top-level-task-group apply guidance.
-- 2026-04-27 [CODE] D014 ACTIVE: Phase 4 research recommends `xstate` pure transitions for mutations and `yaml` for persisted state files because the local YAML helper cannot represent the required array-heavy schema.
-- 2026-04-27 [CODE] D015 ACTIVE: Phase 4 plans pin `yaml@2.8.3`, do not add `xstate`, and instead schedule a local transition-table module in `lib/change-state.js` to keep the implementation bounded and library-first.
+- 2026-04-27 [CODE] D015 ACTIVE: Phase 4 plans pin `yaml@2.8.3`, do not add `xstate`, and use a local transition-table module in `lib/change-state.js`.
 - 2026-04-28 [USER] D016 ACTIVE: Phase 6 `rules.tdd.mode` defaults to `strict`, enforcing RED and VERIFY for behavior-change and bugfix work while keeping REFACTOR optional and allowing visible exemptions for non-behavior work.
-- 2026-04-28 [CODE] D017 ACTIVE: Phase 6 prompt refresh stays bounded to the 12 checked-in `apply` / `propose` / `continue` / `ff` prompts across Claude/Codex/Gemini, with temporary parity relief removed in the phase-closing gate.
 - 2026-04-28 [USER] D018 ACTIVE: Phase 7 should implement hard verify/archive gates, conservative sync conflict checks, archive-internal safe sync, per-change batch skip reporting, and library-first gate modules rather than prompt-only guidance.
 - 2026-04-28 [CODE] D019 ACTIVE: Phase 7 plans lock `picomatch@4.0.4` for Node-14-compatible `allowedPaths` / `forbiddenPaths` matching and preserve archived changes as full directories at `.opsx/archive/<change-name>/`.
+- 2026-04-28 [CODE] D020 ACTIVE: Phase 7 hard gates reject forged sync roots, validate canonical spec writes, treat per-change batch exceptions as blocked results, and require clean verify/sync/archive preconditions before archival.
 
 ## Receipts
-- 2026-04-28 [TOOL] Phase 5 verification completed: `npm run test:workflow-runtime` passed 66/66; direct spot-checks for `runSpecSplitCheckpoint()` and `validateCheckpointContracts()` passed; `05-VERIFICATION.md` was written.
-- 2026-04-28 [TOOL] Independent `gsd-plan-checker` returned `## VERIFICATION PASSED` for all 9 Phase 6 plans; TDD-01 through TDD-04 are covered after research questions were resolved in commit `2834516`.
-- 2026-04-28 [TOOL] Phase 6 context committed as `e633a9e`; STATE session record committed as `5f0249f`.
-- 2026-04-28T08:55:43Z [TOOL] Phase 6 plans `06-01` through `06-09` passed `frontmatter.validate` and `verify.plan-structure`; planning docs did not require a runtime-code test run.
-- 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 80/80; parity probe returned `PHASE6_PROMPT_PARITY_OK`; no Phase 6 mismatch allowlist terms remain in `scripts/test-workflow-runtime.js`.
-- 2026-04-28T13:30:51Z [CODE] Phase 7 research written to `07-RESEARCH.md`; validation strategy written to `07-VALIDATION.md`; next expected action is `$gsd-plan-phase 7`.
-- 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 86/86 while preparing Phase 7 research; runtime parity and pre-Phase-7 baselines remain green.
-- 2026-04-28T13:54:12Z [TOOL] Phase 7 plan docs `07-01` through `07-08` passed `gsd-sdk query frontmatter.validate --schema plan` and `gsd-sdk query verify.plan-structure`; roadmap/state now point to `$gsd-execute-phase 7`.
-- 2026-04-28 [TOOL] Independent `gsd-plan-checker` returned `## VERIFICATION PASSED` for all 8 Phase 7 plans; QUAL-01 through QUAL-04 are covered and the 6-wave dependency chain is coherent.
-- 2026-04-28 [TOOL] Phase 5 context committed as `08235de`; STATE session record committed as `8aa329d`.
-- 2026-04-28 [TOOL] Phase 5 planning artifacts committed as `738a8a9` (research/validation), `c913212` (patterns), `6986346` (plans), and `b51b74f` (STATE planned-phase).
-- 2026-04-28 [TOOL] Independent `gsd-plan-checker` returned `## VERIFICATION PASSED` for all 7 Phase 5 plans; SPEC-01 through SPEC-04 are covered.
-- 2026-04-28 [TOOL] `frontmatter.validate` and `verify.plan-structure` passed for `.planning/phases/05-spec-split-checkpoint/05-01-PLAN.md` through `05-07-PLAN.md`.
-- 2026-04-27T17:04Z [TOOL] Verification pass confirmed Phase 4 goal achievement: `npm run test:workflow-runtime` passed 49/49, `04-REVIEW.md` remained clean, and `04-VERIFICATION.md` captures the passed report.
-- 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-09` after removing temporary parity exemptions and restoring full `commands/**` checked-in parity.
-- 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-08` and Gemini parity check returned `GEMINI_PARITY_OK`.
-- 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 49/49 during `04-07` and Codex parity check returned `CODEx_PARITY_OK`.
-- 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 39/39 after `04-02` Task 2 GREEN.
-- 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 49/49 after `04-04` Task 2 GREEN.
-- 2026-04-27 [TOOL] `gsd-sdk query state.advance-plan` moved Phase 4 cursor from Plan 2 to Plan 3.
-- 2026-04-27 [TOOL] Committed Phase 4 context as `94ca803 docs(04): capture phase context`.
-- 2026-04-27 [TOOL] `npm run test:workflow-runtime` passed 31/31 while preparing Phase 4 research.
-- 2026-04-27 [TOOL] `gsd-sdk query init.plan-phase 04` confirmed `phase_dir=.planning/phases/04-change-state-machine-and-drift-control`, `commit_docs=true`, and no existing Phase 4 plans before planning.
-- 2026-04-27 [TOOL] `gsd-sdk query history-digest` confirmed Phase 2 migration scaffolds and Phase 3 generated parity gates are the direct dependencies for Phase 4 planning.
-- 2026-04-27 [TOOL] Final Phase 3 verification commands passed: `npm run test:workflow-runtime` 31/31, `node scripts/check-phase1-legacy-allowlist.js`, `node bin/opsx.js --help`, `gsd-sdk query verify.schema-drift 03`, and wrong-platform route greps.
-- 2026-04-27 [TOOL] `03-REVIEW.md` final status `clean`; `03-VERIFICATION.md` final status `passed`.
-- 2026-04-27 [CODE] Commits `9690fac`, `c719ba1`, `2d17425`, and `950e2f4` closed Phase 3 review remediation, clean review, and verification report.
-- 2026-04-27 [CODE] Phase 3 revision addressed all checker blockers/warnings by splitting source-of-truth edits from generated refreshes and separating skill/docs/help surfaces into bounded plans.
-- 2026-04-27 [TOOL] `date -u +%Y-%m-%dT%H:%M:%SZ` returned `2026-04-27T09:01:50Z` for the revised planning timestamp.
-- 2026-04-27 [TOOL] Phase 3 generated bundle inventory confirmed 45 checked-in command files across Claude, Codex, and Gemini, requiring bounded refresh slices to stay under plan file-budget warnings.
-- 2026-04-27 [TOOL] Existing checker feedback required resolving `03-RESEARCH.md` open questions and splitting the old `03-02` / `03-03` plan scopes.
-- 2026-04-27 [CODE] Revised Phase 3 now uses Wave 0 planning contracts, Wave 1 source-output assertions, Wave 2 six bounded generated refresh slices, Wave 3 skill/docs alignment, and Wave 4 help + final verification.
-- 2026-04-27 [TOOL] `npm run test:workflow-runtime` remained the fast baseline suite during planning; `node scripts/check-phase1-legacy-allowlist.js` was already known-stale and is now narrowed/activated only in the final verification wave.
-- 2026-04-27 [TOOL] Phase 2 verifier wrote `02-VERIFICATION.md` with `status: passed`, `score: 9/9 must-haves verified`, and automated checks `npm run test:workflow-runtime`, `opsx --help`, `opsx status`, `opsx migrate --dry-run`, and `opsx check`.
-- 2026-04-27 [TOOL] Final Phase 2 clean review commit `bbdd06e` wrote `02-REVIEW.md` with `status: clean`; reviewer verification ran `npm run test:workflow-runtime` and passed `30/30`.
-- 2026-04-27 [TOOL] Revised Phase 3 `03-01-PLAN.md` through `03-11-PLAN.md` passed `frontmatter.validate`, `verify.plan-structure`, and the independent `gsd-plan-checker` with `VERIFICATION PASSED`.
-- 2026-04-27 [TOOL] `03-01` execution verification passed: `npm run test:workflow-runtime` (30/30), planning-doc grep contract, and validation-script grep contract.
-- 2026-04-27 [TOOL] `03-02` execution verification passed: `npm run test:workflow-runtime` (30/30) and source-contract grep checks for explicit routes plus strict preflight paths.
-- 2026-04-27 [TOOL] `03-03` execution verification passed: `npm run test:workflow-runtime` (30/30) and listed Claude files parity-verified against `buildPlatformBundle('claude')`.
+- 2026-04-28 [TOOL] Phase 7 plans `07-01` through `07-08` executed and produced summaries.
+- 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 100/100 after all Phase 7 plan execution before review remediation.
+- 2026-04-28 [TOOL] Initial Phase 7 review found 1 critical and 3 warnings; remediation commit `2712351` hardened verify, sync, and batch gates.
+- 2026-04-28 [TOOL] Second Phase 7 review found forged canonical sync root risk; remediation commit `60d3420` rejects caller-supplied spec roots outside `repoRoot/.opsx/specs`.
+- 2026-04-28 [TOOL] `npm run test:workflow-runtime` passed 104/104 after Phase 7 review remediation.
+- 2026-04-28 [TOOL] Final Phase 7 review report committed as `7e68899` with `status: clean`, 0 findings, and 104/104 tests.
+- 2026-04-28 [TOOL] `gsd-sdk query verify.schema-drift 07` returned valid with 0 issues across 8 checked plans.
+- 2026-04-28 [TOOL] Phase 7 verification report committed as `f32d323` with `status: passed` and 4/4 must-haves verified.
+- 2026-04-28 [TOOL] `workflow.security_enforcement` is true; no `07-SECURITY.md` exists yet, so run `$gsd-secure-phase 7` before advancing if a dedicated security gate is required.

@@ -4,7 +4,7 @@
 
 OpsX is the next major version of the current `xenonbyte/openspec` repository. It is an AI-native operational spec execution workflow for Claude Code, Codex, and Gemini that turns user intent into versioned specs, lightweight TDD tasks, state-machine-driven execution steps, checkpoint reviews, verification records, and archive history.
 
-The repository is being converted to OpsX as a breaking v3.0 release. Phase 1 converted the public package, CLI, skill, command, docs, and release surface to OpsX. Phase 2 made `.opsx/` and `~/.opsx/` canonical and added safe migration dry-run/execute behavior. Phase 3 made `/opsx-*`, `$opsx-*`, and `skills/opsx` the explicit public workflow surface with generator-backed parity checks. Phase 4 added the durable per-change state machine, artifact hash drift warnings, context/drift sidecars, and one-group apply guidance. Phase 5 added the pre-design `spec-split-checkpoint`, deterministic split-spec validation, read-only reviewer escalation guidance, and generated planning-route parity. Phase 6 added strict-by-default TDD-light planning, checkpoint enforcement, execution proof persistence, and restored prompt parity. Later phases still own archive/verify quality gates and release hardening.
+The repository is being converted to OpsX as a breaking v3.0 release. Phase 1 converted the public package, CLI, skill, command, docs, and release surface to OpsX. Phase 2 made `.opsx/` and `~/.opsx/` canonical and added safe migration dry-run/execute behavior. Phase 3 made `/opsx-*`, `$opsx-*`, and `skills/opsx` the explicit public workflow surface with generator-backed parity checks. Phase 4 added the durable per-change state machine, artifact hash drift warnings, context/drift sidecars, and one-group apply guidance. Phase 5 added the pre-design `spec-split-checkpoint`, deterministic split-spec validation, read-only reviewer escalation guidance, and generated planning-route parity. Phase 6 added strict-by-default TDD-light planning, checkpoint enforcement, execution proof persistence, and restored prompt parity. Phase 7 added hard verify, sync, archive, path-boundary, drift, and batch isolation gates. Phase 8 still owns path/glob/JSON stability and release hardening.
 
 ## Core Value
 
@@ -38,10 +38,10 @@ Agents can reliably continue spec-driven work from disk-backed OpsX artifacts in
 - ✓ Phase 4 durable change state, active change skeletons, lifecycle routing, artifact hash drift warnings, context/drift sidecars, and one-group apply guidance verified against STATE-01 through STATE-08 — v3.0 Phase 4
 - ✓ Phase 5 `spec-split-checkpoint`, deterministic split-spec validator, read-only reviewer guidance, and checked-in planning-route parity verified against SPEC-01 through SPEC-04 — v3.0 Phase 5
 - ✓ Phase 6 strict-by-default TDD-light config, task guidance, checkpoint enforcement, execution proof persistence, and 12-prompt parity closure verified against TDD-01 through TDD-04 — v3.0 Phase 6
+- ✓ Phase 7 hard verify, sync, archive, drift/path-boundary, and batch isolation gates verified against QUAL-01 through QUAL-04 — v3.0 Phase 7
 
 ### Active
 
-- [ ] Enforce verification, sync, archive, drift, and path-boundary quality gates.
 - [ ] Expand tests so the v3.0 migration is guarded by command, migration, state, spec-review, TDD, and JSON-output coverage.
 
 ### Out of Scope
@@ -80,6 +80,7 @@ Agents can reliably continue spec-driven work from disk-backed OpsX artifacts in
 | Add state/context/drift runtime artifacts | Durable disk state reduces chat-summary drift and enables clean-context recovery | Phase 4 complete |
 | Add TDD-light with strict default for behavior-changing work | Captures red/green verification discipline without making every task heavyweight | Phase 6 complete; `strict` blocks missing RED/VERIFY, missing classification, and missing exemption reasons while scoped exemptions remain visible |
 | Add spec-split checkpoint before design | Split specs need early coverage/conflict review before design and tasks harden | Phase 5 complete |
+| Add hard verify, sync, archive, and batch gates | Changes should not be verified, synced, archived, or batch-processed when artifacts, drift, path scope, or per-change state are unsafe | Phase 7 complete; verify/sync/archive/batch runtime gates are covered by 104 runtime tests and a clean code review |
 
 ## Evolution
 
@@ -99,4 +100,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-28 after Phase 6 verification*
+*Last updated: 2026-04-28 after Phase 7 verification*
