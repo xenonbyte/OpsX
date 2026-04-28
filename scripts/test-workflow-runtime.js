@@ -615,6 +615,178 @@ function runTests() {
     assert.deepStrictEqual(result.outOfScopeMatches, []);
   });
 
+  test('verify gate blocks forbidden paths unresolved drift and incomplete task groups', () => {
+    const { evaluateVerifyGate } = require('../lib/verify');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const { writeChangeState } = require('../lib/change-store');
+    const changeName = 'verify-gate-blocking';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Behavior change runtime gate',
+        '- [x] RED: add failing coverage',
+        '- [ ] GREEN: implement verify gate behavior',
+        '- [ ] VERIFY: run workflow runtime tests'
+      ].join('\n'),
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Verify gate blocks invalid scope',
+        'The system SHALL block forbidden path changes and unresolved drift findings.'
+      ].join('\n')
+    });
+
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'IMPLEMENTED',
+      hashes: hashTrackedArtifacts(changeDir),
+      allowedPaths: ['lib/**'],
+      forbiddenPaths: ['*.pem']
+    });
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## User approval needed',
+      '- Awaiting explicit reviewer approval.',
+      '',
+      '## Scope changes detected',
+      '- Expanded scope beyond approved proposal.',
+      '',
+      '## Requirements discovered during apply',
+      '- Added a new requirement not reflected in specs.',
+      '',
+      '## Files changed outside allowed paths',
+      '- secrets/private.pem'
+    ].join('\n'));
+
+    const gate = evaluateVerifyGate({
+      changeDir,
+      changedFiles: ['secrets/private.pem']
+    });
+    assert.strictEqual(gate.status, 'BLOCK');
+    const codes = new Set(gate.findings.map((finding) => finding.code));
+    [
+      'forbidden-path-change',
+      'task-group-incomplete',
+      'execution-checkpoint-missing',
+      'drift-approval-pending',
+      'scope-change-unresolved',
+      'discovered-requirement-unresolved'
+    ].forEach((code) => {
+      assert(codes.has(code), `Expected blocking code ${code}`);
+    });
+  });
+
+  test('verify gate warns for manual verification rationale and docs-only extras', () => {
+    const { evaluateVerifyGate } = require('../lib/verify');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const { writeChangeState } = require('../lib/change-store');
+    const changeName = 'verify-gate-warn-manual';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Behavior change verification',
+        '- [x] RED: add failing gate test',
+        '- [x] GREEN: implement gate check',
+        '- [x] VERIFY: run workflow runtime tests'
+      ].join('\n'),
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Verify gate warning visibility',
+        'The system SHALL surface manual verification risk as warnings when rationale is missing.'
+      ].join('\n')
+    });
+    const now = new Date().toISOString();
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'IMPLEMENTED',
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        execution: {
+          status: 'PASS',
+          updatedAt: now
+        }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Behavior change verification',
+        verificationCommand: 'manual qa',
+        verificationResult: 'MANUAL PASS',
+        changedFiles: ['docs/verify-notes.md'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Manual verification performed without automation.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['lib/**'],
+      forbiddenPaths: ['*.pem']
+    });
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+
+    const gate = evaluateVerifyGate({
+      changeDir,
+      changedFiles: ['docs/verify-notes.md']
+    });
+    assert.strictEqual(gate.status, 'WARN');
+    const manualRationale = gate.findings.find((finding) => finding.code === 'manual-verification-rationale-missing');
+    assert(manualRationale, 'Expected manual verification rationale warning.');
+    assert.strictEqual(manualRationale.severity, 'WARN');
+    const docsExtra = gate.findings.find((finding) => finding.code === 'out-of-scope-change');
+    assert(docsExtra, 'Expected docs/config extra scope warning.');
+    assert.strictEqual(docsExtra.severity, 'WARN');
+  });
+
+  test('acceptVerifyGate advances implemented changes to VERIFIED with refreshed hashes', () => {
+    const { acceptVerifyGate } = require('../lib/verify');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const { writeChangeState } = require('../lib/change-store');
+    const changeName = 'accept-verify-gate-transition';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Behavior change verification',
+        '- [x] RED: add failing gate test',
+        '- [x] GREEN: implement gate check',
+        '- [x] VERIFY: run workflow runtime tests'
+      ].join('\n'),
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Verify acceptance transition',
+        'The system SHALL transition IMPLEMENTED changes to VERIFIED when gate acceptance succeeds.'
+      ].join('\n')
+    });
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'IMPLEMENTED',
+      hashes: {
+        'proposal.md': 'stale-hash'
+      }
+    });
+
+    const accepted = acceptVerifyGate(changeDir, {
+      status: 'PASS',
+      findings: []
+    });
+    assert.strictEqual(accepted.stage, 'VERIFIED');
+    assert.strictEqual(accepted.nextAction, 'sync');
+    assert.deepStrictEqual(accepted.hashes, hashTrackedArtifacts(changeDir));
+  });
+
   test('change-store normalizes sparse Phase 2 state to Phase 4 defaults', () => {
     const { normalizeChangeState } = require('../lib/change-store');
     const normalized = normalizeChangeState({
