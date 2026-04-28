@@ -17,7 +17,7 @@ Use these when the active workflow action is explicit.
 11. Run `spec checkpoint` after `design` and before `tasks`.
 12. Run `task checkpoint` after `tasks` and before `apply`.
 13. Keep route surface unchanged: Codex must not add `$opsx-spec-split-*`, Claude/Gemini must not add `/opsx-spec-split-*`; use existing `propose` / `continue` / `ff` routes.
-14. TDD-light RED/GREEN/REFACTOR/VERIFY rules are deferred to Phase 6.
+14. Authored tasks must include `## Test Plan`, and each top-level group must declare `TDD Class:` or `TDD Exemption:` with explicit `VERIFY:` coverage. `manual-only verification` is allowed only when the `Verification:` line explains why automated checks are not practical.
 15. Hard verify/archive enforcement remains deferred to Phase 7.
 
 ## onboard

@@ -123,8 +123,8 @@ If `language: en`:
 5. For `status` and `resume`, keep behavior read-only: warn on hash drift, reload from disk, and do not refresh stored hashes from read-only routes.
 6. Apply project context, per-artifact rules, and `securityReview` policy before writing.
 7. Read dependency artifacts before writing a new artifact.
-8. Run `spec-split-checkpoint` after `specs` and before `design`; run `spec checkpoint` before entering `tasks`, and `task checkpoint` before entering `apply`.
-9. During `apply`, execute one top-level task group, run `execution checkpoint`, persist verification command/result plus changed files, refresh `context.md` / `drift.md`, then stop.
+8. Run `spec-split-checkpoint` after `specs` and before `design`; run `spec checkpoint` before entering `tasks`, and run `task checkpoint` before entering `apply` using `rules.tdd.mode` (`off|light|strict`) with RED/VERIFY enforcement for `behavior-change` and `bugfix`, visible `TDD Exemption:` reasons for exempt work, and optional `REFACTOR`.
+9. During `apply`, execute one top-level task group, run `execution checkpoint`, persist completed TDD steps, verification command/result, diff summary, and drift through existing state paths, refresh `context.md` / `drift.md`, then stop.
 10. Report changed files, current state, next step, and blockers.
 
 ## Guardrails
@@ -133,7 +133,7 @@ If `language: en`:
 - Keep `status` and `resume` strictly read-only; do not mutate `.opsx/active.yaml`, `state.yaml`, `context.md`, or `drift.md` from those routes.
 - When artifact hash drift is detected, warn and reload from disk first; refresh stored hashes only after accepted checkpoint/state writes.
 - Treat `allowedPaths` / `forbiddenPaths` as warnings during Phase 4. Do not hard-block `verify` or `archive` yet.
-- TDD-light RED/GREEN/REFACTOR/VERIFY workflow rules are deferred to Phase 6.
+- `task checkpoint` uses `rules.tdd.mode`; required groups must expose `RED` and `VERIFY`, `REFACTOR` stays optional, and exempt groups must include visible `TDD Exemption:` reasons.
 - Hard enforcement for `verify` / `archive` path and drift gates is deferred to Phase 7.
 - Do not skip dependency checks silently.
 - Do not archive incomplete changes unless the user explicitly accepts the risk.
