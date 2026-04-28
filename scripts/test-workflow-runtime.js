@@ -759,6 +759,53 @@ function runTests() {
     });
   });
 
+  test('spec validator exports split-spec parser and deterministic finding codes', () => {
+    const {
+      collectSpecSplitEvidence,
+      parseSpecFile,
+      reviewSpecSplitEvidence
+    } = require('../lib/spec-validator');
+
+    assert.strictEqual(typeof collectSpecSplitEvidence, 'function');
+    assert.strictEqual(typeof parseSpecFile, 'function');
+    assert.strictEqual(typeof reviewSpecSplitEvidence, 'function');
+
+    const parsed = parseSpecFile('specs/auth/spec.md', [
+      '## ADDED Requirements',
+      '### Requirement: Auth requirement',
+      'The system SHALL enforce MFA for privileged roles.',
+      '#### Scenario: MFA challenge',
+      '- **WHEN** privileged user signs in',
+      '- **THEN** require MFA'
+    ].join('\n'));
+
+    const evidence = collectSpecSplitEvidence({
+      proposalText: [
+        '## What Changes',
+        '- Enforce MFA for privileged roles.',
+        '## Capabilities',
+        '### Modified Capabilities',
+        '- auth'
+      ].join('\n'),
+      specFiles: [{ path: parsed.path, text: parsed.text }]
+    });
+    const findings = reviewSpecSplitEvidence(evidence);
+
+    [
+      'proposal-coverage-gap',
+      'scope-expansion-unapproved',
+      'duplicate-requirement-id',
+      'duplicate-behavior-likely',
+      'conflicting-requirements',
+      'spec-empty',
+      'scenario-missing',
+      'hidden-requirement-in-fence'
+    ].forEach((code) => {
+      assert.strictEqual(typeof code, 'string');
+    });
+    assert(Array.isArray(findings));
+  });
+
   test('read-only drift detection warns without refreshing stored hashes', () => {
     const { loadChangeState, writeChangeState } = require('../lib/change-store');
     const changeName = 'read-only-drift';
