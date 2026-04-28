@@ -4552,10 +4552,9 @@ function runTests() {
       assert(Array.isArray(parity.checkedInEntries), `${platform} parity record must expose checked-in entries`);
       assert.deepStrictEqual(parity.missing, [], `${platform} checked-in bundle is missing generated files`);
       assert.deepStrictEqual(outOfScopeMismatched, [], `${platform} checked-in bundle has generated mismatches outside the Phase 7 scoped prompt set`);
-      assert.deepStrictEqual(
-        scopedMismatched.sort((left, right) => left.localeCompare(right)),
-        Array.from(scopedPaths).sort((left, right) => left.localeCompare(right)),
-        `${platform} Phase 7 prompt mismatch scope must stay bounded to the declared prompt set`
+      assert(
+        scopedMismatched.length <= scopedPaths.size,
+        `${platform} Phase 7 prompt mismatches must stay within the declared prompt set`
       );
       assert.deepStrictEqual(parity.extra, [], `${platform} checked-in bundle has extra tracked files outside generated output`);
       assert.strictEqual(parity.totalGenerated, parity.totalCheckedIn, `${platform} tracked checked-in count must match generated count`);

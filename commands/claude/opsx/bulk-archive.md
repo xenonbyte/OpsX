@@ -21,15 +21,15 @@ Execution rules:
 - If required artifacts are missing, report that honestly and apply route-specific fallback guidance.
 - Route fallback guidance:
 - If `.opsx/config.yaml` is missing, stop and redirect to `/opsx-onboard`.
-- If `.opsx/active.yaml` is missing or points to a missing change, stop and ask the user to run `/opsx-new` or `/opsx-propose`.
-- Do not invent an active change, state file, or task state when required artifacts are absent.
+- Evaluate global preconditions first and stop immediately when they fail with BLOCK.
+- Run each target change in per-change isolation and report archived/skipped/blocked results with reasons.
 - Use request details already present in the conversation.
 - Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.
 - If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
-- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
-- `execution checkpoint` runs after each top-level task group during `apply`.
+- Batch routes must run global preconditions first, then process each change in per-change isolation and report applied/archived, skipped, and blocked counts.
+- Batch execution keeps per-change isolation, continues through per-change failures, and reports skipped/blocked reasons plus aggregate counts.
 - Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
 - If the required change name, description, or selection is missing, ask for the minimum clarification needed.
-- Ask the user to confirm the target set when it is not explicit.
+- Run global preconditions first, then archive each change in per-change isolation with skipped/blocked reasons.
 - When files are mutated, report changed files, current state, next step, and blockers.
