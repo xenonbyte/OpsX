@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 5 context gathered
-last_updated: "2026-04-28T06:35:15.490Z"
-last_activity: 2026-04-28 -- Phase 05 execution started
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-04-28T06:39:51.869Z"
+last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 37
-  completed_plans: 30
-  percent: 81
+  completed_plans: 31
+  percent: 84
 ---
 
 # State
@@ -26,9 +26,9 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 05 (spec-split-checkpoint) — EXECUTING
-Plan: 1 of 7
-Status: Executing Phase 05
-Last activity: 2026-04-28 -- Phase 05 execution started
+Plan: 2 of 7
+Status: Ready to execute
+Last activity: 2026-04-28
 
 ## Next Action
 
@@ -92,6 +92,8 @@ Run `$gsd-execute-phase 5` to continue executing Phase 5 from the first incomple
 - Phase 04 Plan 08 keeps scope mechanically bounded by leaving commands/gemini/opsx.toml and non-listed generated files untouched.
 - Phase 04 Plan 09 removed temporary parity exemptions and restored strict repo-wide checked-in command parity against buildPlatformBundle() output.
 - Phase 04 Plan 09 kept source-output assertions for read-only hash-drift wording and one-group apply behavior while re-locking full parity.
+- Phase 05 Plan 01 keeps spec-split-checkpoint as canonical output id while normalizing persisted aliases to checkpoints.specSplit.
+- Phase 05 Plan 01 reuses Phase 4 checkpoint persistence/validator contracts without adding new artifact types.
 
 ## Blockers
 
@@ -130,11 +132,12 @@ Run `$gsd-execute-phase 5` to continue executing Phase 5 from the first incomple
 | Phase 04 P07 | 1m 54s | 1 tasks | 7 files |
 | Phase 04 P08 | 4m 44s | 1 tasks | 7 files |
 | Phase 04 P09 | 6m | 1 tasks | 1 files |
+| Phase 05 P01 | 5m | 2 tasks | 4 files |
 
 ## Session
 
-Last session: --stopped-at
-Stopped At: Phase 5 context gathered
-Resume File: --resume-file
+Last session: 2026-04-28T06:39:51.866Z
+Stopped At: Completed 05-01-PLAN.md
+Resume File: None
 
 **Planned Phase:** 05 (spec-split-checkpoint) — 7 plans — 2026-04-27T19:16:27.225Z
