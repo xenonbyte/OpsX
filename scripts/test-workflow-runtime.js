@@ -710,7 +710,7 @@ function runTests() {
     assert.strictEqual(normalized.active.taskGroup, null);
   });
 
-  test('spec-split checkpoint schema metadata is present for the pre-design gate', () => {
+  test('spec-split-checkpoint schema is inserted after specs and before design', () => {
     const schemaPath = path.join(REPO_ROOT, 'schemas', 'spec-driven', 'schema.json');
     const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
     const checkpointIds = Array.isArray(schema.checkpoints) ? schema.checkpoints.map((checkpoint) => checkpoint.id) : [];
@@ -730,7 +730,7 @@ function runTests() {
     });
   });
 
-  test('change-store maps canonical split checkpoint id into persisted specSplit slot', () => {
+  test('change-store preserves specSplit checkpoint alias round-trip', () => {
     const { normalizeChangeState, recordCheckpointResult, loadChangeState } = require('../lib/change-store');
     const changeName = 'spec-split-checkpoint-persistence';
     const changeDir = createChange(fixtureRoot, changeName, {
@@ -754,6 +754,9 @@ function runTests() {
     const persisted = loadChangeState(changeDir);
     assert.strictEqual(persisted.checkpoints.specSplit.status, 'PASS');
     assert(!Object.prototype.hasOwnProperty.call(persisted.checkpoints, 'spec-split-checkpoint'));
+    ['spec', 'task', 'execution'].forEach((checkpointId) => {
+      assert(Object.prototype.hasOwnProperty.call(persisted.checkpoints, checkpointId));
+    });
   });
 
   test('read-only drift detection warns without refreshing stored hashes', () => {
@@ -1775,7 +1778,7 @@ function runTests() {
     }, 'schema-not-found');
   });
 
-  test('checkpoint contract validators remain green after runtime module integration', () => {
+  test('checkpoint contract validators remain green with spec-split-checkpoint', () => {
     assert.deepStrictEqual(validatePhaseOneWorkflowContract(), []);
     assert.deepStrictEqual(validateCheckpointContracts(), []);
   });
