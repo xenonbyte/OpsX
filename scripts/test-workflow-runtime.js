@@ -2297,6 +2297,99 @@ function runTests() {
     assert.strictEqual(checkpoint.tdd.groups[0].exemptionReasonMissing, true);
   });
 
+  test('task checkpoint strict mode blocks unconfigured TDD Exemption classes', () => {
+    const checkpoint = runTaskCheckpoint({
+      config: {
+        rules: {
+          tdd: {
+            mode: 'strict',
+            requireFor: ['behavior-change', 'bugfix'],
+            exempt: ['docs-only', 'copy-only', 'config-only']
+          }
+        }
+      },
+      sources: {
+        proposal: '## Why\nNeed behavior-change checkpoint coverage.',
+        specs: [
+          '## ADDED Requirements',
+          '### Requirement: Behavior-change checkpoint',
+          'The system SHALL support behavior-change checkpoint coverage.'
+        ].join('\n'),
+        design: [
+          '## Context',
+          'Runtime behavior-change checkpoint design.'
+        ].join('\n'),
+        tasks: [
+          '## Test Plan',
+          '- Behavior: behavior-change task group coverage.',
+          '- Requirement/Scenario: TDD-03 runtime checkpoint requirement.',
+          '- Verification: automated runtime checks.',
+          '- TDD Mode: strict',
+          '- Exemption Reason: none',
+          '',
+          '## 1. Runtime behavior-change update',
+          '- TDD Exemption: not-configured — custom reason',
+          '- [ ] GREEN: Implement runtime checkpoint behavior.'
+        ].join('\n')
+      }
+    });
+
+    assert.strictEqual(checkpoint.status, 'BLOCK');
+    assert(checkpoint.findings.some((finding) => finding.code === 'tdd-exemption-class-invalid' && finding.severity === 'BLOCK'));
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-red-missing'));
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-verify-missing'));
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-exemption-reason-missing'));
+    assert.strictEqual(checkpoint.tdd.groups[0].class, 'not-configured');
+    assert.strictEqual(checkpoint.tdd.groups[0].classSource, 'explicit-exemption');
+    assert.strictEqual(checkpoint.tdd.groups[0].required, false);
+    assert.strictEqual(checkpoint.tdd.groups[0].exempt, false);
+    assert.strictEqual(checkpoint.tdd.groups[0].exemptionClassInvalid, true);
+  });
+
+  test('task checkpoint light mode warns unconfigured TDD Exemption classes', () => {
+    const checkpoint = runTaskCheckpoint({
+      config: {
+        rules: {
+          tdd: {
+            mode: 'light',
+            requireFor: ['behavior-change', 'bugfix'],
+            exempt: ['docs-only', 'copy-only', 'config-only']
+          }
+        }
+      },
+      sources: {
+        proposal: '## Why\nNeed behavior-change checkpoint coverage.',
+        specs: [
+          '## ADDED Requirements',
+          '### Requirement: Behavior-change checkpoint',
+          'The system SHALL support behavior-change checkpoint coverage.'
+        ].join('\n'),
+        design: [
+          '## Context',
+          'Runtime behavior-change checkpoint design.'
+        ].join('\n'),
+        tasks: [
+          '## Test Plan',
+          '- Behavior: behavior-change task group coverage.',
+          '- Requirement/Scenario: TDD-03 runtime checkpoint requirement.',
+          '- Verification: automated runtime checks.',
+          '- TDD Mode: light',
+          '- Exemption Reason: none',
+          '',
+          '## 1. Runtime behavior-change update',
+          '- TDD Exemption: not-configured — custom reason',
+          '- [ ] GREEN: Implement runtime checkpoint behavior.'
+        ].join('\n')
+      }
+    });
+
+    assert.strictEqual(checkpoint.status, 'WARN');
+    assert(checkpoint.findings.some((finding) => finding.code === 'tdd-exemption-class-invalid' && finding.severity === 'WARN'));
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-red-missing'));
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-verify-missing'));
+    assert.strictEqual(checkpoint.tdd.groups[0].exemptionClassInvalid, true);
+  });
+
   test('apply instructions surface tdd mode and blocker codes', () => {
     const changeName = 'apply-instructions-tdd-mode';
     createChange(fixtureRoot, changeName, {
