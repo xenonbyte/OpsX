@@ -213,7 +213,7 @@ Plans:
 **Plans:** 7 plans (7 waves)
 
 Plans:
-- [ ] `08-01-PLAN.md` — Extract the shared workflow-test harness, create topic seams, and move package/generation coverage behind `npm test`.
+- [x] `08-01-PLAN.md` — Extract the shared workflow-test harness, create topic seams, and move package/generation coverage behind `npm test`.
 - [ ] `08-02-PLAN.md` — Implement `opsx status --json` and move migration/state/status coverage into the state topic script.
 - [ ] `08-03-PLAN.md` — Add repo-local path/glob utilities and refactor read-only path surfaces into the path topic script.
 - [ ] `08-04-PLAN.md` — Migrate write-sensitive migrate/sync guards onto the shared path utilities and extend path fixtures.

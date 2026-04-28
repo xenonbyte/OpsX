@@ -78,8 +78,10 @@
 
 ### Test Coverage
 
-- [ ] **TEST-01**: Tests verify package/bin metadata only exposes `@xenonbyte/opsx` and `opsx`.
-- [ ] **TEST-02**: Tests verify command generation only exposes `/opsx-*` and `$opsx-*` public entrypoints.
+- [x] **TEST-01
+**: Tests verify package/bin metadata only exposes `@xenonbyte/opsx` and `opsx`.
+- [x] **TEST-02
+**: Tests verify command generation only exposes `/opsx-*` and `$opsx-*` public entrypoints.
 - [ ] **TEST-03**: Tests cover migration, state-machine transitions, artifact hash drift, resume/continue behavior, and status JSON output.
 - [ ] **TEST-04**: Tests cover spec-split review, hidden requirement detection, TDD-light warnings/blocks, allowed/forbidden path checks, and archive blocking.
 

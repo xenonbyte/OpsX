@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 8 context gathered
-last_updated: "2026-04-28T18:40:16.380Z"
-last_activity: 2026-04-29 -- Phase 8 execution started
+stopped_at: Completed 08-01-PLAN.md
+last_updated: "2026-04-28T18:55:05.995Z"
+last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 7
   total_plans: 61
-  completed_plans: 54
-  percent: 89
+  completed_plans: 55
+  percent: 90
 ---
 
 # State
@@ -26,9 +26,9 @@ See: `.planning/PROJECT.md` (updated 2026-04-28)
 ## Current Position
 
 Phase: 8 (Stability, JSON, and Release Coverage) — EXECUTING
-Plan: 1 of 7
-Status: Executing Phase 8
-Last activity: 2026-04-29 -- Phase 8 execution started
+Plan: 2 of 7
+Status: Ready to execute
+Last activity: 2026-04-28
 
 ## Next Action
 
@@ -148,6 +148,9 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 - Phase 07 Plan 07 kept Gemini refresh scope strictly bounded to the five verify/sync/archive/batch files regenerated from buildPlatformBundle('gemini').
 - [Phase 07 Plan 08] Restore strict parity by requiring parity.mismatched to be empty for every platform bundle.
 - [Phase 07 Plan 08] Keep PHASE7_GATE_PROMPT_PATHS fixed at 15 while asserting gate wording on both generated and checked-in files.
+- 08-01 keeps scripts/test-workflow-runtime.js as the compatibility aggregate while registering topic scripts in deterministic order.
+- 08-01 moves TEST-01 and TEST-02 assertions into dedicated package and generation topic scripts with standalone runners.
+- 08-01 promotes npm test to the same aggregate entrypoint as npm run test:workflow-runtime.
 
 ## Blockers
 
@@ -213,12 +216,13 @@ Run `$gsd-execute-phase 8` to execute the verified Phase 8 release-hardening pla
 | Phase 07 P06 | 3 min | 1 tasks | 5 files |
 | Phase 07 P07 | 4 min | 1 tasks | 5 files |
 | Phase 07 P08 | 6 | 1 tasks | 1 files |
+| Phase 08 P01 | 6 min | 2 tasks | 8 files |
 
 ## Session
 
-Last session: 2026-04-28T17:16:51.116Z
-Stopped At: Phase 8 context gathered
-Resume File: .planning/phases/08-stability-json-and-release-coverage/08-CONTEXT.md
+Last session: 2026-04-28T18:55:05.991Z
+Stopped At: Completed 08-01-PLAN.md
+Resume File: None
 
 **Next Phase:** 8 (Stability, JSON, and Release Coverage)
 
