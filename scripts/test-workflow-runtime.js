@@ -608,9 +608,9 @@ function runTests() {
 
     assert.deepStrictEqual(result.forbiddenMatches, ['secrets/blocked.pem']);
     assert.deepStrictEqual(result.explainableExtraMatches.sort((left, right) => left.localeCompare(right)), [
-      'README.md',
       'config/runtime.yaml',
-      'docs/opsx.md'
+      'docs/opsx.md',
+      'README.md'
     ]);
     assert.deepStrictEqual(result.outOfScopeMatches, []);
   });
