@@ -479,6 +479,34 @@ function runTests() {
     });
   });
 
+  test('YAML config parser preserves block lists used by gate policies', () => {
+    const { parseYaml, stringifyYaml } = require('../lib/yaml');
+    const parsed = parseYaml([
+      'rules:',
+      '  tdd:',
+      '    requireFor:',
+      '      - "behavior-change"',
+      '      - "migration-only"',
+      '    exempt:',
+      '      - "docs-only"'
+    ].join('\n'));
+
+    assert.deepStrictEqual(parsed.rules.tdd.requireFor, ['behavior-change', 'migration-only']);
+    assert.deepStrictEqual(parsed.rules.tdd.exempt, ['docs-only']);
+
+    const rendered = stringifyYaml({
+      rules: {
+        tdd: {
+          requireFor: ['behavior-change', 'bugfix'],
+          exempt: ['docs-only']
+        }
+      }
+    });
+    const roundTrip = parseYaml(rendered);
+    assert.deepStrictEqual(roundTrip.rules.tdd.requireFor, ['behavior-change', 'bugfix']);
+    assert.deepStrictEqual(roundTrip.rules.tdd.exempt, ['docs-only']);
+  });
+
   test('project config template seeds rules.tdd strict defaults', () => {
     const templateText = fs.readFileSync(path.join(REPO_ROOT, 'templates', 'project', 'config.yaml.tmpl'), 'utf8');
     assert(templateText.includes('  tdd:'), 'Template must include rules.tdd block.');
