@@ -837,21 +837,21 @@ function runTests() {
       'specs/runtime/spec.md': [
         '## MODIFIED Requirements',
         '### Requirement: Session token rotation rule',
-        'The system MUST NOT rotate access tokens for every session request and keep audit logs unchanged.',
+        'The system MUST NOT rotate access tokens for every session request and keep audit logs aligned.',
         '',
         '#### Scenario: Conflicting polarity',
         '- **WHEN** session token handling executes',
-        '- **THEN** the requirement conflicts with canonical normative behavior'
+        '- **THEN** token rotation and audit logs remain aligned'
       ].join('\n')
     });
     writeText(path.join(fixtureRoot, '.opsx', 'specs', 'runtime', 'spec.md'), [
       '## ADDED Requirements',
       '### Requirement: Session token rotation baseline',
-      'The system SHALL rotate access tokens for every session request and keep audit logs unchanged.',
+      'The system SHALL rotate access tokens for every session request and keep audit logs aligned.',
       '',
       '#### Scenario: Canonical rotation baseline',
-      '- **WHEN** a session request succeeds',
-      '- **THEN** the token rotates and audit logs are persisted',
+      '- **WHEN** session token handling executes',
+      '- **THEN** token rotation and audit logs remain aligned',
       '',
       '### Requirement: Preserve canonical metrics coverage',
       'The system SHALL preserve canonical metrics coverage unless explicitly removed.',
