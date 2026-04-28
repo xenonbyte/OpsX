@@ -209,6 +209,114 @@ function registerTests(test, helpers) {
     ], literalPattern);
     assert.deepStrictEqual(matches, ['specs/special[qa]?/spec.md']);
   });
+
+  test('parseGlobArtifactOutput keeps glob-special fixture names as literals', () => {
+    const { parseGlobArtifactOutput } = require('../lib/glob-utils');
+    const parsed = parseGlobArtifactOutput([
+      ' specs\\a[bracket]\\spec.md ',
+      'specs/question?/spec.md',
+      'specs/star*/spec.md',
+      '',
+      'specs//a[bracket]//spec.md'
+    ]);
+    assert.deepStrictEqual(parsed, [
+      'specs/a[bracket]/spec.md',
+      'specs/question?/spec.md',
+      'specs/star*/spec.md'
+    ]);
+  });
+
+  test('migration guards still enforce repo/home base containment labels', () => {
+    const { ensureWithinBase } = require('../lib/path-utils');
+    const migrateSource = fs.readFileSync(path.join(__dirname, '../lib/migrate.js'), 'utf8');
+    assert(migrateSource.includes('ensureWithinMigrationBase('));
+    assert(migrateSource.includes("ensureWithinMigrationBase(plan.homeDir, candidatePath, 'home');"));
+    assert(migrateSource.includes("ensureWithinMigrationBase(plan.cwd, move.from, 'repo');"));
+
+    const repoBase = path.join(fixtureRoot, '.opsx');
+    const homeBase = path.join(fixtureRoot, 'home');
+    assert.throws(
+      () => ensureWithinBase(repoBase, path.join(repoBase, '..', 'escape.md'), 'repo base'),
+      /outside repo base/
+    );
+    assert.throws(
+      () => ensureWithinBase(homeBase, path.join(homeBase, '..', 'escape.md'), 'home base'),
+      /outside home base/
+    );
+  });
+
+  test('applySyncPlan rejects targets outside canonical specs without writing files', () => {
+    const { applySyncPlan } = require('../lib/sync');
+    const outsidePath = path.join(fixtureRoot, 'outside-sync-write.md');
+    const canonicalSpecsDir = path.join(fixtureRoot, '.opsx', 'specs');
+
+    assert.throws(() => applySyncPlan({
+      status: 'PASS',
+      repoRoot: fixtureRoot,
+      canonicalSpecsDir,
+      writes: [{
+        targetPath: outsidePath,
+        content: 'outside write'
+      }]
+    }), /outside \.opsx\/specs/);
+    assert.strictEqual(fs.existsSync(outsidePath), false);
+  });
+
+  test('applySyncPlan rejects caller supplied canonical spec roots outside repo .opsx specs', () => {
+    const { applySyncPlan } = require('../lib/sync');
+    const outsidePath = path.join(fixtureRoot, 'outside-forged-root.md');
+
+    assert.throws(() => applySyncPlan({
+      status: 'PASS',
+      repoRoot: fixtureRoot,
+      canonicalSpecsDir: fixtureRoot,
+      writes: [{
+        targetPath: outsidePath,
+        content: 'forged root write'
+      }]
+    }), /canonicalSpecsDir must match/);
+    assert.strictEqual(fs.existsSync(outsidePath), false);
+  });
+
+  test('applySyncPlan leaves canonical specs untouched when staging a later write fails', () => {
+    const { applySyncPlan } = require('../lib/sync');
+    const canonicalSpecsDir = path.join(fixtureRoot, '.opsx', 'specs');
+    const firstTarget = path.join(canonicalSpecsDir, 'runtime', 'spec.md');
+    const firstBefore = 'canonical content before staged failure\n';
+    fs.mkdirSync(path.dirname(firstTarget), { recursive: true });
+    fs.writeFileSync(firstTarget, firstBefore, 'utf8');
+    const invalidParent = path.join(canonicalSpecsDir, 'not-a-directory');
+    fs.mkdirSync(path.dirname(invalidParent), { recursive: true });
+    fs.writeFileSync(invalidParent, 'this file blocks child staging\n', 'utf8');
+
+    assert.throws(() => applySyncPlan({
+      status: 'PASS',
+      canonicalSpecsDir,
+      writes: [
+        {
+          targetPath: firstTarget,
+          content: 'new canonical content\n'
+        },
+        {
+          targetPath: path.join(invalidParent, 'spec.md'),
+          content: 'cannot be staged\n'
+        }
+      ]
+    }));
+    assert.strictEqual(fs.readFileSync(firstTarget, 'utf8'), firstBefore);
+  });
+
+  test('runtime aggregate delegates sync path-guard assertions to path topic script', () => {
+    const runtimeSource = fs.readFileSync(path.join(__dirname, './test-workflow-runtime.js'), 'utf8');
+    assert.strictEqual(
+      runtimeSource.includes('applySyncPlan rejects targets outside canonical specs without writing files'),
+      false
+    );
+    assert.strictEqual(
+      runtimeSource.includes('applySyncPlan rejects caller supplied canonical spec roots outside repo .opsx specs'),
+      false
+    );
+  });
 }
 
 if (require.main === module) {
