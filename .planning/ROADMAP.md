@@ -182,12 +182,12 @@ Plans:
 
 **Requirements:** QUAL-01, QUAL-02, QUAL-03, QUAL-04
 
-**Status:** Planned — 2026-04-28
+**Status:** In Progress — 2026-04-28
 
 **Plans:** 8 plans (6 waves)
 
 Plans:
-- [ ] `07-01-PLAN.md` — Add Node-14-compatible path-scope matching and the hard verify gate with accepted `VERIFIED` transitions.
+- [x] `07-01-PLAN.md` — Add Node-14-compatible path-scope matching and the hard verify gate with accepted `VERIFIED` transitions.
 - [ ] `07-02-PLAN.md` — Build conservative in-memory spec sync with no-partial-write semantics and accepted `SYNCED` transitions.
 - [ ] `07-03-PLAN.md` — Implement archive safe-sync gating, exact `.opsx/archive/<change-name>/` moves, and isolated batch orchestration.
 - [ ] `07-04-PLAN.md` — Update source-of-truth verify/sync/archive/batch guidance and stage a temporary 15-route prompt assertion scope.
