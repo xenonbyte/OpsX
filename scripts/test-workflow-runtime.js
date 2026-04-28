@@ -2346,6 +2346,101 @@ function runTests() {
     assert.strictEqual(checkpoint.tdd.groups[0].exemptionClassInvalid, true);
   });
 
+  test('task checkpoint strict mode blocks visible but unconfigured TDD Exemption classes', () => {
+    const checkpoint = runTaskCheckpoint({
+      config: {
+        rules: {
+          tdd: {
+            mode: 'strict',
+            requireFor: ['behavior-change', 'bugfix'],
+            exempt: ['docs-only', 'copy-only', 'config-only']
+          }
+        }
+      },
+      sources: {
+        proposal: '## Why\nNeed behavior-change checkpoint coverage.',
+        specs: [
+          '## ADDED Requirements',
+          '### Requirement: Behavior-change checkpoint',
+          'The system SHALL support behavior-change checkpoint coverage.'
+        ].join('\n'),
+        design: [
+          '## Context',
+          'Runtime behavior-change checkpoint design.'
+        ].join('\n'),
+        tasks: [
+          '## Test Plan',
+          '- Behavior: behavior-change task group coverage.',
+          '- Requirement/Scenario: TDD-03 runtime checkpoint requirement.',
+          '- Verification: automated runtime checks.',
+          '- TDD Mode: strict',
+          '- Exemption Reason: none',
+          '',
+          '## 1. Runtime behavior-change update',
+          '- TDD Exemption: migration-only -- custom reason',
+          '- [ ] GREEN: Implement runtime checkpoint behavior.'
+        ].join('\n')
+      }
+    });
+
+    assert.strictEqual(checkpoint.status, 'BLOCK');
+    assert(checkpoint.findings.some((finding) => finding.code === 'tdd-exemption-class-invalid' && finding.severity === 'BLOCK'));
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-red-missing'));
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-verify-missing'));
+    assert(!checkpoint.findings.some((finding) => finding.code === 'tdd-exemption-reason-missing'));
+    assert.strictEqual(checkpoint.tdd.groups[0].class, 'migration-only');
+    assert.strictEqual(checkpoint.tdd.groups[0].classSource, 'explicit-exemption');
+    assert.strictEqual(checkpoint.tdd.groups[0].required, false);
+    assert.strictEqual(checkpoint.tdd.groups[0].exempt, false);
+    assert.strictEqual(checkpoint.tdd.groups[0].exemptionClassInvalid, true);
+  });
+
+  test('task checkpoint strict mode accepts configured TDD Exemption classes', () => {
+    const checkpoint = runTaskCheckpoint({
+      config: {
+        rules: {
+          tdd: {
+            mode: 'strict',
+            requireFor: ['behavior-change', 'bugfix'],
+            exempt: ['docs-only', 'copy-only', 'config-only', 'migration-only']
+          }
+        }
+      },
+      sources: {
+        proposal: '## Why\nNeed behavior-change checkpoint coverage.',
+        specs: [
+          '## ADDED Requirements',
+          '### Requirement: Behavior-change checkpoint',
+          'The system SHALL support behavior-change checkpoint coverage.'
+        ].join('\n'),
+        design: [
+          '## Context',
+          'Runtime behavior-change checkpoint design.'
+        ].join('\n'),
+        tasks: [
+          '## Test Plan',
+          '- Behavior: behavior-change task group coverage.',
+          '- Requirement/Scenario: TDD-03 runtime checkpoint requirement.',
+          '- Verification: automated runtime checks.',
+          '- TDD Mode: strict',
+          '- Exemption Reason: migration-only custom reason.',
+          '',
+          '## 1. Runtime behavior-change update',
+          '- TDD Exemption: migration-only -- custom reason',
+          '- [ ] GREEN: Implement runtime checkpoint behavior.'
+        ].join('\n')
+      }
+    });
+
+    assert.strictEqual(checkpoint.status, 'PASS');
+    assert(!checkpoint.findings.some((finding) => finding.code.startsWith('tdd-')));
+    assert.strictEqual(checkpoint.tdd.groups[0].class, 'migration-only');
+    assert.strictEqual(checkpoint.tdd.groups[0].classSource, 'explicit-exemption');
+    assert.strictEqual(checkpoint.tdd.groups[0].required, false);
+    assert.strictEqual(checkpoint.tdd.groups[0].exempt, true);
+    assert.strictEqual(checkpoint.tdd.groups[0].exemptionClassInvalid, false);
+  });
+
   test('task checkpoint light mode warns unconfigured TDD Exemption classes', () => {
     const checkpoint = runTaskCheckpoint({
       config: {
