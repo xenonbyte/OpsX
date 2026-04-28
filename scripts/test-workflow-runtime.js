@@ -5,7 +5,7 @@ const { spawnSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { createHash } = require('node:crypto');
+const { createHash } = require('crypto');
 const YAML = require('yaml');
 const { copyDir, ensureDir, removePath, writeText } = require('../lib/fs-utils');
 const { REPO_ROOT, PACKAGE_VERSION } = require('../lib/constants');
@@ -490,6 +490,21 @@ function runTests() {
     assert(templateText.includes('      - "docs-only"'), 'Template must include docs-only exempt entry.');
     assert(templateText.includes('      - "copy-only"'), 'Template must include copy-only exempt entry.');
     assert(templateText.includes('      - "config-only"'), 'Template must include config-only exempt entry.');
+  });
+
+  test('declared Node 14 engine floor uses compatible CommonJS builtin imports', () => {
+    const packageJson = require('../package.json');
+    const nodeCryptoSpecifier = ['node', 'crypto'].join(':');
+    assert.strictEqual(packageJson.engines.node, '>=14.14.0');
+    [
+      'scripts/test-workflow-runtime.js',
+      'lib/change-artifacts.js'
+    ].forEach((relativePath) => {
+      const content = fs.readFileSync(path.join(REPO_ROOT, relativePath), 'utf8');
+      assert(!content.includes(`require('${nodeCryptoSpecifier}')`), `${relativePath} must avoid node-prefixed crypto require.`);
+      assert(!content.includes(`require("${nodeCryptoSpecifier}")`), `${relativePath} must avoid node-prefixed crypto require.`);
+      assert(content.includes("require('crypto')"), `${relativePath} must use Node 14.14 compatible crypto require.`);
+    });
   });
 
   test('schema graph validation catches duplicate ids, invalid requires, and cycles', () => {
