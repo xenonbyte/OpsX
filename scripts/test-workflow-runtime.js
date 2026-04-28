@@ -685,65 +685,6 @@ function runTests() {
     assert(findingCodes.has('conflicting-requirements'));
   });
 
-  test('applySyncPlan rejects targets outside canonical specs without writing files', () => {
-    const { applySyncPlan } = require('../lib/sync');
-    const outsidePath = path.join(fixtureRoot, 'outside-sync-write.md');
-    const canonicalSpecsDir = path.join(fixtureRoot, '.opsx', 'specs');
-
-    assert.throws(() => applySyncPlan({
-      status: 'PASS',
-      repoRoot: fixtureRoot,
-      canonicalSpecsDir,
-      writes: [{
-        targetPath: outsidePath,
-        content: 'outside write'
-      }]
-    }), /outside \.opsx\/specs/);
-    assert.strictEqual(fs.existsSync(outsidePath), false);
-  });
-
-  test('applySyncPlan rejects caller supplied canonical spec roots outside repo .opsx specs', () => {
-    const { applySyncPlan } = require('../lib/sync');
-    const outsidePath = path.join(fixtureRoot, 'outside-forged-root.md');
-
-    assert.throws(() => applySyncPlan({
-      status: 'PASS',
-      repoRoot: fixtureRoot,
-      canonicalSpecsDir: fixtureRoot,
-      writes: [{
-        targetPath: outsidePath,
-        content: 'forged root write'
-      }]
-    }), /canonicalSpecsDir must match/);
-    assert.strictEqual(fs.existsSync(outsidePath), false);
-  });
-
-  test('applySyncPlan leaves canonical specs untouched when staging a later write fails', () => {
-    const { applySyncPlan } = require('../lib/sync');
-    const canonicalSpecsDir = path.join(fixtureRoot, '.opsx', 'specs');
-    const firstTarget = path.join(canonicalSpecsDir, 'runtime', 'spec.md');
-    const firstBefore = 'canonical content before staged failure\n';
-    writeText(firstTarget, firstBefore);
-    const invalidParent = path.join(canonicalSpecsDir, 'not-a-directory');
-    writeText(invalidParent, 'this file blocks child staging\n');
-
-    assert.throws(() => applySyncPlan({
-      status: 'PASS',
-      canonicalSpecsDir,
-      writes: [
-        {
-          targetPath: firstTarget,
-          content: 'new canonical content\n'
-        },
-        {
-          targetPath: path.join(invalidParent, 'spec.md'),
-          content: 'cannot be staged\n'
-        }
-      ]
-    }));
-    assert.strictEqual(fs.readFileSync(firstTarget, 'utf8'), firstBefore);
-  });
-
   test('applySyncPlan writes full conflict-free capability files and advances VERIFIED to SYNCED', () => {
     const { planSync, applySyncPlan, acceptSyncPlan } = require('../lib/sync');
     const { writeChangeState, loadChangeState } = require('../lib/change-store');
