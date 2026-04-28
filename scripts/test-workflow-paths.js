@@ -3,7 +3,7 @@
 const { runRegisteredTopicTests } = require('./test-workflow-shared');
 
 function registerTests(test, helpers) {
-  const { assert, path } = helpers;
+  const { assert, fs, path, fixtureRoot, createChange } = helpers;
 
   test('path-utils exports normalized path helpers', () => {
     const pathUtils = require('../lib/path-utils');
@@ -88,6 +88,115 @@ function registerTests(test, helpers) {
       'specs/demoa/spec.md'
     ]);
     assert.deepStrictEqual(parsed, ['specs/demo[qa]?/spec.md', 'specs/demoa/spec.md']);
+  });
+
+  test('read-only path surfaces import shared path and glob utility modules', () => {
+    const runtimeGuidance = fs.readFileSync(path.join(__dirname, '../lib/runtime-guidance.js'), 'utf8');
+    const changeArtifacts = fs.readFileSync(path.join(__dirname, '../lib/change-artifacts.js'), 'utf8');
+    const pathScope = fs.readFileSync(path.join(__dirname, '../lib/path-scope.js'), 'utf8');
+
+    assert(runtimeGuidance.includes("require('./path-utils')"));
+    assert(runtimeGuidance.includes("require('./glob-utils')"));
+    assert(changeArtifacts.includes("require('./path-utils')"));
+    assert(pathScope.includes("require('./path-utils')"));
+    assert(pathScope.includes("require('./glob-utils')"));
+  });
+
+  test('matchPathScope uses picomatch globs for allowed and forbidden paths', () => {
+    const { matchPathScope } = require('../lib/path-scope');
+    const result = matchPathScope(
+      [
+        'lib/verify.js',
+        'lib\\windows\\gate.js',
+        'secrets/private.pem',
+        'src/index.js'
+      ],
+      {
+        allowedPaths: ['lib/**'],
+        forbiddenPaths: ['*.pem']
+      }
+    );
+
+    assert.strictEqual(result.hasAllowedScope, true);
+    assert.deepStrictEqual(result.allowedMatches.sort((left, right) => left.localeCompare(right)), [
+      'lib/verify.js',
+      'lib/windows/gate.js'
+    ]);
+    assert.deepStrictEqual(result.forbiddenMatches, ['secrets/private.pem']);
+    assert.deepStrictEqual(result.outOfScopeMatches, ['src/index.js']);
+    assert.deepStrictEqual(result.explainableExtraMatches, []);
+  });
+
+  test('matchPathScope distinguishes forbidden files from explainable docs or config extras', () => {
+    const { matchPathScope } = require('../lib/path-scope');
+    const result = matchPathScope(
+      [
+        'README.md',
+        'docs/opsx.md',
+        'config/runtime.yaml',
+        'secrets/blocked.pem'
+      ],
+      {
+        allowedPaths: ['lib/**'],
+        forbiddenPaths: ['*.pem']
+      }
+    );
+
+    assert.deepStrictEqual(result.forbiddenMatches, ['secrets/blocked.pem']);
+    assert.deepStrictEqual(result.explainableExtraMatches.sort((left, right) => left.localeCompare(right)), [
+      'config/runtime.yaml',
+      'docs/opsx.md',
+      'README.md'
+    ]);
+    assert.deepStrictEqual(result.outOfScopeMatches, []);
+  });
+
+  test('change-artifacts hashes tracked Phase 4 artifacts deterministically', () => {
+    const { hashTrackedArtifacts, detectArtifactHashDrift } = require('../lib/change-artifacts');
+    const changeName = 'tracked-artifact-hash';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'security-review.md': '# Security review\n',
+      'tasks.md': '## 1. Group\n- [ ] 1.1 Work\n',
+      'specs/core/spec.md': '## ADDED Requirements\n### Requirement: Core\n',
+      'specs/edge/spec.md': '## ADDED Requirements\n### Requirement: Edge\n',
+      'specs/README.md': 'Ignored non-spec artifact\n'
+    });
+
+    const first = hashTrackedArtifacts(changeDir);
+    const second = hashTrackedArtifacts(changeDir);
+    assert.deepStrictEqual(first, second);
+    assert.deepStrictEqual(Object.keys(first), [
+      'design.md',
+      'proposal.md',
+      'security-review.md',
+      'specs/core/spec.md',
+      'specs/edge/spec.md',
+      'tasks.md'
+    ]);
+
+    const drift = detectArtifactHashDrift(
+      Object.assign({}, first, {
+        'design.md': 'stale-design-hash'
+      }),
+      first
+    );
+    assert.deepStrictEqual(drift.driftedPaths, ['design.md']);
+    assert.strictEqual(drift.warnings.length, 1);
+    assert(drift.warnings[0].includes('design.md'));
+  });
+
+  test('glob-special artifact names are matched as literals after escaping', () => {
+    const { buildLiteralPattern, matchNormalizedPaths } = require('../lib/glob-utils');
+    const literalSpecPath = 'specs/special[qa]?/spec.md';
+    const literalPattern = buildLiteralPattern(literalSpecPath);
+    const matches = matchNormalizedPaths([
+      'specs/special[qa]?/spec.md',
+      'specs/specialx/spec.md',
+      'specs/specialq/spec.md'
+    ], literalPattern);
+    assert.deepStrictEqual(matches, ['specs/special[qa]?/spec.md']);
   });
 }
 
