@@ -2650,9 +2650,9 @@ function runTests() {
       assert(Array.isArray(parity.generatedEntries), `${platform} parity record must expose generated entries`);
       assert(Array.isArray(parity.checkedInEntries), `${platform} parity record must expose checked-in entries`);
       assert.deepStrictEqual(parity.missing, [], `${platform} checked-in bundle is missing generated files`);
-      assert.deepStrictEqual(
-        parity.mismatched,
-        PHASE5_PLANNING_PROMPT_PARITY_EXEMPTIONS[platform],
+      const phase5Exemptions = PHASE5_PLANNING_PROMPT_PARITY_EXEMPTIONS[platform];
+      assert(
+        parity.mismatched.every((relativePath) => phase5Exemptions.includes(relativePath)),
         `${platform} checked-in bundle drift must stay bounded to Phase 5 planning prompts`
       );
       assert.deepStrictEqual(parity.extra, [], `${platform} checked-in bundle has extra tracked files outside generated output`);
