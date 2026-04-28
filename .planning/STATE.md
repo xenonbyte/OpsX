@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-04-28T09:55:38.779Z"
+stopped_at: Completed 06-03-PLAN.md
+last_updated: "2026-04-28T10:14:13.002Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 46
-  completed_plans: 39
-  percent: 85
+  completed_plans: 40
+  percent: 87
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 06 (TDD-Light Workflow) — EXECUTING
-Plan: 2 of 9
+Plan: 3 of 9
 Status: Ready to execute
 Last activity: 2026-04-28
 
@@ -112,6 +112,8 @@ Run `$gsd-execute-phase 6` to execute the Phase 6 waves, starting with Wave 1.
 - [Phase 06] Merge requireFor/exempt lists additively and de-duplicate entries to preserve explicit custom classes without losing defaults.
 - Keep Test Plan metadata separate from numbered execution groups for deterministic parsing.
 - Require visible TDD Exemption reasons plus VERIFY coverage even for exempt groups.
+- Keep TDD enforcement on existing task-checkpoint surface and expose metadata via checkpoint payload instead of adding a new checkpoint id.
+- Use explicit TDD Class/TDD Exemption markers as authoritative and keep heuristics conservative (behavior-change/bugfix tokens) to avoid false blocking.
 
 ## Blockers
 
@@ -160,11 +162,12 @@ Run `$gsd-execute-phase 6` to execute the Phase 6 waves, starting with Wave 1.
 | Phase 05 P07 | 3m | 1 tasks | 2 files |
 | Phase 06 P01 | 1m 44s | 1 tasks | 3 files |
 | Phase 06 P02 | 2 min | 2 tasks | 6 files |
+| Phase 06 P03 | 14 min | 1 tasks | 3 files |
 
 ## Session
 
-Last session: 2026-04-28T09:55:38.768Z
-Stopped At: Completed 06-02-PLAN.md
+Last session: 2026-04-28T10:13:45.780Z
+Stopped At: Completed 06-03-PLAN.md
 Resume File: None
 
 **Next Phase:** 06 (TDD-Light Workflow)

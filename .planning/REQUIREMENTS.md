@@ -58,7 +58,8 @@
 **: `.opsx/config.yaml` supports `rules.tdd.mode` with `off`, `light`, and `strict`.
 - [x] **TDD-02
 **: `tasks.md` templates include a Test Plan and RED/GREEN/REFACTOR/VERIFY task structure for behavior changes and bug fixes.
-- [ ] **TDD-03**: `task-checkpoint` warns in light mode when behavior changes lack RED or VERIFY tasks and blocks in strict mode.
+- [x] **TDD-03
+**: `task-checkpoint` warns in light mode when behavior changes lack RED or VERIFY tasks and blocks in strict mode.
 - [ ] **TDD-04**: `execution-checkpoint` records completed steps, verification command/result, diff summary, and drift after each top-level task group.
 
 ### Verification, Sync, Archive, and Batch Workflows
@@ -131,9 +132,9 @@
 | SPEC-02 | Phase 5 | Completed |
 | SPEC-03 | Phase 5 | Completed |
 | SPEC-04 | Phase 5 | Completed |
-| TDD-01 | Phase 6 | Pending |
-| TDD-02 | Phase 6 | Pending |
-| TDD-03 | Phase 6 | Pending |
+| TDD-01 | Phase 6 | Completed |
+| TDD-02 | Phase 6 | Completed |
+| TDD-03 | Phase 6 | Completed |
 | TDD-04 | Phase 6 | Pending |
 | QUAL-01 | Phase 7 | Pending |
 | QUAL-02 | Phase 7 | Pending |
