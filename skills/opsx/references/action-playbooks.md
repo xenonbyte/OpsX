@@ -18,7 +18,7 @@ Use these when the active workflow action is explicit.
 12. Run `task checkpoint` after `tasks` and before `apply`.
 13. Keep route surface unchanged: Codex must not add `$opsx-spec-split-*`, Claude/Gemini must not add `/opsx-spec-split-*`; use existing `propose` / `continue` / `ff` routes.
 14. Authored tasks must include `## Test Plan`, and each top-level group must declare `TDD Class:` or `TDD Exemption:` with explicit `VERIFY:` coverage. `manual-only verification` is allowed only when the `Verification:` line explains why automated checks are not practical.
-15. Hard verify/archive enforcement remains deferred to Phase 7.
+15. Verify/sync/archive/batch routes follow Phase 7 hard gates: verify emits `PASS`/`WARN`/`BLOCK`, sync uses conservative no-partial-write planning, archive enforces safe sync before move, and batch routes report per-change skipped/blocked reasons.
 
 ## onboard
 
@@ -84,38 +84,44 @@ Use these when the active workflow action is explicit.
 - Record completed TDD steps, verification command/result, changed files, diff summary, and drift status; refresh `context.md` / `drift.md`, then stop for the next run.
 - If `execution checkpoint` returns `WARN` or `BLOCK`, patch existing artifacts before continuing.
 - Mark completed tasks with `- [x]` for the executed group only.
-- Surface `allowedPaths` / `forbiddenPaths` as warnings only in Phase 4; hard-block verify/archive enforcement is deferred to Phase 7.
+- Keep execution evidence complete so downstream `verify` can emit accurate `PASS` / `WARN` / `BLOCK` outcomes.
 
 ## batch-apply
 
 - Confirm the target set and execution order before mutating files.
 - Apply only changes that are actually ready to execute.
+- Enforce global preconditions before iteration; if they fail, stop with a `BLOCK` result.
+- Run each change in per-change isolation and continue after per-change failures.
+- Report `applied`, `skipped`, and `blocked` counts with per-change reasons.
 - If no ready changes are found, stop and recommend the platform-specific `status` route: Codex `$opsx-status`, Claude/Gemini `/opsx-status`.
 - Do not auto-create missing state, do not fabricate ready tasks, and do not skip checkpoint requirements.
 
 ## verify
 
 - Check completeness, correctness, and coherence.
-- Report `CRITICAL`, `WARNING`, and `SUGGESTION` items.
-- In Phase 4, drift and path-boundary findings remain warnings. Hard verify/archive gates begin in Phase 7.
+- Emit canonical `PASS`, `WARN`, and `BLOCK` findings with `patchTargets` and `nextStep`.
+- Treat unresolved drift approvals, forbidden/out-of-scope path changes, missing execution proof, and incomplete task groups as blocking conditions.
 
 ## sync
 
-- Merge delta specs into `.opsx/specs/`.
-- Preserve unrelated content.
-- Report conflicts.
+- Plan spec updates in memory before writing to `.opsx/specs/`.
+- Preserve unrelated content and surface conflicts explicitly.
+- If findings include `BLOCK`, do not write partial sync output.
 
 ## archive
 
-- Confirm task completion state.
-- Sync specs when needed.
-- Move the change to archive.
-- In Phase 4, do not treat `allowedPaths` / `forbiddenPaths` drift as an automatic hard block here; that hard gate is deferred to Phase 7.
+- Accept only `VERIFIED` or `SYNCED` changes.
+- For `VERIFIED`, run the same internal safe sync checks before archive move.
+- Block archive when verify or sync preconditions fail.
+- Move the full change directory into `.opsx/archive/<change-name>/` after gate acceptance.
 
 ## bulk-archive
 
 - Confirm the target set before archiving multiple changes.
-- Archive only changes that are completed and ready for archival.
+- Enforce global preconditions before iteration; if they fail, stop with a `BLOCK` result.
+- Archive only changes that pass verify/sync prerequisites.
+- Run each change in per-change isolation and continue after per-change failures.
+- Report `archived`, `skipped`, and `blocked` counts with per-change reasons.
 - If no completed changes are found, stop and recommend the platform-specific `status` route: Codex `$opsx-status`, Claude/Gemini `/opsx-status`.
 - Do not auto-create archive metadata, and do not mark incomplete changes as completed.
 
@@ -131,6 +137,5 @@ Use these when the active workflow action is explicit.
 - Use `required`, `recommended`, `waived`, and `completed` for security-review state.
 - Use `PASS`, `WARN`, and `BLOCK` for checkpoint output.
 - Treat `status` as read-only: warn on hash drift, reload from disk, and do not refresh stored hashes from read-only routes.
-- Surface `allowedPaths` / `forbiddenPaths` as warnings in Phase 4 (not hard blocks).
-- Hard verify/archive path enforcement is deferred to Phase 7.
+- Reflect active hard-gate semantics in output: blocked verify/sync/archive candidates stay blocked until findings are resolved.
 - Do not auto-create `.opsx/active.yaml` or invent an active change from `status`.

@@ -18,7 +18,7 @@
 12. 在 `tasks` 之后、`apply` 之前运行 `task checkpoint`。
 13. 路由面保持不变：Codex 不得新增 `$opsx-spec-split-*`，Claude/Gemini 不得新增 `/opsx-spec-split-*`，继续使用现有 `propose` / `continue` / `ff` 路由。
 14. 编写 `tasks.md` 时必须包含 `## Test Plan`，且每个一级任务组都要声明 `TDD Class:` 或 `TDD Exemption:`，并包含显式 `VERIFY:`。`manual-only verification` 仅在 `Verification:` 行明确说明为何不适合自动化检查时允许。
-15. verify/archive 的硬门禁继续延后到 Phase 7。
+15. verify/sync/archive/batch 路由遵循 Phase 7 硬门禁：verify 产出 `PASS`/`WARN`/`BLOCK`，sync 采用保守且不允许 partial write 的规划，archive 先做安全 sync 再移动，batch 输出每个 change 的 skipped/blocked 原因。
 
 ## onboard
 
@@ -84,38 +84,44 @@
 - 记录 completed TDD steps、verification command/result、changed files、diff summary、drift status；刷新 `context.md` / `drift.md`，然后停止等待下一次执行。
 - 如果 `execution checkpoint` 返回 `WARN` 或 `BLOCK`，先回写已有工件再继续。
 - 仅将本次执行的任务组条目标记为 `- [x]`。
-- `allowedPaths` / `forbiddenPaths` 在 Phase 4 仅作为告警，不是硬阻塞；verify/archive 的硬门禁延后到 Phase 7。
+- 保持 execution 证据完整，确保后续 `verify` 能输出准确的 `PASS` / `WARN` / `BLOCK` 结论。
 
 ## batch-apply
 
 - 执行前先确认目标变更集合与执行顺序。
 - 仅对真实 READY 的 changes 执行批量 apply。
+- 迭代前先校验全局前置条件；若失败则以 `BLOCK` 立即停止。
+- 对每个 change 使用 per-change isolation，单个失败后继续处理其他目标。
+- 输出 `applied`、`skipped`、`blocked` 计数及逐项原因。
 - 若未找到 READY changes，立即停止并建议对应平台的 `status` 路由：Codex `$opsx-status`，Claude/Gemini `/opsx-status`。
 - 不要 auto-create 缺失状态，不要伪造 READY 任务，也不要跳过 checkpoint 要求。
 
 ## verify
 
 - 从 Completeness、Correctness、Coherence 三个维度检查。
-- 输出 `CRITICAL`、`WARNING`、`SUGGESTION`。
-- Phase 4 里 drift 与路径边界问题先按告警处理；verify/archive 的硬门禁从 Phase 7 开始。
+- 产出标准化的 `PASS`、`WARN`、`BLOCK` 结果，并附带 `patchTargets` 与 `nextStep`。
+- 对未解决 drift 审批、forbidden/out-of-scope 路径变更、execution 证据缺失、未完成任务组等情况直接阻塞。
 
 ## sync
 
-- 将 delta specs 合并进 `.opsx/specs/`。
-- 保留无关内容不变。
-- 输出冲突点。
+- 写入 `.opsx/specs/` 前先在内存中完成保守规划。
+- 保留无关内容并明确报告冲突。
+- 若出现 `BLOCK` finding，则 do not write partial sync output。
 
 ## archive
 
-- 确认任务完成状态。
-- 需要时先做 spec sync。
-- 将 change 移入 archive。
-- Phase 4 不要把 `allowedPaths` / `forbiddenPaths` 的 drift 直接当成 archive 硬阻塞；该硬门禁延后到 Phase 7。
+- 仅接受 `VERIFIED` 或 `SYNCED` 的 change。
+- 对 `VERIFIED` change，移动前必须执行同一套内部 safe sync 检查。
+- verify 或 sync 前置条件失败时必须阻塞 archive。
+- 门禁通过后将完整 change 目录移动到 `.opsx/archive/<change-name>/`。
 
 ## bulk-archive
 
 - 批量归档前先确认目标集合。
-- 仅归档已完成且满足归档条件的 changes。
+- 迭代前先校验全局前置条件；若失败则以 `BLOCK` 立即停止。
+- 仅归档通过 verify/sync 前置条件的 changes。
+- 对每个 change 使用 per-change isolation，单个失败后继续处理其他目标。
+- 输出 `archived`、`skipped`、`blocked` 计数及逐项原因。
 - 若没有可归档的 completed changes，立即停止并建议对应平台的 `status` 路由：Codex `$opsx-status`，Claude/Gemini `/opsx-status`。
 - 不要 auto-create archive metadata，也不要把未完成 change 标记为 completed。
 
@@ -131,6 +137,5 @@
 - `security-review` 使用 `required`、`recommended`、`waived`、`completed`。
 - checkpoint 使用 `PASS`、`WARN`、`BLOCK`。
 - `status` 必须保持只读：发现 hash drift 时先告警并从磁盘 reload，且 do not refresh stored hashes from read-only routes。
-- 在 Phase 4 中 `allowedPaths` / `forbiddenPaths` 仅作为告警显示（不是硬阻塞）。
-- verify/archive 的路径硬门禁延后到 Phase 7。
+- 输出中应反映当前硬门禁语义：verify/sync/archive 候选出现阻塞 finding 时，状态保持 blocked 直到修复完成。
 - 不要 auto-create `.opsx/active.yaml`，也不要在 `status` 路由里虚构 active change。

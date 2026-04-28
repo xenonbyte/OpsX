@@ -4003,6 +4003,23 @@ function runTests() {
         assert(playbookContent.includes(token), `${relativePath} apply guidance must include ${token}`);
       });
     });
+
+    const stalePhase7Phrases = [
+      'deferred to Phase 7',
+      'explicitly user-approved incomplete changes',
+      'Do not archive incomplete changes unless the user explicitly accepts the risk.',
+      '硬门禁延后到 Phase 7'
+    ];
+    [
+      'skills/opsx/SKILL.md',
+      'skills/opsx/references/action-playbooks.md',
+      'skills/opsx/references/action-playbooks-zh.md'
+    ].forEach((relativePath) => {
+      const content = fs.readFileSync(path.join(REPO_ROOT, relativePath), 'utf8');
+      stalePhase7Phrases.forEach((phrase) => {
+        assert(!content.includes(phrase), `${relativePath} must not include stale phrase: ${phrase}`);
+      });
+    });
   });
 
   test('opsx check/doc/language work as subcommands and compatibility aliases', () => {

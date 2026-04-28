@@ -132,11 +132,12 @@ If `language: en`:
 - Ask concise clarification questions when missing scope can materially change behavior.
 - Keep `status` and `resume` strictly read-only; do not mutate `.opsx/active.yaml`, `state.yaml`, `context.md`, or `drift.md` from those routes.
 - When artifact hash drift is detected, warn and reload from disk first; refresh stored hashes only after accepted checkpoint/state writes.
-- Treat `allowedPaths` / `forbiddenPaths` as warnings during Phase 4. Do not hard-block `verify` or `archive` yet.
+- `verify` must emit `PASS` / `WARN` / `BLOCK`; unresolved `BLOCK` findings stop `sync`, `archive`, and bulk archive eligibility.
+- `sync` must compute a conservative in-memory plan first; when findings include `BLOCK`, do not write partial sync output.
 - `task checkpoint` uses `rules.tdd.mode`; required groups must expose `RED` and `VERIFY`, `REFACTOR` stays optional, and exempt groups must include visible `TDD Exemption:` reasons.
-- Hard enforcement for `verify` / `archive` path and drift gates is deferred to Phase 7.
+- `archive` must require verify and sync preconditions; when the stage is only `VERIFIED`, run the same safe sync check before moving to `.opsx/archive/<change-name>/`.
+- `batch-apply` / `bulk-archive` must run each change in per-change isolation and report skipped/blocked reasons; global precondition failures stop the run.
 - Do not skip dependency checks silently.
-- Do not archive incomplete changes unless the user explicitly accepts the risk.
 - Keep outputs concise and action-oriented.
 
 ## Resources
