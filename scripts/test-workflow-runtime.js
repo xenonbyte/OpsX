@@ -710,6 +710,52 @@ function runTests() {
     assert.strictEqual(normalized.active.taskGroup, null);
   });
 
+  test('spec-split checkpoint schema metadata is present for the pre-design gate', () => {
+    const schemaPath = path.join(REPO_ROOT, 'schemas', 'spec-driven', 'schema.json');
+    const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+    const checkpointIds = Array.isArray(schema.checkpoints) ? schema.checkpoints.map((checkpoint) => checkpoint.id) : [];
+    const splitIndex = checkpointIds.indexOf('spec-split-checkpoint');
+    const specIndex = checkpointIds.indexOf('spec-checkpoint');
+
+    assert(splitIndex !== -1, 'Expected schema checkpoints to include spec-split-checkpoint.');
+    assert(specIndex !== -1, 'Expected schema checkpoints to include spec-checkpoint.');
+    assert(splitIndex < specIndex, 'Expected spec-split-checkpoint to run before spec-checkpoint.');
+
+    const splitCheckpoint = schema.checkpoints[splitIndex];
+    assert.strictEqual(splitCheckpoint.trigger, 'after-specs-before-design');
+    assert.deepStrictEqual(splitCheckpoint.states, ['PASS', 'WARN', 'BLOCK']);
+    assert.deepStrictEqual(splitCheckpoint.insertion, {
+      after: ['specs'],
+      before: ['design']
+    });
+  });
+
+  test('change-store maps canonical split checkpoint id into persisted specSplit slot', () => {
+    const { normalizeChangeState, recordCheckpointResult, loadChangeState } = require('../lib/change-store');
+    const changeName = 'spec-split-checkpoint-persistence';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n'
+    });
+    const normalized = normalizeChangeState({
+      change: changeName,
+      checkpoints: {
+        'spec-split-checkpoint': {
+          status: 'WARN'
+        }
+      }
+    });
+
+    assert.strictEqual(normalized.checkpoints.specSplit.status, 'WARN');
+    ['spec', 'task', 'execution'].forEach((checkpointId) => {
+      assert(Object.prototype.hasOwnProperty.call(normalized.checkpoints, checkpointId));
+    });
+
+    recordCheckpointResult(changeDir, 'spec-split-checkpoint', { status: 'PASS' });
+    const persisted = loadChangeState(changeDir);
+    assert.strictEqual(persisted.checkpoints.specSplit.status, 'PASS');
+    assert(!Object.prototype.hasOwnProperty.call(persisted.checkpoints, 'spec-split-checkpoint'));
+  });
+
   test('read-only drift detection warns without refreshing stored hashes', () => {
     const { loadChangeState, writeChangeState } = require('../lib/change-store');
     const changeName = 'read-only-drift';
