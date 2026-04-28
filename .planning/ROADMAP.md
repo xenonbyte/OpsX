@@ -194,7 +194,7 @@ Plans:
 - [x] `07-05-PLAN.md` — Refresh the bounded Claude verify/sync/archive/batch route slice from generator output.
 - [x] `07-06-PLAN.md` — Refresh the bounded Codex verify/sync/archive/batch prompt slice from generator output.
 - [x] `07-07-PLAN.md` — Refresh the bounded Gemini verify/sync/archive/batch route slice from generator output.
-- [ ] `07-08-PLAN.md` — Remove temporary Phase 7 prompt allowances and restore strict full-bundle parity.
+- [x] `07-08-PLAN.md` — Remove temporary Phase 7 prompt allowances and restore strict full-bundle parity.
 
 **Success criteria:**
 1. `opsx-verify` compares proposal, specs, design, tasks, code diff, tests, TDD records, execution checkpoints, drift, and allowed/forbidden paths.
