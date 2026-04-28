@@ -9,6 +9,7 @@ const { createHash } = require('node:crypto');
 const YAML = require('yaml');
 const { copyDir, ensureDir, removePath, writeText } = require('../lib/fs-utils');
 const { REPO_ROOT, PACKAGE_VERSION } = require('../lib/constants');
+const { normalizeConfig } = require('../lib/config');
 const {
   RuntimeGuidanceError,
   validateSchemaGraph,
@@ -416,6 +417,46 @@ function runTests() {
   function test(name, fn) {
     tests.push({ name, fn });
   }
+
+  test('normalizeConfig defaults rules.tdd to strict mode for behavior-change and bugfix', () => {
+    const normalized = normalizeConfig({});
+    assert.deepStrictEqual(normalized.rules.tdd, {
+      mode: 'strict',
+      requireFor: ['behavior-change', 'bugfix'],
+      exempt: ['docs-only', 'copy-only', 'config-only']
+    });
+  });
+
+  test('normalizeConfig repairs invalid rules.tdd values and merges custom classification lists', () => {
+    const normalized = normalizeConfig({
+      rules: {
+        tdd: {
+          mode: 'unexpected',
+          requireFor: ['behavior-change', 'migration-only', 'bugfix', '', 'migration-only', '   '],
+          exempt: ['docs-only', 'generated-refresh-only', 'copy-only', '', 'generated-refresh-only', 'config-only']
+        }
+      }
+    });
+
+    assert.deepStrictEqual(normalized.rules.tdd, {
+      mode: 'strict',
+      requireFor: ['behavior-change', 'bugfix', 'migration-only'],
+      exempt: ['docs-only', 'copy-only', 'config-only', 'generated-refresh-only']
+    });
+  });
+
+  test('project config template seeds rules.tdd strict defaults', () => {
+    const templateText = fs.readFileSync(path.join(REPO_ROOT, 'templates', 'project', 'config.yaml.tmpl'), 'utf8');
+    assert(templateText.includes('  tdd:'), 'Template must include rules.tdd block.');
+    assert(templateText.includes('    mode: "strict"'), 'Template must seed strict mode.');
+    assert(templateText.includes('    requireFor:'), 'Template must seed requireFor list.');
+    assert(templateText.includes('      - "behavior-change"'), 'Template must include behavior-change requireFor entry.');
+    assert(templateText.includes('      - "bugfix"'), 'Template must include bugfix requireFor entry.');
+    assert(templateText.includes('    exempt:'), 'Template must seed exempt list.');
+    assert(templateText.includes('      - "docs-only"'), 'Template must include docs-only exempt entry.');
+    assert(templateText.includes('      - "copy-only"'), 'Template must include copy-only exempt entry.');
+    assert(templateText.includes('      - "config-only"'), 'Template must include config-only exempt entry.');
+  });
 
   test('schema graph validation catches duplicate ids, invalid requires, and cycles', () => {
     expectRuntimeError(() => {
