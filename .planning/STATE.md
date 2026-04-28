@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
-status: ready_to_plan
-stopped_at: Phase 5 verified and complete
-last_updated: "2026-04-28T07:47:39Z"
+status: planning
+stopped_at: Phase 6 context gathered
+last_updated: "2026-04-28T08:19:55.559Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
@@ -155,8 +155,8 @@ Run `$gsd-discuss-phase 6` to gather Phase 6 context, or `$gsd-plan-phase 6` to 
 
 ## Session
 
-Last session: 2026-04-28T07:47:39Z
-Stopped At: Phase 5 verified and complete
-Resume File: None
+Last session: --stopped-at
+Stopped At: Phase 6 context gathered
+Resume File: --resume-file
 
 **Next Phase:** 06 (TDD-Light Workflow)
