@@ -24,16 +24,17 @@ Execution rules:
 - Route fallback guidance:
 - If `.opsx/config.yaml` is missing, stop and redirect to `/opsx-onboard`.
 - If `.opsx/active.yaml` is missing or points to a missing change, stop and ask the user to run `/opsx-new` or `/opsx-propose`.
-- Do not invent an active change, state file, or task state when required artifacts are absent.
+- Build a conservative in-memory sync plan first, then emit PASS/WARN/BLOCK findings.
+- When findings include BLOCK conflicts, do not write partial sync output.
 - Use request details already present in the conversation.
 - Use inline arguments when available, but confirm ambiguous names or descriptions before mutating files.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.
 - If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
-- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
-- `execution checkpoint` runs after each top-level task group during `apply`.
+- Sync routes must compute conservative in-memory plans first, then emit `PASS`/`WARN`/`BLOCK`; when blocked, do not write partial sync output.
+- Sync execution writes only after full-plan acceptance; when findings include `BLOCK`, do not write partial sync output.
 - Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
 - If the required change name, description, or selection is missing, ask for the minimum clarification needed.
-- Merge only the requested delta specs and report conflicts explicitly.
+- Compute sync changes in memory first, report PASS/WARN/BLOCK findings, and do not write partial sync output when blocked.
 - When files are mutated, report changed files, current state, next step, and blockers.
 
 """
