@@ -56,7 +56,8 @@
 
 - [x] **TDD-01
 **: `.opsx/config.yaml` supports `rules.tdd.mode` with `off`, `light`, and `strict`.
-- [ ] **TDD-02**: `tasks.md` templates include a Test Plan and RED/GREEN/REFACTOR/VERIFY task structure for behavior changes and bug fixes.
+- [x] **TDD-02
+**: `tasks.md` templates include a Test Plan and RED/GREEN/REFACTOR/VERIFY task structure for behavior changes and bug fixes.
 - [ ] **TDD-03**: `task-checkpoint` warns in light mode when behavior changes lack RED or VERIFY tasks and blocks in strict mode.
 - [ ] **TDD-04**: `execution-checkpoint` records completed steps, verification command/result, diff summary, and drift after each top-level task group.
 

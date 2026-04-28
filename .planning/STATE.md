@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-04-28T09:50:27.281Z"
-last_activity: 2026-04-28 -- Phase 06 execution started
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-04-28T09:55:38.779Z"
+last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 46
-  completed_plans: 38
-  percent: 83
+  completed_plans: 39
+  percent: 85
 ---
 
 # State
@@ -26,9 +26,9 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 06 (TDD-Light Workflow) — EXECUTING
-Plan: 1 of 9
-Status: Executing Phase 06
-Last activity: 2026-04-28 -- Phase 06 execution started
+Plan: 2 of 9
+Status: Ready to execute
+Last activity: 2026-04-28
 
 ## Next Action
 
@@ -110,6 +110,8 @@ Run `$gsd-execute-phase 6` to execute the Phase 6 waves, starting with Wave 1.
 - [Phase 06]: Keep generated prompt refresh bounded to `apply`, `propose`, `continue`, and `ff` across Claude/Codex/Gemini, using a temporary 12-file parity gate before the final repo-wide parity restore.
 - [Phase 06] Normalize rules.tdd via normalizeTddConfig() so checkpoint logic always receives strict-safe mode and list defaults.
 - [Phase 06] Merge requireFor/exempt lists additively and de-duplicate entries to preserve explicit custom classes without losing defaults.
+- Keep Test Plan metadata separate from numbered execution groups for deterministic parsing.
+- Require visible TDD Exemption reasons plus VERIFY coverage even for exempt groups.
 
 ## Blockers
 
@@ -157,11 +159,12 @@ Run `$gsd-execute-phase 6` to execute the Phase 6 waves, starting with Wave 1.
 | Phase 05 P06 | 39s | 1 tasks | 3 files |
 | Phase 05 P07 | 3m | 1 tasks | 2 files |
 | Phase 06 P01 | 1m 44s | 1 tasks | 3 files |
+| Phase 06 P02 | 2 min | 2 tasks | 6 files |
 
 ## Session
 
-Last session: 2026-04-28T09:50:27.277Z
-Stopped At: Completed 06-01-PLAN.md
+Last session: 2026-04-28T09:55:38.768Z
+Stopped At: Completed 06-02-PLAN.md
 Resume File: None
 
 **Next Phase:** 06 (TDD-Light Workflow)
