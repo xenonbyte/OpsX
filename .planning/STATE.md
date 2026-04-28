@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-04-28T14:30:46.510Z"
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-04-28T14:40:15.565Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 54
-  completed_plans: 47
-  percent: 87
+  completed_plans: 48
+  percent: 89
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 07 (Verify, Sync, Archive, and Batch Gates) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Status: Ready to execute
 Last activity: 2026-04-28
 
@@ -49,6 +49,7 @@ Run `$gsd-execute-phase 7` to execute the eight planned Phase 7 plans.
 - 2026-04-28: Phase 6 planned into 9 plans across 6 waves; Wave 1 covers `rules.tdd` defaults and task guidance, Waves 2-4 implement checkpoint/persistence/generator source work, Wave 5 refreshes the 12 route prompts for `apply` / `propose` / `continue` / `ff`, and Wave 6 restores strict parity.
 - 2026-04-28: Phase 6 execution and verification completed; `npm run test:workflow-runtime` passed 80/80, code review is clean, and `06-VERIFICATION.md` passed 6/6 must-haves.
 - 2026-04-28: Phase 7 planning completed with 8 plans across 6 waves; the locked implementation path uses `picomatch@4.0.4` for Node-14-compatible path-scope matching and exact `.opsx/archive/<change-name>/` archive moves.
+- 2026-04-28: Phase 7 Plan 02 completed; `lib/sync.js` now enforces conservative in-memory sync planning, blocks omissions/conflicts, and advances `VERIFIED` to `SYNCED` only after accepted writes.
 
 ## Decisions
 
@@ -131,6 +132,8 @@ Run `$gsd-execute-phase 7` to execute the eight planned Phase 7 plans.
 - [Phase 07 Plan 01] Pin picomatch to 4.0.4 for Node >=14.14-compatible allowed/forbidden path matching.
 - [Phase 07 Plan 01] Classify docs/config-only scope extras as WARN while forbidden or clearly out-of-scope files remain BLOCK.
 - [Phase 07 Plan 01] Accept verify writes only through MUTATION_EVENTS.VERIFY_ACCEPTED with tracked-hash refresh.
+- Phase 07 Plan 02 establishes plan-then-write sync with parseSpecFile/reviewSpecSplitEvidence and treats likely behavior conflicts as blocking.
+- Phase 07 Plan 02 blocks sync unless canonical requirements are preserved or explicitly removed, then applies SYNC_ACCEPTED only after accepted writes.
 
 ## Blockers
 
@@ -188,13 +191,14 @@ Run `$gsd-execute-phase 7` to execute the eight planned Phase 7 plans.
 | Phase 06 P08 | 3 min | 1 tasks | 4 files |
 | Phase 06 P09 | 1m | 1 tasks | 1 files |
 | Phase 07 P01 | 5 min | 2 tasks | 6 files |
+| Phase 07 P02 | 3m | 1 tasks | 2 files |
 
 ## Session
 
-Last session: 2026-04-28T14:30:46.506Z
-Stopped At: Completed 07-01-PLAN.md
+Last session: 2026-04-28T14:39:20.965Z
+Stopped At: Completed 07-02-PLAN.md
 Resume File: None
 
 **Next Phase:** 7 (Verify, Sync, Archive, and Batch Gates)
 
-**Planned Phase:** 7 (Verify, Sync, Archive, and Batch Gates) — 8 plans across 6 waves — ready to execute
+**Planned Phase:** 7 (Verify, Sync, Archive, and Batch Gates) — 8 

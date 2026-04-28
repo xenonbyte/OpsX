@@ -67,7 +67,8 @@
 
 - [x] **QUAL-01
 **: `opsx-verify` checks proposal/specs/design/tasks/code/test alignment, TDD-light records, execution checkpoint completeness, changed-file scope, drift, and configured verification commands.
-- [ ] **QUAL-02**: `opsx-sync` merges change specs into `.opsx/specs/**` while checking for omissions and requirement conflicts.
+- [x] **QUAL-02
+**: `opsx-sync` merges change specs into `.opsx/specs/**` while checking for omissions and requirement conflicts.
 - [ ] **QUAL-03**: `opsx-archive` blocks unless the change is verified or synced, tasks are complete, execution checkpoints are complete, specs are synced, and drift has no unresolved blockers.
 - [ ] **QUAL-04**: `opsx-batch-apply` and `opsx-bulk-archive` process each change independently without mixing state or context.
 - [ ] **QUAL-05**: `opsx status --json` writes clean JSON to stdout without spinner/progress noise.
@@ -139,7 +140,7 @@
 | TDD-03 | Phase 6 | Completed |
 | TDD-04 | Phase 6 | Completed |
 | QUAL-01 | Phase 7 | Completed |
-| QUAL-02 | Phase 7 | Pending |
+| QUAL-02 | Phase 7 | Completed |
 | QUAL-03 | Phase 7 | Pending |
 | QUAL-04 | Phase 7 | Pending |
 | QUAL-05 | Phase 8 | Pending |
@@ -156,4 +157,4 @@
 
 ---
 *Requirements defined: 2026-04-27*
-*Last updated: 2026-04-28 after Phase 7 Plan 01 execution*
+*Last updated: 2026-04-28 after Phase 7 Plan 02 execution*

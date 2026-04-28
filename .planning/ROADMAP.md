@@ -188,7 +188,7 @@ Plans:
 
 Plans:
 - [x] `07-01-PLAN.md` — Add Node-14-compatible path-scope matching and the hard verify gate with accepted `VERIFIED` transitions.
-- [ ] `07-02-PLAN.md` — Build conservative in-memory spec sync with no-partial-write semantics and accepted `SYNCED` transitions.
+- [x] `07-02-PLAN.md` — Build conservative in-memory spec sync with no-partial-write semantics and accepted `SYNCED` transitions.
 - [ ] `07-03-PLAN.md` — Implement archive safe-sync gating, exact `.opsx/archive/<change-name>/` moves, and isolated batch orchestration.
 - [ ] `07-04-PLAN.md` — Update source-of-truth verify/sync/archive/batch guidance and stage a temporary 15-route prompt assertion scope.
 - [ ] `07-05-PLAN.md` — Refresh the bounded Claude verify/sync/archive/batch route slice from generator output.
