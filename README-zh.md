@@ -22,6 +22,7 @@ opsx doc
 opsx language <en|zh>
 opsx migrate
 opsx status
+opsx status --json
 opsx --help
 opsx --version
 ```
@@ -43,6 +44,17 @@ $opsx-apply
 
 其余工作流命令也遵循同一显式模式（例如：
 `$opsx-explore`、`$opsx-continue`、`$opsx-verify`、`$opsx-archive`）。
+不要使用 standalone `$opsx` 或 `/opsx:*`；公共入口保持 explicit-only。
+
+## 发布前预检
+
+发布前使用一个总入口：
+
+```bash
+npm test
+```
+
+该命令会通过聚合测试器执行 Phase 8 已拆分的 package、generation、state、paths、gates 覆盖。
 
 ## 项目配置
 

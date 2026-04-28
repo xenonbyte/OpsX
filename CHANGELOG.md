@@ -8,6 +8,7 @@ Highlights:
 - Ship the breaking rename from OpenSpec to OpsX on the public surface: npm package `@xenonbyte/opsx`, CLI `opsx`, and distributed skill bundle `skills/opsx`
 - Do not ship an `openspec` executable alias in `@xenonbyte/opsx@3.0.0`; any compatibility bridge belongs to a separate `@xenonbyte/openspec@2.x` follow-up
 - Keep Phase 1 messaging honest: full `.opsx/` workspace/global migration is deferred to Phase 2, and durable workflow state-machine behavior is deferred to later phases
+- Phase 8 release hardening finalizes `opsx status --json` transport semantics (`ok: true`), shared `lib/path-utils.js` + `lib/glob-utils.js` stability boundaries, and `npm test` as the release preflight entrypoint
 
 ## v2.0.1
 

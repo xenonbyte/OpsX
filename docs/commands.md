@@ -58,6 +58,7 @@ opsx doc
 opsx language <en|zh>
 opsx migrate
 opsx status
+opsx status --json
 opsx --help
 opsx --version
 ```
@@ -71,3 +72,15 @@ Behavior notes:
 - `install` / `uninstall` require `--platform` and support comma-separated multi-platform values.
 - Installation always deploys the full command surface; there is no profile split.
 - `migrate` and `status` are included in the command surface; deeper migration/state workflows are delivered in later phases.
+
+## `opsx status --json` Contract
+
+- `status --json` writes a machine-readable JSON envelope to stdout only.
+- Top-level keys are stable for automation: `ok`, `version`, `command`, `workspace`, `migration`, `activeChange`, `changeStatus`, `warnings`, `errors`.
+- `ok: true` means transport success (the CLI successfully emitted JSON). It does not mean the workspace or change is ready.
+- Expected workflow states still exit `0` in `--json` mode, including:
+  - workspace not initialized
+  - no active change selected
+  - migration candidates present
+  - readiness warnings/blockers surfaced in `workspace`, `migration`, `changeStatus`, `warnings`, or `errors`
+- True exceptional failures (for example invalid command arguments or runtime filesystem exceptions) use stderr and non-zero exit.

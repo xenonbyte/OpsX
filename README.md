@@ -22,6 +22,7 @@ opsx doc
 opsx language <en|zh>
 opsx migrate
 opsx status
+opsx status --json
 opsx --help
 opsx --version
 ```
@@ -43,6 +44,18 @@ $opsx-apply
 
 Additional workflow routes follow the same explicit pattern (for example:
 `$opsx-explore`, `$opsx-continue`, `$opsx-verify`, `$opsx-archive`).
+Do not use standalone `$opsx` or `/opsx:*`; public routes stay explicit-only.
+
+## Release Preflight
+
+Use one total entrypoint before release:
+
+```bash
+npm test
+```
+
+This runs the split Phase 8 workflow/runtime coverage (package, generation,
+state, paths, and gates) through the aggregate test runner.
 
 ## Project Config
 

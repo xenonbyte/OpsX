@@ -29,6 +29,9 @@
   - project config: `.opsx/config.yaml`
   - active change pointer: `.opsx/active.yaml`
   - per-change metadata: `.opsx/changes/<name>/change.yaml`
+- Path/glob behavior is stabilized through shared repo-local helpers:
+  - `lib/path-utils.js` for canonical path normalization and base-boundary checks
+  - `lib/glob-utils.js` for predictable glob parsing/matching and literal escaping for glob-special artifact names
 - Migration commands (`opsx migrate --dry-run` / `opsx migrate`) may still translate older pre-v3.0 workspace layouts, but those layouts are not part of current runtime guidance.
 - Existing public CLI usage remains unchanged:
   - `opsx install`
@@ -39,6 +42,10 @@
   - `opsx migrate`
   - `opsx status`
 - Existing checkpoint contracts stay canonical (`PASS`, `WARN`, `BLOCK`, `patchTargets`, `nextStep`).
+
+## Release Gate Reminder
+
+- Use `npm test` as the total preflight entrypoint before running the final release checklist.
 
 ## Rollback Guidance
 If runtime-guidance behavior needs rollback:
