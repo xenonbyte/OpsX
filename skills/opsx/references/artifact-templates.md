@@ -64,13 +64,31 @@ Rules:
 ## tasks.md
 
 ```markdown
-## 1. Setup
-- [ ] 1.1 Example task
+## Test Plan
+- Behavior: Enforce RED and VERIFY evidence for behavior-changing task groups.
+- Requirement/Scenario: TDD-02 / behavior-change groups must expose deterministic TDD markers.
+- Verification: Run `npm run test:workflow-runtime` and review checkpoint findings.
+- TDD Mode: strict
+- Exemption Reason: none
+
+## 1. Enforce task-checkpoint TDD markers
+- TDD Class: behavior-change
+- [ ] RED: Add a failing runtime test for missing VERIFY evidence.
+- [ ] GREEN: Implement checkpoint updates so the RED test passes.
+- [ ] REFACTOR: Optional cleanup that preserves passing tests.
+- [ ] VERIFY: Run `npm run test:workflow-runtime` and capture results.
+
+## 2. Refresh docs-only wording
+- TDD Exemption: docs-only — wording-only updates with no behavior logic change.
+- [ ] Update wording in guidance artifacts for the shipped TDD-light contract.
+- [ ] VERIFY: Run `npm run test:workflow-runtime` to ensure no runtime regressions.
 ```
 
 Rules:
-- Use exact checkbox format `- [ ] X.Y Description`.
-- Mark completed work with `- [x]`.
-- Order tasks by dependency.
-- Organize work under top-level task groups such as `## 1. Setup`; `execution checkpoint` runs after each top-level group.
+- Keep `## Test Plan` as the metadata block ahead of executable top-level groups.
+- Use exact marker keys in the test plan: `Behavior`, `Requirement/Scenario`, `Verification`, `TDD Mode`, and `Exemption Reason`.
+- For behavior or bugfix groups, include `- TDD Class: behavior-change` or `- TDD Class: bugfix` and explicit `RED`, `GREEN`, and `VERIFY` checklist items.
+- `REFACTOR` is optional and must stay visible when used.
+- For exempt groups, add a visible `- TDD Exemption: <class> — <reason>` line and still include a `VERIFY` checklist item.
+- Keep executable work in numbered top-level groups such as `## 1. ...`; `execution checkpoint` runs after each top-level group.
 - If a checkpoint finds drift or missing coverage, patch `tasks.md` instead of creating a separate review artifact.

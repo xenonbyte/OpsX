@@ -2141,7 +2141,9 @@ function runTests() {
       changeName: 'template-source',
       artifactId: 'tasks'
     });
-    assert(payload.template.content.includes('- [ ] 1.1 Example task'));
+    assert(payload.template.content.includes('## Test Plan'));
+    assert(payload.template.content.includes('TDD Class: behavior-change'));
+    assert(payload.template.content.includes('TDD Exemption: docs-only'));
     assert(payload.template.sourcePath.includes(path.join('skills', 'opsx', 'references')));
   });
 
