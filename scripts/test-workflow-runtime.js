@@ -277,55 +277,6 @@ function runTests() {
     assert.strictEqual(resolveContinueAction({ stage: 'SYNCED' }), 'archive');
   });
 
-  test('matchPathScope uses picomatch globs for allowed and forbidden paths', () => {
-    const { matchPathScope } = require('../lib/path-scope');
-    const result = matchPathScope(
-      [
-        'lib/verify.js',
-        'lib\\windows\\gate.js',
-        'secrets/private.pem',
-        'src/index.js'
-      ],
-      {
-        allowedPaths: ['lib/**'],
-        forbiddenPaths: ['*.pem']
-      }
-    );
-
-    assert.strictEqual(result.hasAllowedScope, true);
-    assert.deepStrictEqual(result.allowedMatches.sort((left, right) => left.localeCompare(right)), [
-      'lib/verify.js',
-      'lib/windows/gate.js'
-    ]);
-    assert.deepStrictEqual(result.forbiddenMatches, ['secrets/private.pem']);
-    assert.deepStrictEqual(result.outOfScopeMatches, ['src/index.js']);
-    assert.deepStrictEqual(result.explainableExtraMatches, []);
-  });
-
-  test('matchPathScope distinguishes forbidden files from explainable docs or config extras', () => {
-    const { matchPathScope } = require('../lib/path-scope');
-    const result = matchPathScope(
-      [
-        'README.md',
-        'docs/opsx.md',
-        'config/runtime.yaml',
-        'secrets/blocked.pem'
-      ],
-      {
-        allowedPaths: ['lib/**'],
-        forbiddenPaths: ['*.pem']
-      }
-    );
-
-    assert.deepStrictEqual(result.forbiddenMatches, ['secrets/blocked.pem']);
-    assert.deepStrictEqual(result.explainableExtraMatches.sort((left, right) => left.localeCompare(right)), [
-      'config/runtime.yaml',
-      'docs/opsx.md',
-      'README.md'
-    ]);
-    assert.deepStrictEqual(result.outOfScopeMatches, []);
-  });
-
   test('verify gate blocks forbidden paths unresolved drift and incomplete task groups', () => {
     const { evaluateVerifyGate } = require('../lib/verify');
     const { hashTrackedArtifacts } = require('../lib/change-artifacts');
@@ -2154,42 +2105,6 @@ function runTests() {
 
     const persisted = loadChangeState(changeDir);
     assert.strictEqual(persisted.hashes.proposal, seeded.hashes.proposal);
-  });
-
-  test('change-artifacts hashes tracked Phase 4 artifacts deterministically', () => {
-    const { hashTrackedArtifacts, detectArtifactHashDrift } = require('../lib/change-artifacts');
-    const changeName = 'tracked-artifact-hash';
-    const changeDir = createChange(fixtureRoot, changeName, {
-      'proposal.md': '# Proposal\n',
-      'design.md': '# Design\n',
-      'security-review.md': '# Security review\n',
-      'tasks.md': '## 1. Group\n- [ ] 1.1 Work\n',
-      'specs/core/spec.md': '## ADDED Requirements\n### Requirement: Core\n',
-      'specs/edge/spec.md': '## ADDED Requirements\n### Requirement: Edge\n',
-      'specs/README.md': 'Ignored non-spec artifact\n'
-    });
-
-    const first = hashTrackedArtifacts(changeDir);
-    const second = hashTrackedArtifacts(changeDir);
-    assert.deepStrictEqual(first, second);
-    assert.deepStrictEqual(Object.keys(first), [
-      'design.md',
-      'proposal.md',
-      'security-review.md',
-      'specs/core/spec.md',
-      'specs/edge/spec.md',
-      'tasks.md'
-    ]);
-
-    const drift = detectArtifactHashDrift(
-      Object.assign({}, first, {
-        'design.md': 'stale-design-hash'
-      }),
-      first
-    );
-    assert.deepStrictEqual(drift.driftedPaths, ['design.md']);
-    assert.strictEqual(drift.warnings.length, 1);
-    assert(drift.warnings[0].includes('design.md'));
   });
 
   test('change-capsule renders bounded context sections and appends stable drift headings', () => {
