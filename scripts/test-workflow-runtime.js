@@ -768,6 +768,73 @@ function runTests() {
     assert.strictEqual(docsExtra.severity, 'WARN');
   });
 
+  test('verify gate falls back to execution log changed files when caller omits diff input', () => {
+    const { evaluateVerifyGate } = require('../lib/verify');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const { writeChangeState } = require('../lib/change-store');
+    const changeName = 'verify-gate-log-changed-files';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Behavior change verification',
+        '- TDD Class: behavior-change',
+        '- [x] RED: add failing gate test',
+        '- [x] GREEN: implement gate check',
+        '- [x] VERIFY: run workflow runtime tests'
+      ].join('\n'),
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Verify gate execution diff fallback',
+        'The system SHALL check recorded execution changed files when direct diff input is absent.'
+      ].join('\n')
+    });
+    const now = new Date().toISOString();
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'IMPLEMENTED',
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        execution: {
+          status: 'PASS',
+          updatedAt: now
+        }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Behavior change verification',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        changedFiles: ['secrets/private.pem'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Forbidden path changed during implementation.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['lib/**'],
+      forbiddenPaths: ['*.pem']
+    });
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+
+    const gate = evaluateVerifyGate({ changeDir });
+    assert.strictEqual(gate.status, 'BLOCK');
+    assert(gate.findings.some((finding) => finding.code === 'forbidden-path-change'));
+    assert.deepStrictEqual(gate.pathScope.forbiddenMatches, ['secrets/private.pem']);
+  });
+
   test('acceptVerifyGate advances implemented changes to VERIFIED with refreshed hashes', () => {
     const { acceptVerifyGate } = require('../lib/verify');
     const { hashTrackedArtifacts } = require('../lib/change-artifacts');
@@ -884,6 +951,48 @@ function runTests() {
     const findingCodes = new Set(plan.findings.map((finding) => finding.code));
     assert(findingCodes.has('omitted-canonical-requirement'));
     assert(findingCodes.has('conflicting-requirements'));
+  });
+
+  test('applySyncPlan rejects targets outside canonical specs without writing files', () => {
+    const { applySyncPlan } = require('../lib/sync');
+    const outsidePath = path.join(fixtureRoot, 'outside-sync-write.md');
+    const canonicalSpecsDir = path.join(fixtureRoot, '.opsx', 'specs');
+
+    assert.throws(() => applySyncPlan({
+      status: 'PASS',
+      canonicalSpecsDir,
+      writes: [{
+        targetPath: outsidePath,
+        content: 'outside write'
+      }]
+    }), /outside \.opsx\/specs/);
+    assert.strictEqual(fs.existsSync(outsidePath), false);
+  });
+
+  test('applySyncPlan leaves canonical specs untouched when staging a later write fails', () => {
+    const { applySyncPlan } = require('../lib/sync');
+    const canonicalSpecsDir = path.join(fixtureRoot, '.opsx', 'specs');
+    const firstTarget = path.join(canonicalSpecsDir, 'runtime', 'spec.md');
+    const firstBefore = 'canonical content before staged failure\n';
+    writeText(firstTarget, firstBefore);
+    const invalidParent = path.join(canonicalSpecsDir, 'not-a-directory');
+    writeText(invalidParent, 'this file blocks child staging\n');
+
+    assert.throws(() => applySyncPlan({
+      status: 'PASS',
+      canonicalSpecsDir,
+      writes: [
+        {
+          targetPath: firstTarget,
+          content: 'new canonical content\n'
+        },
+        {
+          targetPath: path.join(invalidParent, 'spec.md'),
+          content: 'cannot be staged\n'
+        }
+      ]
+    }));
+    assert.strictEqual(fs.readFileSync(firstTarget, 'utf8'), firstBefore);
   });
 
   test('applySyncPlan writes full conflict-free capability files and advances VERIFIED to SYNCED', () => {
@@ -1286,25 +1395,35 @@ function runTests() {
       'proposal.md': '# Proposal\n'
     });
 
+    const malformedChangeName = 'batch-malformed-change';
+    const malformedChangeDir = createChange(fixtureRoot, malformedChangeName, {
+      'proposal.md': '# Proposal\n'
+    });
+    writeText(path.join(malformedChangeDir, 'state.yaml'), 'stage: [\n');
+
     const result = runBatchApply({
       repoRoot: fixtureRoot,
-      changeNames: [readyChangeName, skippedChangeName]
+      changeNames: [readyChangeName, skippedChangeName, malformedChangeName]
     });
 
     assert.strictEqual(result.status, 'PASS');
     assert.strictEqual(result.summary.ready, 1);
     assert.strictEqual(result.summary.skipped, 1);
-    assert.strictEqual(result.summary.blocked, 0);
+    assert.strictEqual(result.summary.blocked, 1);
 
     const readyEntry = result.results.find((entry) => entry.change === readyChangeName);
     const skippedEntry = result.results.find((entry) => entry.change === skippedChangeName);
+    const malformedEntry = result.results.find((entry) => entry.change === malformedChangeName);
     assert(readyEntry, 'Expected ready entry for ready change.');
     assert(skippedEntry, 'Expected skipped entry for skipped change.');
+    assert(malformedEntry, 'Expected blocked entry for malformed change.');
     assert.strictEqual(readyEntry.status, 'ready');
     assert.strictEqual(typeof readyEntry.nextTaskGroup, 'string');
     assert.strictEqual(skippedEntry.status, 'skipped');
     assert(skippedEntry.reason && skippedEntry.reason.length > 0);
     assert(Array.isArray(skippedEntry.findings));
+    assert.strictEqual(malformedEntry.status, 'blocked');
+    assert(malformedEntry.reason.includes('change-evaluation-error'));
   });
 
   test('runBulkArchive continues past blocked changes and preserves per-change reasons', () => {
@@ -1369,6 +1488,12 @@ function runTests() {
       ''
     ].join('\n'));
 
+    const malformedChangeName = 'bulk-archive-malformed';
+    const malformedChangeDir = createChange(fixtureRoot, malformedChangeName, {
+      'proposal.md': '# Proposal\n'
+    });
+    writeText(path.join(malformedChangeDir, 'state.yaml'), 'stage: [\n');
+
     const archivedChangeName = 'bulk-archive-success';
     const archivedChangeDir = createChange(fixtureRoot, archivedChangeName, {
       'proposal.md': '# Proposal\n',
@@ -1427,20 +1552,24 @@ function runTests() {
 
     const result = runBulkArchive({
       repoRoot: fixtureRoot,
-      changeNames: [blockedChangeName, archivedChangeName]
+      changeNames: [blockedChangeName, malformedChangeName, archivedChangeName]
     });
     assert.strictEqual(result.status, 'PASS');
     assert.strictEqual(result.summary.archived, 1);
-    assert.strictEqual(result.summary.blocked, 1);
+    assert.strictEqual(result.summary.blocked, 2);
     assert.strictEqual(result.summary.skipped, 0);
 
     const blockedEntry = result.results.find((entry) => entry.change === blockedChangeName);
+    const malformedEntry = result.results.find((entry) => entry.change === malformedChangeName);
     const archivedEntry = result.results.find((entry) => entry.change === archivedChangeName);
     assert(blockedEntry, 'Expected blocked result for blocked change.');
+    assert(malformedEntry, 'Expected blocked result for malformed change.');
     assert(archivedEntry, 'Expected archived result for successful change.');
     assert.strictEqual(blockedEntry.status, 'blocked');
     assert(blockedEntry.reason && blockedEntry.reason.length > 0);
     assert(Array.isArray(blockedEntry.findings));
+    assert.strictEqual(malformedEntry.status, 'blocked');
+    assert(malformedEntry.reason.includes('change-evaluation-error'));
     assert.strictEqual(archivedEntry.status, 'archived');
     assert(fs.existsSync(path.join(fixtureRoot, '.opsx', 'archive', archivedChangeName)));
   });
