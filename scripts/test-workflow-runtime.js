@@ -960,12 +960,29 @@ function runTests() {
 
     assert.throws(() => applySyncPlan({
       status: 'PASS',
+      repoRoot: fixtureRoot,
       canonicalSpecsDir,
       writes: [{
         targetPath: outsidePath,
         content: 'outside write'
       }]
     }), /outside \.opsx\/specs/);
+    assert.strictEqual(fs.existsSync(outsidePath), false);
+  });
+
+  test('applySyncPlan rejects caller supplied canonical spec roots outside repo .opsx specs', () => {
+    const { applySyncPlan } = require('../lib/sync');
+    const outsidePath = path.join(fixtureRoot, 'outside-forged-root.md');
+
+    assert.throws(() => applySyncPlan({
+      status: 'PASS',
+      repoRoot: fixtureRoot,
+      canonicalSpecsDir: fixtureRoot,
+      writes: [{
+        targetPath: outsidePath,
+        content: 'forged root write'
+      }]
+    }), /canonicalSpecsDir must match/);
     assert.strictEqual(fs.existsSync(outsidePath), false);
   });
 
