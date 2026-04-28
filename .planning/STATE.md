@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: planning
-stopped_at: Phase 6 context gathered
-last_updated: "2026-04-28T08:19:55.559Z"
+stopped_at: Phase 6 planning complete
+last_updated: "2026-04-28T08:55:43Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 5
-  total_plans: 37
+  total_plans: 46
   completed_plans: 37
-  percent: 100
+  percent: 80
 ---
 
 # State
@@ -27,12 +27,12 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 
 Phase: 6 (TDD-Light Workflow)
 Plan: Not started
-Status: Ready to plan
+Status: Planned
 Last activity: 2026-04-28
 
 ## Next Action
 
-Run `$gsd-discuss-phase 6` to gather Phase 6 context, or `$gsd-plan-phase 6` to plan directly.
+Run `$gsd-execute-phase 6` to execute the Phase 6 waves, starting with Wave 1.
 
 ## Accumulated Context
 
@@ -46,6 +46,7 @@ Run `$gsd-discuss-phase 6` to gather Phase 6 context, or `$gsd-plan-phase 6` to 
 - 2026-04-27: Phase 4 context gathered; decisions lock a library-first state-machine implementation, strict mutation transitions, warn-and-reload hash drift, and one-top-level-task-group apply guidance.
 - 2026-04-27: Phase 4 planned into 9 plans across 7 waves; independent plan checker passed with all STATE-01 through STATE-08 requirements covered.
 - 2026-04-27: Phase 4 execution completed; verifier passed 5/5 must-haves, `04-REVIEW.md` is clean after remediation commit `7282e57`, and `npm run test:workflow-runtime` passed 49/49.
+- 2026-04-28: Phase 6 planned into 9 plans across 6 waves; Wave 1 covers `rules.tdd` defaults and task guidance, Waves 2-4 implement checkpoint/persistence/generator source work, Wave 5 refreshes the 12 route prompts for `apply` / `propose` / `continue` / `ff`, and Wave 6 restores strict parity.
 
 ## Decisions
 
@@ -106,6 +107,7 @@ Run `$gsd-discuss-phase 6` to gather Phase 6 context, or `$gsd-plan-phase 6` to 
 - Phase 05 Plan 06 keeps temporary parity-gate logic unchanged because bounded runtime verification already passes.
 - Phase 05 Plan 07 removed temporary prompt parity exemptions and restored strict repo-wide generated parity checks.
 - Phase 05 Plan 07 locked split-spec planning note assertions on both generated output and checked-in prompts for the same 9 planning routes.
+- [Phase 06]: Keep generated prompt refresh bounded to `apply`, `propose`, `continue`, and `ff` across Claude/Codex/Gemini, using a temporary 12-file parity gate before the final repo-wide parity restore.
 
 ## Blockers
 
@@ -156,7 +158,7 @@ Run `$gsd-discuss-phase 6` to gather Phase 6 context, or `$gsd-plan-phase 6` to 
 ## Session
 
 Last session: --stopped-at
-Stopped At: Phase 6 context gathered
+Stopped At: Phase 6 planning complete
 Resume File: --resume-file
 
 **Next Phase:** 06 (TDD-Light Workflow)
