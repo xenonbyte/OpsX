@@ -835,6 +835,94 @@ function runTests() {
     assert.deepStrictEqual(gate.pathScope.forbiddenMatches, ['secrets/private.pem']);
   });
 
+  test('verify gate deep merges global project and change gate policy', () => {
+    const { evaluateVerifyGate } = require('../lib/verify');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const { writeChangeState } = require('../lib/change-store');
+    const policyRoot = createFixtureRepo();
+    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-policy-home-'));
+    cleanupTargets.push(policyRoot, tempHome);
+
+    writeText(path.join(tempHome, '.opsx', 'config.yaml'), [
+      'schema: spec-driven',
+      'language: en',
+      'securityReview:',
+      '  required: true',
+      '  allowWaiver: false'
+    ].join('\n'));
+    writeText(path.join(policyRoot, '.opsx', 'config.yaml'), [
+      'schema: spec-driven',
+      'language: en',
+      'rules:',
+      '  tdd:',
+      '    mode: strict',
+      '    requireFor:',
+      '      - migration-only',
+      '    exempt:',
+      '      - docs-only'
+    ].join('\n'));
+
+    const changeName = 'verify-policy-deep-merge';
+    const changeDir = createChange(policyRoot, changeName, {
+      'change.yaml': [
+        `name: ${changeName}`,
+        'schema: spec-driven',
+        'rules:',
+        '  tdd:',
+        '    mode: strict',
+        'securityReview:',
+        '  allowWaiver: true'
+      ].join('\n'),
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Policy merge',
+        '- TDD Class: migration-only',
+        '- [x] GREEN: implement policy merge behavior'
+      ].join('\n'),
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Verify policy merge',
+        'The system SHALL preserve global and project gate policy when change config is partial.'
+      ].join('\n')
+    });
+    const now = new Date().toISOString();
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'IMPLEMENTED',
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        execution: {
+          status: 'PASS',
+          updatedAt: now
+        }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Policy merge',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        changedFiles: ['lib/verify.js'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['GREEN'],
+        diffSummary: 'Verify policy merge regression.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['lib/**'],
+      forbiddenPaths: ['*.pem']
+    });
+
+    const gate = evaluateVerifyGate({
+      changeDir,
+      changedFiles: ['lib/verify.js'],
+      homeDir: tempHome
+    });
+    const codes = new Set(gate.findings.map((finding) => finding.code));
+    assert.strictEqual(gate.status, 'BLOCK');
+    assert(codes.has('security-review-required'), 'Expected global securityReview.required to block verify.');
+    assert(codes.has('strict-tdd-record-missing'), 'Expected project rules.tdd.requireFor to block verify.');
+  });
+
   test('acceptVerifyGate advances implemented changes to VERIFIED with refreshed hashes', () => {
     const { acceptVerifyGate } = require('../lib/verify');
     const { hashTrackedArtifacts } = require('../lib/change-artifacts');
