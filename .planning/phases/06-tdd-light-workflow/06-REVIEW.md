@@ -1,6 +1,6 @@
 ---
 phase: 06-tdd-light-workflow
-reviewed: 2026-04-28T12:17:32Z
+reviewed: 2026-04-28T12:39:31Z
 depth: standard
 files_reviewed: 25
 files_reviewed_list:
@@ -31,64 +31,40 @@ files_reviewed_list:
   - templates/project/config.yaml.tmpl
 findings:
   critical: 0
-  warning: 2
+  warning: 0
   info: 0
-  total: 2
-status: issues_found
+  total: 0
+status: clean
 ---
 
 # Phase 6: Code Review Report
 
-**Reviewed:** 2026-04-28T12:17:32Z
+**Reviewed:** 2026-04-28T12:39:31Z
 **Depth:** standard
 **Files Reviewed:** 25
-**Status:** issues_found
+**Status:** clean
 
 ## Summary
 
-Reviewed Phase 6 runtime, persistence, generator, generated command/prompt slices, skill guidance, bilingual playbooks, artifact templates, project config template, and runtime tests at standard depth.
+Reviewed the Phase 6 rework across runtime config, task and execution checkpoints, persistence, generated prompt source, checked-in Claude/Codex/Gemini prompt slices, OpsX skill guidance, bilingual playbooks, artifact templates, project config template, and runtime tests.
 
-The latest fixes for missing exemption reasons and unknown `TDD Exemption:` classes are partially covered: `not-configured` now emits `tdd-exemption-class-invalid` in strict/light tests. Two inconsistencies remain.
+All reviewed files meet quality standards. No actionable bugs, security issues, regressions, or code-quality findings were found.
+
+Specific re-review focus passed:
+
+- Explicit `TDD Exemption:` authorization is restricted to configured `rules.tdd.exempt` classes in runtime logic.
+- Default strict config rejects `TDD Exemption: migration-only -- custom reason` with `tdd-exemption-class-invalid`.
+- Explicitly adding `migration-only` to `rules.tdd.exempt` accepts the same exemption.
+- English and Chinese apply playbooks require completed TDD steps, verification command/result, changed files, diff summary, and drift status.
+- Prompt parity is strict for the shipped generated bundles, covers the Phase 6 prompt slice directly, and no Phase 6 mismatch allowlist escape hatch remains.
 
 Verification performed:
-- `npm run test:workflow-runtime` -> passed (`84 test(s) passed`)
-- Direct runtime probe confirmed default strict config accepts `TDD Exemption: migration-only -- custom reason` without a TDD finding.
 
-## Warnings
-
-### WR-01: Hidden Exemption Allowlist Lets Unconfigured Classes Bypass Strict TDD
-
-**File:** `lib/workflow.js:1133`
-
-**Issue:** `classifyTaskGroupTdd()` accepts an explicit `TDD Exemption:` when the class is either in `rules.tdd.exempt` or in the hardcoded `VISIBLE_TDD_EXEMPT_CLASSES` list. That list includes `migration-only` and `generated-refresh-only` at `lib/workflow.js:186`, but those classes are not configured by default in `templates/project/config.yaml.tmpl:16`. With default strict config, `TDD Exemption: migration-only -- custom reason` becomes `exempt: true` and skips RED/VERIFY with no `tdd-exemption-class-invalid` finding. This conflicts with the Phase 6 requirement that unconfigured explicit exemption classes must not silently bypass strict TDD.
-
-**Fix:**
-```js
-const exemptionClassAllowed = Boolean(metadata.exemptionClass)
-  && exemptSet.has(metadata.exemptionClass);
-const exemptionClassInvalid = Boolean(metadata.exemptionClass) && !exemptionClassAllowed;
-```
-
-Then add regression coverage proving:
-- default strict config blocks `TDD Exemption: migration-only -- custom reason` with `tdd-exemption-class-invalid`;
-- adding `migration-only` to `rules.tdd.exempt` makes the same group a valid exemption.
-
-### WR-02: Apply Playbooks Omit Required Execution Proof Fields
-
-**File:** `skills/opsx/references/action-playbooks.md:84`
-
-**Issue:** The generated apply prompts and generator say the execution checkpoint records completed TDD steps, verification command/result, diff summary, and drift status. `runExecutionCheckpoint()` warns when these proof fields are missing, and `recordTaskGroupExecution()` persists them. The English and Chinese apply playbooks still tell agents to record only verification command/result plus changed files (`skills/opsx/references/action-playbooks-zh.md:84` has the same gap). Agents following the playbook directly can under-record execution evidence and trigger incomplete proof warnings despite following shipped guidance.
-
-**Fix:** Update both playbooks to require the same proof fields as runtime and generated prompts:
-
-```markdown
-- Record completed TDD steps, verification command/result, changed files, diff summary, and drift status; refresh `context.md` / `drift.md`, then stop for the next run.
-```
-
-Also add a runtime-suite assertion that both `action-playbooks.md` and `action-playbooks-zh.md` include `completed TDD steps`, `diff summary`, and `drift status` or their approved bilingual equivalents.
+- `npm run test:workflow-runtime` -> passed (`86 test(s) passed`)
+- Targeted grep confirmed no `allowedMismatches`, `unexpectedMismatches`, `Phase 6 prompt allowlist`, or `non-phase6 mismatches` references remain in the reviewed runtime test scope.
 
 ---
 
-_Reviewed: 2026-04-28T12:17:32Z_
+_Reviewed: 2026-04-28T12:39:31Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
