@@ -8,6 +8,15 @@ rules:
   proposal: "Include platform compatibility and migration impact."
   design: "Explain OpsX CLI/runtime separation and rollout notes."
   tasks: "Keep tasks implementation-first, dependency-ordered, and grouped into top-level milestones."
+  tdd:
+    mode: "strict"
+    requireFor:
+      - "behavior-change"
+      - "bugfix"
+    exempt:
+      - "docs-only"
+      - "copy-only"
+      - "config-only"
 securityReview:
   mode: "heuristic"
   required: false
