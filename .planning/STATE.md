@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-03-PLAN.md
-last_updated: "2026-04-28T10:14:13.002Z"
+stopped_at: Completed 06-04-PLAN.md
+last_updated: "2026-04-28T10:19:32.753Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 46
-  completed_plans: 40
-  percent: 87
+  completed_plans: 41
+  percent: 89
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 06 (TDD-Light Workflow) — EXECUTING
-Plan: 3 of 9
+Plan: 4 of 9
 Status: Ready to execute
 Last activity: 2026-04-28
 
@@ -114,6 +114,8 @@ Run `$gsd-execute-phase 6` to execute the Phase 6 waves, starting with Wave 1.
 - Require visible TDD Exemption reasons plus VERIFY coverage even for exempt groups.
 - Keep TDD enforcement on existing task-checkpoint surface and expose metadata via checkpoint payload instead of adding a new checkpoint id.
 - Use explicit TDD Class/TDD Exemption markers as authoritative and keep heuristics conservative (behavior-change/bugfix tokens) to avoid false blocking.
+- [Phase 06 Plan 04] Expose normalized execution proof fields on execution-checkpoint results so store persistence can reuse the same payload.
+- [Phase 06 Plan 04] Keep richer proof in existing verificationLog/context.md/drift.md artifacts and enforce thin proof via WARN finding execution-proof-missing.
 
 ## Blockers
 
@@ -163,11 +165,12 @@ Run `$gsd-execute-phase 6` to execute the Phase 6 waves, starting with Wave 1.
 | Phase 06 P01 | 1m 44s | 1 tasks | 3 files |
 | Phase 06 P02 | 2 min | 2 tasks | 6 files |
 | Phase 06 P03 | 14 min | 1 tasks | 3 files |
+| Phase 06 P04 | 2m 45s | 1 tasks | 4 files |
 
 ## Session
 
-Last session: 2026-04-28T10:13:45.780Z
-Stopped At: Completed 06-03-PLAN.md
+Last session: 2026-04-28T10:19:32.749Z
+Stopped At: Completed 06-04-PLAN.md
 Resume File: None
 
 **Next Phase:** 06 (TDD-Light Workflow)

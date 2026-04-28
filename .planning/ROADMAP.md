@@ -159,7 +159,7 @@ Plans:
 - [x] `06-01-PLAN.md` — Normalize `rules.tdd` strict defaults and lock config regression coverage.
 - [x] `06-02-PLAN.md` — Add `## Test Plan`, visible exemptions, and shipped TDD-light guidance to skill/playbook templates.
 - [x] `06-03-PLAN.md` — Enforce TDD-light warnings and blocks in `task-checkpoint` and surface them in apply guidance.
-- [ ] `06-04-PLAN.md` — Persist completed TDD steps, diff summary, and drift through existing execution proof paths.
+- [x] `06-04-PLAN.md` — Persist completed TDD steps, diff summary, and drift through existing execution proof paths.
 - [ ] `06-05-PLAN.md` — Update generator source-of-truth for TDD-light route copy and stage a temporary 12-file parity gate.
 - [ ] `06-06-PLAN.md` — Refresh the bounded Claude `apply` / `propose` / `continue` / `ff` prompt slice from generator output.
 - [ ] `06-07-PLAN.md` — Refresh the bounded Codex `apply` / `propose` / `continue` / `ff` prompt slice from generator output.
