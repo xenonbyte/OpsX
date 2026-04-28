@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-03-PLAN.md
-last_updated: "2026-04-28T14:50:36.262Z"
+stopped_at: Completed 07-04-PLAN.md
+last_updated: "2026-04-28T14:59:56.900Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 54
-  completed_plans: 49
-  percent: 91
+  completed_plans: 50
+  percent: 93
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 07 (Verify, Sync, Archive, and Batch Gates) — EXECUTING
-Plan: 4 of 8
+Plan: 5 of 8
 Status: Ready to execute
 Last activity: 2026-04-28
 
@@ -137,6 +137,8 @@ Run `$gsd-execute-phase 7` to execute the eight planned Phase 7 plans.
 - Archive must reuse evaluateVerifyGate findings and cannot bypass verify/sync blockers.
 - Archive from VERIFIED runs safe sync acceptance before ARCHIVE_ACCEPTED transition and move.
 - Batch helpers remain orchestration-only with per-change isolation and global precondition stop codes.
+- Keep temporary prompt drift scoped to the declared 15 route files during Phase 7 source refresh.
+- Enforce stale guidance phrase removal via runtime assertions in skill and bilingual playbooks.
 
 ## Blockers
 
@@ -196,11 +198,12 @@ Run `$gsd-execute-phase 7` to execute the eight planned Phase 7 plans.
 | Phase 07 P01 | 5 min | 2 tasks | 6 files |
 | Phase 07 P02 | 3m | 1 tasks | 2 files |
 | Phase 07 P03 | 4 min | 2 tasks | 3 files |
+| Phase 07 P04 | 5 min | 2 tasks | 6 files |
 
 ## Session
 
-Last session: 2026-04-28T14:50:36.258Z
-Stopped At: Completed 07-03-PLAN.md
+Last session: 2026-04-28T14:59:56.896Z
+Stopped At: Completed 07-04-PLAN.md
 Resume File: None
 
 **Next Phase:** 7 (Verify, Sync, Archive, and Batch Gates)
