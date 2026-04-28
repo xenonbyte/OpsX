@@ -57,7 +57,7 @@ Agents can reliably continue spec-driven work from disk-backed OpsX artifacts in
 - Local repo inspection on 2026-04-27 confirms `package.json` still uses `@xenonbyte/openspec`, binary `openspec`, and GitHub URLs under `xenonbyte/openspec`.
 - `README.md` still presents OpenSpec, `openspec install`, `$openspec`, `/prompts:openspec`, `openspec/config.yaml`, `~/.openspec`, `skills/openspec`, and the `openspec/` dogfood workspace.
 - `openspec/config.yaml` already uses Chinese language defaults and describes this package as the XenonByte OpenSpec multi-platform distribution.
-- `schemas/spec-driven/schema.json` currently has `spec-checkpoint`, `task-checkpoint`, and `execution-checkpoint`, but not `spec-split-checkpoint` or runtime state artifacts.
+- Before Phase 5, `schemas/spec-driven/schema.json` had `spec-checkpoint`, `task-checkpoint`, and `execution-checkpoint`, but not `spec-split-checkpoint` or runtime state artifacts.
 - The repository did not have `.planning/` before this milestone; this document starts the GSD planning layer for the existing brownfield project.
 - User-supplied milestone input on 2026-04-27 defines the desired OpsX direction, migration mapping, command model, state machine, spec review, TDD-light, anti-drift rules, and recommended PR breakdown.
 
