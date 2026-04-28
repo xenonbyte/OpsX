@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-06-PLAN.md
-last_updated: "2026-04-28T10:28:03.037Z"
+stopped_at: Completed 06-07-PLAN.md
+last_updated: "2026-04-28T10:31:39.204Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 46
-  completed_plans: 43
-  percent: 93
+  completed_plans: 44
+  percent: 96
 ---
 
 # State
@@ -26,7 +26,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-27)
 ## Current Position
 
 Phase: 06 (TDD-Light Workflow) — EXECUTING
-Plan: 6 of 9
+Plan: 7 of 9
 Status: Ready to execute
 Last activity: 2026-04-28
 
@@ -120,6 +120,8 @@ Run `$gsd-execute-phase 6` to execute the Phase 6 waves, starting with Wave 1.
 - Phase 06 Plan 05 introduced apply-only execution-checkpoint wording for completed TDD steps and proof fields.
 - Phase 06 Plan 05 added a temporary 12-file parity allowlist while preserving strict parity for non-listed prompts.
 - Phase 06 Plan 06 completion is gated by npm run test:workflow-runtime plus direct four-file Claude parity assertion.
+- Phase 06 Plan 07 kept refresh scope strictly bounded to the four plan-listed Codex action prompts.
+- Phase 06 Plan 07 used source-of-truth regeneration only and avoided manual edits to checked-in prompt prose.
 
 ## Blockers
 
@@ -172,11 +174,12 @@ Run `$gsd-execute-phase 6` to execute the Phase 6 waves, starting with Wave 1.
 | Phase 06 P04 | 2m 45s | 1 tasks | 4 files |
 | Phase 06 P05 | 1m 50s | 1 tasks | 2 files |
 | Phase 06 P06 | 1m | 1 tasks | 4 files |
+| Phase 06 P07 | 1m 29s | 1 tasks | 4 files |
 
 ## Session
 
-Last session: 2026-04-28T10:28:03.032Z
-Stopped At: Completed 06-06-PLAN.md
+Last session: 2026-04-28T10:31:39.201Z
+Stopped At: Completed 06-07-PLAN.md
 Resume File: None
 
 **Next Phase:** 06 (TDD-Light Workflow)
