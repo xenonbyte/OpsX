@@ -22,14 +22,16 @@ Execution rules:
 - Route fallback guidance:
 - If `.opsx/config.yaml` is missing, stop and redirect to `$opsx-onboard`.
 - If `.opsx/active.yaml` is missing or points to a missing change, stop and ask the user to run `$opsx-new` or `$opsx-propose`.
-- Do not invent an active change, state file, or task state when required artifacts are absent.
+- Archive only changes that pass verify and sync preconditions.
+- If the change is only VERIFIED, run the same safe sync check before moving it.
+- Move the full change directory into `.opsx/archive/<change-name>/` after PASS gate acceptance.
 - Use request details already present in the conversation.
 - Do not assume text typed after a `$opsx-*` command is reliably available as an inline argument in Codex.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.
 - If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
-- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
-- `execution checkpoint` runs after each top-level task group during `apply`.
+- Archive routes must require verify/sync preconditions; if a change is `VERIFIED`, run the same safe sync check before moving it into `.opsx/archive/<change-name>/`.
+- Archive execution re-runs verify/sync safety, performs internal safe sync from `VERIFIED`, and archives the full change directory at `.opsx/archive/<change-name>/.`
 - Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
 - If the required change name, description, or selection is missing, ask for the minimum clarification needed.
-- Archive only completed or explicitly user-approved incomplete changes.
+- Archive only changes that pass verify and sync preconditions, and if a change is only VERIFIED, run the same safe sync check before moving it.
 - When files are mutated, report changed files, current state, next step, and blockers.

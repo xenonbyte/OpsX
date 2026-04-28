@@ -22,14 +22,14 @@ Execution rules:
 - Route fallback guidance:
 - If `.opsx/config.yaml` is missing, stop and redirect to `$opsx-onboard`.
 - If `.opsx/active.yaml` is missing or points to a missing change, stop and ask the user to run `$opsx-new` or `$opsx-propose`.
-- Do not invent an active change, state file, or task state when required artifacts are absent.
+- Emit PASS/WARN/BLOCK findings with patch targets and a concrete next action before sync or archive.
 - Use request details already present in the conversation.
 - Do not assume text typed after a `$opsx-*` command is reliably available as an inline argument in Codex.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.
 - If config or heuristics indicate a security-sensitive change, create or recommend `security-review.md` after `design` and before `tasks`; if the user waives it, record the waiver in artifacts.
-- `spec checkpoint` runs after `design` and before `tasks`; `task checkpoint` runs after `tasks` and before `apply`.
-- `execution checkpoint` runs after each top-level task group during `apply`.
+- Verify routes must report `PASS`, `WARN`, and `BLOCK` findings with `patchTargets` and a concrete `nextStep` before archive eligibility.
+- Verify execution records `PASS`/`WARN`/`BLOCK` findings and blocks downstream archive actions until unresolved `BLOCK` findings are patched.
 - Checkpoint outcomes use `PASS`, `WARN`, `BLOCK` and update existing artifacts instead of creating new review files.
 - If the required change name, description, or selection is missing, ask for the minimum clarification needed.
-- Report findings with severity and cite the relevant artifact or file path.
+- Return PASS/WARN/BLOCK findings with patch targets and a concrete next action.
 - When files are mutated, report changed files, current state, next step, and blockers.
