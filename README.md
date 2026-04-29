@@ -1,5 +1,7 @@
 # OpsX
 
+[简体中文](README-zh.md)
+
 OpsX is an AI-native operational spec execution workflow for Claude, Codex, and Gemini.
 
 OpsX is a downstream adaptation of [Fission-AI/OpenSpec](https://github.com/Fission-AI/OpenSpec).
