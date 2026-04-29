@@ -30,6 +30,7 @@ function registerTests(test, helpers) {
     fixtureRoot,
     spawnSync,
     cleanupTargets,
+    createFixtureRepo,
     createLegacyMigrationRepoFixture,
     createLegacySharedHomeFixture,
     runOpsxCli
@@ -181,6 +182,31 @@ function registerTests(test, helpers) {
     assert(Array.isArray(envelope.errors), 'status --json payload must include errors array.');
   });
 
+  test('status --json --verbose emits structured diagnostics on stderr', () => {
+    const statusFixture = createFixtureRepo();
+    const statusHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-status-verbose-home-'));
+    cleanupTargets.push(statusFixture, statusHome);
+
+    const statusOutput = runOpsxCli(['status', '--json', '--verbose'], {
+      cwd: statusFixture,
+      env: { HOME: statusHome }
+    });
+
+    assert.strictEqual(statusOutput.status, 0, statusOutput.stderr);
+    let envelope = null;
+    assert.doesNotThrow(() => {
+      envelope = JSON.parse(statusOutput.stdout);
+    });
+
+    const diagnostics = statusOutput.stderr.trim().split(/\n+/)
+      .filter(Boolean)
+      .map((line) => JSON.parse(line));
+    const statusDiagnostic = diagnostics.find((entry) => entry.event === 'cli.status.json');
+    assert(statusDiagnostic, 'Expected verbose status to emit cli.status.json diagnostics.');
+    assert.strictEqual(statusDiagnostic.level, 'info');
+    assert.strictEqual(statusDiagnostic.initialized, envelope.workspace.initialized);
+  });
+
   test('declared Node 14 engine floor uses compatible CommonJS builtin imports', () => {
     const packageJson = require('../package.json');
     const nodeCryptoSpecifier = ['node', 'crypto'].join(':');
@@ -288,6 +314,7 @@ function registerTests(test, helpers) {
   test('message catalog and verbose logger provide localized structured diagnostics', () => {
     const { formatMessage } = require('../lib/messages');
     const { createLogger } = require('../lib/logger');
+    const { writeChangeState, recordCheckpointResult } = require('../lib/change-store');
     const lines = [];
 
     assert.strictEqual(formatMessage('language.switched', 'zh'), '语言已切换为中文。');
@@ -302,6 +329,22 @@ function registerTests(test, helpers) {
     assert.strictEqual(payload.level, 'info');
     assert.strictEqual(payload.event, 'visible');
     assert.strictEqual(payload.count, 1);
+
+    const storeLines = [];
+    const changeDir = path.join(fixtureRoot, '.opsx', 'changes', 'logger-business-path');
+    ensureDir(changeDir);
+    writeChangeState(changeDir, {
+      change: 'logger-business-path',
+      stage: 'TASKS_READY'
+    }, { verbose: true, sink: (line) => storeLines.push(line) });
+    recordCheckpointResult(changeDir, 'task', {
+      status: 'PASS',
+      accepted: true
+    }, {}, { verbose: true, sink: (line) => storeLines.push(line) });
+
+    const storeEvents = storeLines.map((line) => JSON.parse(line));
+    assert(storeEvents.some((entry) => entry.event === 'change-state.write'));
+    assert(storeEvents.some((entry) => entry.event === 'checkpoint.record' && entry.checkpoint === 'task'));
   });
 
   test('check output remains accurate after partial uninstall across platforms', () => {

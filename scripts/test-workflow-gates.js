@@ -280,6 +280,12 @@ function registerTests(test, helpers) {
     assert.strictEqual(resolveContinueAction({ stage: 'VERIFIED' }), 'sync');
     assert.strictEqual(resolveContinueAction({ stage: 'SYNCED' }), 'archive');
 
+    const missingReadyGroup = applyMutationEvent({ stage: 'TASKS_READY' }, {
+      type: 'START_TASK_GROUP'
+    });
+    assert.strictEqual(missingReadyGroup.status, 'BLOCK');
+    assert.strictEqual(missingReadyGroup.code, 'missing-task-group');
+
     const missingQueuedGroup = applyMutationEvent({ stage: 'GROUP_VERIFIED' }, {
       type: 'START_TASK_GROUP'
     });

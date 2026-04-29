@@ -30,6 +30,8 @@
 - 2026-04-29 [CODE] Non-split optimization pass added chunked artifact hashing, migration journal rollback, structured debug logging, localized CLI message catalog, and optional-read TOCTOU guards.
 - 2026-04-29 [CODE] Migration rollback now removes empty canonical parent directories created during failed moves, so a failed `opsx migrate` can be retried after journal cleanup.
 - 2026-04-29 [CODE] Accepted sync outputs are now recorded in state and exempted from unlogged git-change blocking, so normal `SYNCED` -> archive flow tolerates `.opsx/specs/**` git diffs produced by sync.
+- 2026-04-29 [CODE] Third review remediation split `workflow.js` and `runtime-guidance.js` into focused modules, kept public exports stable, and moved CLI/install strings through `lib/messages.js`.
+- 2026-04-29 [CODE] Fourth review remediation fixed `TASKS_READY` missing task-group blocking and wired structured logger diagnostics into CLI status/migrate plus state/checkpoint/task execution write paths.
 
 ## Done (recent)
 - 2026-04-28 [CODE] Executed all Phase 7 plans `07-01` through `07-08`.
@@ -119,6 +121,8 @@
 - 2026-04-29 [TOOL] Non-split optimization verification: `node scripts/test-workflow-paths.js` passed 18/18, `node scripts/test-workflow-package.js` passed 12/12, `node scripts/test-workflow-state.js` passed 14/14, `node scripts/test-workflow-gates.js` passed 97/97, and `npm test` passed 148/148.
 - 2026-04-29 [TOOL] Migration rollback retry fix verification: `node scripts/test-workflow-state.js` passed 14/14 and `npm test` passed 148/148.
 - 2026-04-29 [TOOL] Sync-output archive fix verification: `node scripts/test-workflow-gates.js` passed 98/98 and `npm test` passed 149/149.
+- 2026-04-29 [TOOL] Third review remediation verification: `node scripts/test-workflow-paths.js` passed 18/18, `node scripts/test-workflow-gates.js` passed 98/98, and `npm test` passed 149/149.
+- 2026-04-29 [TOOL] Fourth review remediation verification: `node scripts/test-workflow-gates.js` passed 98/98, `node scripts/test-workflow-package.js` passed 13/13, and `npm test` passed 150/150.
 - 2026-04-28 [TOOL] `gsd-sdk query verify.schema-drift 07` returned valid with 0 issues across 8 checked plans.
 - 2026-04-28 [TOOL] Phase 7 verification report committed as `f32d323` with `status: passed` and 4/4 must-haves verified.
 - 2026-04-28 [TOOL] `workflow.security_enforcement` is true; no `07-SECURITY.md` exists yet, so run `$gsd-secure-phase 7` before advancing if a dedicated security gate is required.

@@ -122,11 +122,13 @@ function registerTests(test, helpers) {
 
   test('read-only path surfaces import shared path and glob utility modules', () => {
     const runtimeGuidance = fs.readFileSync(path.join(__dirname, '../lib/runtime-guidance.js'), 'utf8');
+    const artifactGraph = fs.readFileSync(path.join(__dirname, '../lib/artifact-graph.js'), 'utf8');
     const changeArtifacts = fs.readFileSync(path.join(__dirname, '../lib/change-artifacts.js'), 'utf8');
     const pathScope = fs.readFileSync(path.join(__dirname, '../lib/path-scope.js'), 'utf8');
 
-    assert(runtimeGuidance.includes("require('./path-utils')"));
-    assert(runtimeGuidance.includes("require('./glob-utils')"));
+    assert(runtimeGuidance.includes("require('./artifact-graph')"));
+    assert(artifactGraph.includes("require('./path-utils')"));
+    assert(artifactGraph.includes("require('./glob-utils')"));
     assert(changeArtifacts.includes("require('./path-utils')"));
     assert(pathScope.includes("require('./path-utils')"));
     assert(pathScope.includes("require('./glob-utils')"));
