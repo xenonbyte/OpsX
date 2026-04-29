@@ -1,6 +1,6 @@
 ---
 phase: 08-stability-json-and-release-coverage
-reviewed: 2026-04-28T20:14:14Z
+reviewed: 2026-04-29T02:20:33Z
 depth: standard
 files_reviewed: 22
 files_reviewed_list:
@@ -28,70 +28,37 @@ files_reviewed_list:
   - scripts/test-workflow-state.js
 findings:
   critical: 0
-  warning: 2
+  warning: 0
   info: 0
-  total: 2
-status: issues_found
+  total: 0
+status: clean
 ---
 
-# Phase 8: Code Review Report
+# Phase 08: Code Review Report
 
-**Reviewed:** 2026-04-28T20:14:14Z
+**Reviewed:** 2026-04-29T02:20:33Z
 **Depth:** standard
 **Files Reviewed:** 22
-**Status:** issues_found
+**Status:** clean
 
 ## Summary
 
-Reviewed the Phase 8 source, docs, and split runtime test files for public-surface regressions, release-gate breakage, Node >=14.14.0/CommonJS compatibility, `status --json` transport behavior, and path/glob containment regressions.
+Reviewed the Phase 08 post-fix source, docs, and test scope after commits `7e8d336` and `1a12a2f`.
 
-No critical security or crash issues were found. The implementation and current regression suite pass locally, but two release-facing issues remain: public README docs still spell banned route forms, and the release checklist mixes non-shell GSD routes into a bash command block that it tells operators to run from the repo root.
+The previous README route-copy issue is fixed: public README guidance no longer spells banned dispatcher or wildcard route forms, and `scripts/test-workflow-generation.js` now scans the public docs/help/guidance surface for those forms.
 
-Verification run during review:
-- `npm test` passed: 126/126
-- `node bin/opsx.js status --json` emitted parseable JSON with exit 0
-- `node scripts/check-phase1-legacy-allowlist.js` passed
-- `npm_config_cache=.npm-cache npm pack --dry-run --json` passed and emitted pack JSON
+The previous release-checklist copy/paste issue is fixed: `docs/release-checklist.md` keeps the executable `gsd-sdk query verify.schema-drift 08` command in a `bash` block and puts `$gsd-code-review 8` / `$gsd-verify-work 8` in a `text` block for GSD/Codex workflow UI invocation.
 
-## Warnings
+Standard review also checked for regressions in `opsx status --json` transport behavior, Node `>=14.14.0` CommonJS compatibility, release gate coverage, and path/glob containment across `lib/path-utils.js`, `lib/glob-utils.js`, `lib/path-scope.js`, `lib/migrate.js`, `lib/sync.js`, and the split topic test runners.
 
-### WR-01: Public README Docs Still Expose Banned Route Forms
+All reviewed files meet quality standards. No issues found.
 
-**File:** `README.md:47`, `README-zh.md:47`
-**Issue:** The public README text explicitly spells `standalone $opsx` and `/opsx:*` as "do not use" examples. The Phase 8 contract says current public UX must not expose standalone `$opsx` or `/opsx:*` at all, and this wording ships those tokens in the primary public docs. The current automated gates miss this because the legacy allowlist check only scans OpenSpec-era tokens, and the generated-route tests do not scan README/README-zh for OpsX wildcard/dispatcher tokens.
-**Fix:** Reword both README lines without spelling the forbidden forms, and add a public-doc scan that catches markdown-wrapped variants.
+## Verification
 
-```markdown
-Use only explicit action routes shown above; avoid dispatcher or wildcard route forms.
-```
-
-Add coverage in `scripts/test-workflow-generation.js` or the shared allowlist gate so README, README-zh, docs, templates, commands, skills, postinstall, and CLI help are scanned for:
-- standalone dispatcher route wording
-- `/opsx:*`
-- `/prompts:opsx-*`
-- `$opsx <request>`
-- markdown-wrapped variants that insert backticks around the route token
-
-### WR-02: Release Checklist Presents Non-Shell GSD Routes as Bash Commands
-
-**File:** `docs/release-checklist.md:61`
-**Issue:** The checklist starts with "Run all commands from repository root" and then places `$gsd-code-review 8` and `$gsd-verify-work 8` inside a `bash` block. Those are GSD/Codex workflow invocations, not executable shell commands; Phase 8 summaries already record that the shell forms are `command not found` in this environment. This makes the canonical release checklist copy/paste fail at the review/UAT gate. The preservation test also checks `.planning/.../08-06-PLAN.md` instead of `docs/release-checklist.md`, so the canonical checklist can drift without failing `npm test`.
-**Fix:** Split executable shell commands from workflow-agent steps, while preserving the exact review/UAT route text.
-
-```bash
-gsd-sdk query verify.schema-drift 08
-```
-
-```text
-Invoke through the GSD/Codex workflow UI:
-$gsd-code-review 8
-$gsd-verify-work 8
-```
-
-Update the generation/release test to assert these post-test steps in `docs/release-checklist.md`, not only in the phase plan.
+- `npm test` passed: 128/128 tests.
 
 ---
 
-_Reviewed: 2026-04-28T20:14:14Z_
+_Reviewed: 2026-04-29T02:20:33Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
