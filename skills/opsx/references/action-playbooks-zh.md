@@ -23,12 +23,14 @@
 ## onboard
 
 - 若 `.opsx/config.yaml` 缺失，明确报告 workspace 尚未初始化。
-- 推荐先执行 `opsx install --platform <claude|codex|gemini[,...]>`，然后使用对应平台路由：Codex `$opsx-new` / `$opsx-propose`，Claude/Gemini `/opsx-new` / `/opsx-propose`。
+- 若命令路由尚未安装，推荐先执行 `opsx install --platform <claude|codex|gemini[,...]>`。
+- 使用对应平台路由创建第一个真实 change，并初始化 workspace config：Codex `$opsx-new` / `$opsx-propose`，Claude/Gemini `/opsx-new` / `/opsx-propose`。
 - 若 workspace 存在但 `.opsx/active.yaml` 没有 active change，明确报告该状态并建议对应平台的 `new` 或 `propose` 路由。
-- 保持 onboarding 指导属性，不要 auto-create `.opsx/config.yaml`、`.opsx/active.yaml`，也不要隐式改动状态文件。
+- 保持 onboarding 指导属性，不要 auto-create `.opsx/active.yaml` 或 change state，也不要隐式改动状态文件。
 
 ## propose
 
+- 若 `.opsx/config.yaml` 缺失，写入前先做简短 workspace 初始化确认：确认 schema、是否锁定项目语言、是否现在补充稳定的 context/rules。若用户选择默认值，则只创建包含 `schema` 的稀疏项目配置；不要把个人全局默认值复制成项目策略。
 - 生成 change 名称。
 - 创建 `change.yaml`。
 - 一次生成 proposal、specs、design、tasks。
@@ -42,6 +44,7 @@
 
 ## new
 
+- 若 `.opsx/config.yaml` 缺失，写入前先做简短 workspace 初始化确认：确认 schema、是否锁定项目语言、是否现在补充稳定的 context/rules。若用户选择默认值，则只创建包含 `schema` 的稀疏项目配置；不要把个人全局默认值复制成项目策略。
 - 只创建新 change scaffold：`change.yaml`、`specs/`、`state.yaml`、`context.md`、`drift.md`。
 - 不要创建占位 `proposal.md`、`design.md`、`tasks.md` 或 `specs/README.md`。
 - 将 `.opsx/active.yaml` 指向该 active change。
@@ -56,7 +59,7 @@
 
 ## resume
 
-- 若 `.opsx/config.yaml` 缺失，报告 workspace 未初始化并引导到对应平台的 onboard 路由：Codex `$opsx-onboard`，Claude/Gemini `/opsx-onboard`。
+- 若 `.opsx/config.yaml` 缺失，报告 workspace 未初始化并建议对应平台的 `new` 或 `propose` 路由：Codex `$opsx-new` / `$opsx-propose`，Claude/Gemini `/opsx-new` / `/opsx-propose`。
 - 若 `.opsx/active.yaml` 没有 active change，明确“无可恢复 change”，并建议对应平台的 `new` 或 `propose` 路由。
 - 若存在 active change，从持久化状态报告 `stage`、`nextAction`、`warnings`、`blockers`。
 - `resume` 必须保持只读：发现 hash drift 时先告警并从磁盘 reload，且 do not refresh stored hashes from read-only routes。
@@ -133,7 +136,7 @@
 - 报告 workspace 是否存在（`.opsx/config.yaml`）以及 active change 是否存在（`.opsx/active.yaml`）。
 - 按 active schema 报告工件 READY/BLOCKED/DONE。
 - 报告 `stage`、`nextAction`、`warnings`、`blockers`。
-- 若 workspace 缺失，建议对应平台的 `onboard` 路由：Codex `$opsx-onboard`，Claude/Gemini `/opsx-onboard`。
+- 若 workspace 缺失，建议对应平台的 `new` 或 `propose` 路由初始化：Codex `$opsx-new` / `$opsx-propose`，Claude/Gemini `/opsx-new` / `/opsx-propose`。
 - 若无 active change，建议对应平台的 `new` 或 `propose` 路由：Codex `$opsx-new` / `$opsx-propose`，Claude/Gemini `/opsx-new` / `/opsx-propose`。
 - 在需要或建议进行 `security-review` 时，明确显示其状态。
 - checkpoint 输出需包含标准字段：`status`、`findings`、`patchTargets`、`nextStep`。

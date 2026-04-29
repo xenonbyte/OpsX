@@ -4,7 +4,7 @@
 
 1. `opsx install --platform codex`
 2. `opsx check`
-3. 在 Codex 中先运行 `$opsx-onboard`，再继续使用 `$opsx-new` 或 `$opsx-propose`
+3. 在 Codex 中运行 `$opsx-new` 或 `$opsx-propose` 创建第一个 change；需要定位状态时再用 `$opsx-onboard`
 
 ## 配置
 
@@ -25,7 +25,7 @@
 ## 说明
 
 - 安装始终下发完整命令面，不再区分 `--profile`。
-- `--check` 会同时展示已安装 manifest 与“最后一次选择的平台”配置字段。
+- `--check` 以已安装 manifest 作为平台安装状态的事实来源。
 - `--doc` 优先读取包内 guide，再回退到已安装共享副本。
 - 命令/action-skill 包会在 `install` 时自动生成，不需要额外的构建/校验命令。
 - 在 Codex 中使用 `$opsx-*` routes。

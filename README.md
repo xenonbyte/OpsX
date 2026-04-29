@@ -95,6 +95,11 @@ state, paths, and gates) through the aggregate test runner.
 ## Project Config
 
 OpsX project-level workflow defaults now live in `.opsx/config.yaml`.
+The first `$opsx-new` / `/opsx-new` or `$opsx-propose` / `/opsx-propose`
+route initializes `.opsx/config.yaml` when the workspace is not yet initialized.
+The agent asks briefly before writing it; choosing defaults creates a sparse
+schema-only config, while explicit answers can lock project language, context,
+rules, and security policy into the repository.
 Use `opsx migrate --dry-run` to print the exact `MOVE`/`CREATE` mapping with
 zero writes. Run `opsx migrate` to execute the same plan; it aborts by default
 if `.opsx/` already exists.

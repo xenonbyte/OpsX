@@ -2575,6 +2575,69 @@ function registerTests(test, helpers) {
     assert.deepStrictEqual(buildStatus({ repoRoot: fixtureRoot, changeName }).hashDriftWarnings, []);
   });
 
+  test('createChangeSkeleton bootstraps sparse project config for first change', () => {
+    const { createChangeSkeleton } = require('../lib/workspace');
+    const bareRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-bare-workspace-'));
+    cleanupTargets.push(bareRoot);
+
+    const result = createChangeSkeleton({
+      repoRoot: bareRoot,
+      changeName: 'first-change',
+      createdAt: '2026-04-27T00:00:00.000Z'
+    });
+
+    const configPath = path.join(bareRoot, '.opsx', 'config.yaml');
+    assert.strictEqual(result.files.projectConfig, configPath);
+    assert(fs.existsSync(configPath));
+
+    const config = YAML.parse(fs.readFileSync(configPath, 'utf8'));
+    assert.deepStrictEqual(config, { schema: 'spec-driven' });
+    assert(!Object.prototype.hasOwnProperty.call(config, 'language'));
+    assert(!Object.prototype.hasOwnProperty.call(config, 'rules'));
+    assert(!Object.prototype.hasOwnProperty.call(config, 'securityReview'));
+    assert(!Object.prototype.hasOwnProperty.call(config, 'platform'));
+    assert(!Object.prototype.hasOwnProperty.call(config, 'ruleFile'));
+    assert(!Object.prototype.hasOwnProperty.call(config, 'version'));
+  });
+
+  test('createChangeSkeleton writes explicit project config answers when provided', () => {
+    const { createChangeSkeleton } = require('../lib/workspace');
+    const configuredRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-configured-workspace-'));
+    cleanupTargets.push(configuredRoot);
+
+    createChangeSkeleton({
+      repoRoot: configuredRoot,
+      changeName: 'configured-first-change',
+      createdAt: '2026-04-27T00:00:00.000Z',
+      projectConfig: {
+        language: 'zh',
+        context: 'Project: configured fixture',
+        rules: {
+          proposal: 'Capture migration impact.'
+        },
+        securityReview: {
+          required: true
+        },
+        platform: 'codex',
+        ruleFile: 'AGENTS.md',
+        version: 'ignored'
+      }
+    });
+
+    const config = YAML.parse(fs.readFileSync(path.join(configuredRoot, '.opsx', 'config.yaml'), 'utf8'));
+    assert.deepStrictEqual(config, {
+      schema: 'spec-driven',
+      language: 'zh',
+      context: 'Project: configured fixture',
+      rules: {
+        proposal: 'Capture migration impact.'
+      },
+      securityReview: {
+        required: true
+      }
+    });
+  });
+
   test('opsx-new skeleton creates no placeholder artifacts, active pointer, and INIT stage', () => {
     const { createChangeSkeleton } = require('../lib/workspace');
     const { loadActiveChangePointer, loadChangeState } = require('../lib/change-store');

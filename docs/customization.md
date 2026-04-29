@@ -19,7 +19,14 @@ exceptions that apply to one change.
 
 ## Recommended Project Config
 
-Create or edit `.opsx/config.yaml` in the project workspace:
+`$opsx-new` / `/opsx-new` and `$opsx-propose` / `/opsx-propose` initialize
+`.opsx/config.yaml` when starting the first change in an uninitialized
+workspace. The agent should ask briefly before writing it: confirm schema,
+whether to lock project language, and whether to add stable context/rules now.
+If the user chooses defaults, OpsX writes an intentionally sparse schema-only
+config. Add team-wide language, context, rules, and security policy only when
+the project wants to lock them in. You can also create or edit
+`.opsx/config.yaml` in the project workspace:
 
 ```yaml
 schema: spec-driven
@@ -135,8 +142,8 @@ Notes:
 `~/.opsx/config.yaml` is the shared-home config used by install/runtime
 commands. It is best for personal defaults such as preferred language.
 
-Installed platform state is not determined only by `platform` in the global
-config. The installed platform set is derived from manifest files under
+The global config does not store selected platforms or rule-file names.
+Installed platform state is derived from manifest files under
 `~/.opsx/manifests/*.manifest`; run `opsx check` to inspect both canonical paths
 and any legacy migration candidates.
 

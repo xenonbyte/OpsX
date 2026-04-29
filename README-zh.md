@@ -84,6 +84,10 @@ npm test
 ## 项目配置
 
 OpsX 的项目级工作流默认配置当前位于 `.opsx/config.yaml`。
+第一次通过 `$opsx-new` / `/opsx-new` 或 `$opsx-propose` / `/opsx-propose`
+创建 change 时，如果 workspace 尚未初始化，会先交互式确认再写入
+`.opsx/config.yaml`；选择默认值时只写入 schema-only 稀疏配置，明确回答后才会
+把项目语言、上下文、规则或安全策略固定到仓库。
 先运行 `opsx migrate --dry-run` 查看精确的 `MOVE`/`CREATE` 映射（不会写入文件），再运行 `opsx migrate` 执行同一迁移计划；如果 `.opsx/` 已存在，默认会直接 abort。
 
 优先级：

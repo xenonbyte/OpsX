@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.0.2
+
+Release date: 2026-04-30
+
+Highlights:
+- Remove `platform` and `ruleFile` from global config persistence; installed platform state is now manifest-derived only.
+- Let `$opsx-new` / `$opsx-propose` initialize missing project `.opsx/config.yaml` from the normal first-change path.
+- Keep default project config schema-only unless the user explicitly locks project language, context, rules, or security policy.
+
 ## v3.0.1
 
 Release date: 2026-04-29

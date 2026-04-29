@@ -476,7 +476,7 @@ function registerTests(test, helpers) {
     });
   });
 
-  test('opsx status reports truthful migration and onboard guidance when workspace is missing', () => {
+  test('opsx status reports truthful migration and initialization guidance when workspace is missing', () => {
     const { fixtureRoot: statusFixture } = createLegacyMigrationRepoFixture({ changeName: 'status-only' });
     const statusHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-status-home-guidance-'));
     cleanupTargets.push(statusFixture, statusHome);
@@ -488,7 +488,7 @@ function registerTests(test, helpers) {
     assert.strictEqual(statusOutput.status, 0, statusOutput.stderr);
     assert(statusOutput.stdout.includes(`OpsX v${PACKAGE_VERSION}`));
     assert(statusOutput.stdout.includes('Workspace not initialized: `.opsx/config.yaml` is missing.'));
-    assert(statusOutput.stdout.includes('Use onboarding routes to initialize and select a change (`$opsx-onboard` / `/opsx-onboard`).'));
+    assert(statusOutput.stdout.includes('Next: use `$opsx-new` / `/opsx-new` or `$opsx-propose` / `/opsx-propose` to initialize and select a change.'));
     assert(statusOutput.stdout.includes('Run `opsx migrate --dry-run` to preview migration.'));
     assert(!statusOutput.stdout.includes('Current phase: Phase 2 (.opsx/ Workspace and Migration)'));
     assert(!statusOutput.stdout.includes('Phase 1 status placeholder.'));

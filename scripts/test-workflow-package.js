@@ -290,6 +290,10 @@ function registerTests(test, helpers) {
     const results = install({ platform: 'claude,codex,gemini', homeDir: tempHome, language: 'en' });
     assert.strictEqual(results.length, 3);
 
+    const globalConfigText = fs.readFileSync(path.join(tempHome, '.opsx', 'config.yaml'), 'utf8');
+    assert(!globalConfigText.includes('platform:'), 'Global config should not persist selected platform metadata.');
+    assert(!globalConfigText.includes('ruleFile:'), 'Global config should not persist rule-file metadata.');
+
     const checkOutput = runCheck({ homeDir: tempHome, cwd: fixtureRoot });
     assert(checkOutput.includes('OpsX Installation Check'));
     assert(checkOutput.includes('Config'));
@@ -308,6 +312,27 @@ function registerTests(test, helpers) {
 
     const removed = uninstall({ platform: 'claude,codex,gemini', homeDir: tempHome });
     assert.deepStrictEqual(removed.sort(), ['claude', 'codex', 'gemini']);
+  });
+
+  test('global config writes drop legacy platform metadata fields', () => {
+    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-home-global-config-'));
+    cleanupTargets.push(tempHome);
+
+    const globalConfigPath = path.join(tempHome, '.opsx', 'config.yaml');
+    writeText(globalConfigPath, [
+      'version: "2.0.0"',
+      'schema: "spec-driven"',
+      'language: "en"',
+      'platform: "codex"',
+      'ruleFile: "AGENTS.md"'
+    ].join('\n'));
+
+    setLanguage('zh', { homeDir: tempHome });
+
+    const updatedConfigText = fs.readFileSync(globalConfigPath, 'utf8');
+    assert(updatedConfigText.includes('language: zh'));
+    assert(!updatedConfigText.includes('platform:'), 'Legacy platform metadata should be scrubbed on write.');
+    assert(!updatedConfigText.includes('ruleFile:'), 'Legacy rule-file metadata should be scrubbed on write.');
   });
 
   test('message catalog and verbose logger provide localized structured diagnostics', () => {
@@ -361,7 +386,8 @@ function registerTests(test, helpers) {
     assert(checkOutput.includes('claude'));
     assert(checkOutput.includes('codex'));
     assert(!checkOutput.includes('Manifest missing for gemini'));
-    assert(checkOutput.includes('configured platform `gemini` is not currently installed'));
+    assert(!checkOutput.includes('configured platform'));
+    assert(!checkOutput.includes('last selected'));
   });
 
   test('doc output prefers package guide over stale installed guide copy', () => {
@@ -379,8 +405,7 @@ function registerTests(test, helpers) {
     writeText(path.join(tempHome, '.opsx', 'config.yaml'), [
       'version: "2.0.0"',
       'schema: "spec-driven"',
-      'language: "en"',
-      'platform: "codex"'
+      'language: "en"'
     ].join('\n'));
 
     const doc = showDoc({ homeDir: tempHome });

@@ -658,6 +658,21 @@ function registerTests(test, helpers) {
       assert.deepStrictEqual(parity.checkedInEntries, parity.generatedEntries, `${platform} checked-in entries must exactly match generated entries`);
     });
 
+    ['new', 'propose'].forEach((actionId) => {
+      Object.entries(PLATFORM_BUNDLE_TARGETS).forEach(([platform, target]) => {
+        const promptPath = target.actionPath(actionId);
+        const promptContent = generatedBundles[platform][promptPath] || '';
+        assert(
+          promptContent.includes('ask a brief workspace-init question before writing it'),
+          `${platform}:${actionId} must initialize missing project config interactively from the normal entry route`
+        );
+        assert(
+          promptContent.includes('create a sparse project config with `schema` only'),
+          `${platform}:${actionId} must keep default project config sparse`
+        );
+      });
+    });
+
     const fallbackCoverage = collectFallbackCopyCoverage(generatedBundles);
     Object.keys(EMPTY_STATE_FALLBACK_MATCHERS).forEach((actionId) => {
       Object.keys(PLATFORM_BUNDLE_TARGETS).forEach((platform) => {

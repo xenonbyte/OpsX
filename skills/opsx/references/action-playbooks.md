@@ -23,12 +23,14 @@ Use these when the active workflow action is explicit.
 ## onboard
 
 - If `.opsx/config.yaml` is missing, report that the workspace is not initialized.
-- Recommend `opsx install --platform <claude|codex|gemini[,...]>`, then continue with the platform route: Codex `$opsx-new` / `$opsx-propose`, Claude/Gemini `/opsx-new` / `/opsx-propose`.
+- If command routes are not installed yet, recommend `opsx install --platform <claude|codex|gemini[,...]>`.
+- Use the platform route to create the first real change and initialize workspace config: Codex `$opsx-new` / `$opsx-propose`, Claude/Gemini `/opsx-new` / `/opsx-propose`.
 - If workspace exists but `.opsx/active.yaml` has no active change, report that state and suggest the same platform-specific `new` or `propose` route.
-- Keep onboarding instructional and do not auto-create `.opsx/config.yaml`, `.opsx/active.yaml`, or change files implicitly.
+- Keep onboarding instructional and do not auto-create `.opsx/active.yaml`, change state, or change files implicitly.
 
 ## propose
 
+- If `.opsx/config.yaml` is missing, ask a brief workspace-init question before writing it: confirm schema, whether to lock project language, and whether to add stable context/rules now. If the user chooses defaults, create a sparse project config with `schema` only; do not copy personal global defaults into project policy.
 - Create a change name.
 - Create `change.yaml`.
 - Generate proposal, specs, design, and tasks.
@@ -42,6 +44,7 @@ Use these when the active workflow action is explicit.
 
 ## new
 
+- If `.opsx/config.yaml` is missing, ask a brief workspace-init question before writing it: confirm schema, whether to lock project language, and whether to add stable context/rules now. If the user chooses defaults, create a sparse project config with `schema` only; do not copy personal global defaults into project policy.
 - Create only the new-change scaffold: `change.yaml`, `specs/`, `state.yaml`, `context.md`, and `drift.md`.
 - Do not create placeholder `proposal.md`, `design.md`, `tasks.md`, or `specs/README.md`.
 - Set `.opsx/active.yaml` to this active change.
@@ -56,7 +59,7 @@ Use these when the active workflow action is explicit.
 
 ## resume
 
-- If `.opsx/config.yaml` is missing, report workspace-not-initialized and redirect to the platform-specific onboard route: Codex `$opsx-onboard`, Claude/Gemini `/opsx-onboard`.
+- If `.opsx/config.yaml` is missing, report workspace-not-initialized and recommend the platform-specific `new` or `propose` route: Codex `$opsx-new` / `$opsx-propose`, Claude/Gemini `/opsx-new` / `/opsx-propose`.
 - If `.opsx/active.yaml` has no active change, state that no resumable change exists and recommend the platform-specific `new` or `propose` route.
 - If an active change exists, report `stage`, `nextAction`, `warnings`, and `blockers` from persisted state.
 - Treat `resume` as read-only: warn on hash drift, reload from disk, and do not refresh stored hashes from read-only routes.
@@ -133,7 +136,7 @@ Use these when the active workflow action is explicit.
 - Report whether workspace exists (`.opsx/config.yaml`) and whether an active change is selected (`.opsx/active.yaml`).
 - Report artifact readiness from the active schema.
 - Report `stage`, `nextAction`, `warnings`, and `blockers`.
-- If workspace is missing, recommend the platform-specific `onboard` route: Codex `$opsx-onboard`, Claude/Gemini `/opsx-onboard`.
+- If workspace is missing, recommend the platform-specific `new` or `propose` route to initialize it: Codex `$opsx-new` / `$opsx-propose`, Claude/Gemini `/opsx-new` / `/opsx-propose`.
 - If no active change exists, recommend the platform-specific `new` or `propose` route: Codex `$opsx-new` / `$opsx-propose`, Claude/Gemini `/opsx-new` / `/opsx-propose`.
 - Make `security-review` readiness explicit when it is required or recommended.
 - Surface checkpoint output using canonical fields: `status`, `findings`, `patchTargets`, and `nextStep`.

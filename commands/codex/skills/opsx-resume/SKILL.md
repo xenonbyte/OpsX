@@ -25,7 +25,7 @@ Execution rules:
 - No resumable change exists because `.opsx/active.yaml` has no active change.
 - Do not auto-create `.opsx/active.yaml` or change state from `resume`.
 - Warn on artifact hash drift, reload from disk, and do not refresh stored hashes from read-only routes.
-- Recommend `$opsx-new` or `$opsx-propose` when there is no active change to resume.
+- Recommend `$opsx-new` or `$opsx-propose` when the workspace or active change is missing.
 - Use request details already present in the conversation.
 - Do not assume text typed after a `$opsx-*` command is reliably available as an inline argument in Codex.
 - Security-review states are `required`, `recommended`, `waived`, `completed`.
