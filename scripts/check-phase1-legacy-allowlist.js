@@ -20,12 +20,7 @@ const SCAN_TARGETS = [
   'AGENTS.md'
 ];
 
-const AGENTS_AUTHORING_ALLOWLIST_LINES = new Set([
-  '# OpenSpec project hand-off',
-  'This repository uses OpenSpec as the workflow source of truth.',
-  '- Read `openspec/config.yaml` for project context and workflow defaults.',
-  '- Keep change artifacts under `openspec/changes/`.'
-]);
+const AGENTS_AUTHORING_ALLOWLIST_LINES = new Set();
 
 function toPosixPath(filePath) {
   return filePath.split(path.sep).join('/');

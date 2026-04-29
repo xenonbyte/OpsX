@@ -11,6 +11,8 @@ function registerTests(test, helpers) {
       'toPosixPath',
       'normalizeRelativePath',
       'relativeToBase',
+      'realpathIfExists',
+      'ensureWithinRealBase',
       'isWithinBase',
       'ensureWithinBase'
     ];
@@ -24,6 +26,8 @@ function registerTests(test, helpers) {
       toPosixPath,
       normalizeRelativePath,
       relativeToBase,
+      realpathIfExists,
+      ensureWithinRealBase,
       isWithinBase,
       ensureWithinBase
     } = require('../lib/path-utils');
@@ -35,8 +39,13 @@ function registerTests(test, helpers) {
     assert.strictEqual(toPosixPath('a\\b\\c.md'), 'a/b/c.md');
     assert.strictEqual(normalizeRelativePath('./specs//demo\\spec.md'), 'specs/demo/spec.md');
     assert.strictEqual(relativeToBase(repoRoot, nestedPath), 'specs/demo/spec.md');
+    assert.strictEqual(realpathIfExists(nestedPath), path.resolve(nestedPath));
     assert.strictEqual(isWithinBase(repoRoot, nestedPath), true);
     assert.strictEqual(isWithinBase(repoRoot, outsidePath), false);
+    assert.throws(
+      () => ensureWithinRealBase(repoRoot, outsidePath, 'repo root'),
+      /outside repo root/
+    );
     assert.throws(
       () => ensureWithinBase(repoRoot, outsidePath, 'repo root'),
       /outside repo root/
@@ -160,6 +169,28 @@ function registerTests(test, helpers) {
       'README.md'
     ]);
     assert.deepStrictEqual(result.outOfScopeMatches, []);
+  });
+
+  test('matchPathScope treats only active workflow state artifacts as workflow extras', () => {
+    const { matchPathScope } = require('../lib/path-scope');
+    const result = matchPathScope(
+      [
+        '.opsx/changes/demo/state.yaml',
+        '.opsx/changes/demo/specs/runtime/spec.md',
+        '.opsx/specs/runtime/spec.md'
+      ],
+      {
+        allowedPaths: ['lib/**'],
+        activeChange: 'demo'
+      }
+    );
+
+    assert.deepStrictEqual(result.workflowArtifactMatches, ['.opsx/changes/demo/state.yaml']);
+    assert.deepStrictEqual(result.explainableExtraMatches, []);
+    assert.deepStrictEqual(result.outOfScopeMatches, [
+      '.opsx/changes/demo/specs/runtime/spec.md',
+      '.opsx/specs/runtime/spec.md'
+    ]);
   });
 
   test('change-artifacts hashes tracked Phase 4 artifacts deterministically', () => {

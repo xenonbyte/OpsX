@@ -42,7 +42,8 @@
 
 ## new
 
-- 创建完整的新 change skeleton：`change.yaml`、占位 `proposal.md`、`design.md`、`tasks.md`、`specs/README.md`、`state.yaml`、`context.md`、`drift.md`。
+- 只创建新 change scaffold：`change.yaml`、`specs/`、`state.yaml`、`context.md`、`drift.md`。
+- 不要创建占位 `proposal.md`、`design.md`、`tasks.md` 或 `specs/README.md`。
 - 将 `.opsx/active.yaml` 指向该 active change。
 - 保持 `stage: INIT`，并报告 proposal 是下一个 READY 工件。
 
@@ -99,12 +100,14 @@
 ## verify
 
 - 从 Completeness、Correctness、Coherence 三个维度检查。
+- 对 `IMPLEMENTED` change，在接受 verify 前运行 `implementation-consistency-checkpoint`。
 - 产出标准化的 `PASS`、`WARN`、`BLOCK` 结果，并附带 `patchTargets` 与 `nextStep`。
 - 对未解决 drift 审批、forbidden/out-of-scope 路径变更、execution 证据缺失、未完成任务组等情况直接阻塞。
 
 ## sync
 
 - 写入 `.opsx/specs/` 前先在内存中完成保守规划。
+- 将 change-local specs 视为每个 capability 的完整目标 spec，而不是 delta-only patch。
 - 保留无关内容并明确报告冲突。
 - 若出现 `BLOCK` finding，则 do not write partial sync output。
 

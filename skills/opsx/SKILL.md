@@ -97,6 +97,7 @@ securityWaiver:
 - `spec checkpoint`: after `design`, before `tasks`
 - `task checkpoint`: after `tasks`, before `apply`
 - `execution checkpoint`: after each top-level task group during `apply`
+- `implementation-consistency-checkpoint`: after all active task groups are implemented, before verify acceptance
 - Canonical checkpoint states are `PASS`, `WARN`, and `BLOCK`.
 - Checkpoints do not create `spec-review.md`, `task-review.md`, or `execution-review.md`.
 - When a checkpoint finds issues, update existing artifacts such as `proposal.md`, `specs/*.md`, `design.md`, `security-review.md`, or `tasks.md`.
@@ -125,7 +126,8 @@ If `language: en`:
 7. Read dependency artifacts before writing a new artifact.
 8. Run `spec-split-checkpoint` after `specs` and before `design`; run `spec checkpoint` before entering `tasks`, and run `task checkpoint` before entering `apply` using `rules.tdd.mode` (`off|light|strict`) with RED/VERIFY enforcement for `behavior-change` and `bugfix`, visible `TDD Exemption:` reasons for exempt work, and optional `REFACTOR`.
 9. During `apply`, execute one top-level task group, run `execution checkpoint`, persist completed TDD steps, verification command/result, diff summary, and drift through existing state paths, refresh `context.md` / `drift.md`, then stop.
-10. Report changed files, current state, next step, and blockers.
+10. During `verify`, run `implementation-consistency-checkpoint` for `IMPLEMENTED` changes to confirm approved specs/tasks have evidence and unresolved drift is absent.
+11. Report changed files, current state, next step, and blockers.
 
 ## Guardrails
 
@@ -134,6 +136,7 @@ If `language: en`:
 - When artifact hash drift is detected, warn and reload from disk first; refresh stored hashes only after accepted checkpoint/state writes.
 - `verify` must emit `PASS` / `WARN` / `BLOCK`; unresolved `BLOCK` findings stop `sync`, `archive`, and bulk archive eligibility.
 - `sync` must compute a conservative in-memory plan first; when findings include `BLOCK`, do not write partial sync output.
+- Change-local specs are full target specs for each capability, not delta-only patches; `sync` writes those full specs into `.opsx/specs/`.
 - `task checkpoint` uses `rules.tdd.mode`; required groups must expose `RED` and `VERIFY`, `REFACTOR` stays optional, and exempt groups must include visible `TDD Exemption:` reasons.
 - `archive` must require verify and sync preconditions; when the stage is only `VERIFIED`, run the same safe sync check before moving to `.opsx/archive/<change-name>/`.
 - `batch-apply` / `bulk-archive` must run each change in per-change isolation and report skipped/blocked reasons; global precondition failures stop the run.

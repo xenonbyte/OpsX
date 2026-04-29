@@ -55,7 +55,8 @@ function registerTests(test, helpers) {
 
     const status = buildStatus({ repoRoot: fixtureRoot, changeName });
     assert.strictEqual(status.stage, 'SPECS_READY');
-    assert.strictEqual(status.nextAction, 'design');
+    assert.strictEqual(status.nextAction, 'continue');
+    assert.strictEqual(status.nextArtifact, 'spec-split-checkpoint');
     assert.strictEqual(status.active.taskGroup, null);
     assert(status.warnings.includes('legacy warning from sparse state'));
     assert(status.warnings.some((warning) => warning.includes('Hash drift detected for proposal.md')));
@@ -63,12 +64,14 @@ function registerTests(test, helpers) {
 
     const statusText = buildStatusText({ repoRoot: fixtureRoot, changeName });
     assert(statusText.includes('Stage: SPECS_READY'));
-    assert(statusText.includes('Next action: design'));
+    assert(statusText.includes('Next action: continue'));
+    assert(statusText.includes('Next artifact: spec-split-checkpoint'));
 
     const resume = buildResumeInstructions({ repoRoot: fixtureRoot, changeName });
     assert.strictEqual(resume.stage, 'SPECS_READY');
-    assert.strictEqual(resume.nextAction, 'design');
-    assert.strictEqual(resume.route, 'opsx-design');
+    assert.strictEqual(resume.nextAction, 'continue');
+    assert.strictEqual(resume.nextArtifact, 'spec-split-checkpoint');
+    assert.strictEqual(resume.route, 'opsx-continue');
 
     assert.strictEqual(fs.readFileSync(statePath, 'utf8'), stateBefore);
     assert.strictEqual(fs.existsSync(contextPath), false);
@@ -346,7 +349,8 @@ function registerTests(test, helpers) {
     assert.strictEqual(migratedState.stage, 'PROPOSAL_READY');
     assert(Object.prototype.hasOwnProperty.call(migratedState.hashes, 'proposal.md'));
     const migratedStatus = buildStatus({ repoRoot: executeFixture, changeName });
-    assert.strictEqual(migratedStatus.nextAction, 'specs');
+    assert.strictEqual(migratedStatus.nextAction, 'continue');
+    assert.strictEqual(migratedStatus.nextArtifact, 'specs');
     assert.deepStrictEqual(migratedStatus.hashDriftWarnings, []);
   });
 

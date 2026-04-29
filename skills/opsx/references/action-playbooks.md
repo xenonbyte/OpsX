@@ -42,7 +42,8 @@ Use these when the active workflow action is explicit.
 
 ## new
 
-- Create the full new-change skeleton: `change.yaml`, placeholder `proposal.md`, `design.md`, `tasks.md`, `specs/README.md`, `state.yaml`, `context.md`, and `drift.md`.
+- Create only the new-change scaffold: `change.yaml`, `specs/`, `state.yaml`, `context.md`, and `drift.md`.
+- Do not create placeholder `proposal.md`, `design.md`, `tasks.md`, or `specs/README.md`.
 - Set `.opsx/active.yaml` to this active change.
 - Leave `stage: INIT` and report proposal as the next ready artifact.
 
@@ -99,12 +100,14 @@ Use these when the active workflow action is explicit.
 ## verify
 
 - Check completeness, correctness, and coherence.
+- Run `implementation-consistency-checkpoint` for `IMPLEMENTED` changes before verify acceptance.
 - Emit canonical `PASS`, `WARN`, and `BLOCK` findings with `patchTargets` and `nextStep`.
 - Treat unresolved drift approvals, forbidden/out-of-scope path changes, missing execution proof, and incomplete task groups as blocking conditions.
 
 ## sync
 
 - Plan spec updates in memory before writing to `.opsx/specs/`.
+- Treat change-local specs as full target specs for each capability, not delta-only patches.
 - Preserve unrelated content and surface conflicts explicitly.
 - If findings include `BLOCK`, do not write partial sync output.
 

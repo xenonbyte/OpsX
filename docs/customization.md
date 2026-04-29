@@ -69,9 +69,11 @@ Rules:
 
 ## Checkpoints
 
+- `spec-split-checkpoint` runs after `specs` and before `design`
 - `spec checkpoint` runs after `design` and before `tasks`
 - `task checkpoint` runs after `tasks` and before `apply`
 - `execution checkpoint` runs after each top-level task group during `apply`
+- `implementation-consistency-checkpoint` runs after implementation and before verify acceptance
 - Checkpoints use `PASS`, `WARN`, and `BLOCK`
 - Checkpoints patch existing artifacts instead of creating separate review files
 

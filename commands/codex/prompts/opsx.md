@@ -35,4 +35,4 @@ Important:
 - If required artifacts are missing, report missing files and redirect to the next explicit route instead of fabricating state.
 - CLI quick checks: `opsx check`, `opsx doc`, `opsx language <en|zh>`.
 - Security-review states: `required`, `recommended`, `waived`, `completed`
-- Checkpoints: `spec checkpoint` before `tasks`, `task checkpoint` before `apply`, and `execution checkpoint` after each top-level task group.
+- Checkpoints: `spec-split-checkpoint` before `design`, `spec checkpoint` before `tasks`, `task checkpoint` before `apply`, `execution checkpoint` after each top-level task group, and `implementation-consistency-checkpoint` before verify acceptance.

@@ -5,6 +5,7 @@
 - 2026-04-27 [CODE] Public current UX must not expose legacy OpenSpec routes/paths, `/prompts:*`, `/opsx:*`, standalone `$opsx`, or `$opsx <request>`.
 - 2026-04-27 [CODE] `commands/codex/prompts/opsx.md` remains only as an internal generated route catalog; public Codex entrypoints are explicit `$opsx-*`.
 - 2026-04-27 [CODE] `AGENTS.md` preserves repo-local `openspec/config.yaml` and `openspec/changes/` authoring-path guidance while replacing stale route bullets with current OpsX guidance.
+- 2026-04-29 [CODE] Supersedes the prior `AGENTS.md` authoring-path guidance: repo hand-off now uses `.opsx/config.yaml` and `.opsx/changes/` only.
 - 2026-04-28 [USER] Phase 6 TDD default decision: use `rules.tdd.mode: strict` for behavior-change and bugfix work.
 - 2026-04-28 [CODE] Phase 7 implements hard verify, sync, archive, drift/path-boundary, and batch isolation gates.
 - 2026-04-28 [TOOL] Phase 7 verification passed; `07-VERIFICATION.md` status is `passed`, score is 4/4, and `npm run test:workflow-runtime` passed 104/104.
@@ -21,6 +22,8 @@
 - 2026-04-29 [CODE] Phase 8 security gate is complete: `08-SECURITY.md` has `status: verified`, `threats_open: 0`, and 14/14 planned threats closed.
 - 2026-04-29 [CODE] Phase 8 code-review fixes are complete: `08-REVIEW-FIX.md` reports `status: all_fixed`, 2/2 warnings fixed, and `npm test` passed 128/128.
 - 2026-04-29 [CODE] Phase 8 post-fix code review is clean: `08-REVIEW.md` has 0 findings across 22 files, and `npm test` passed 128/128.
+- 2026-04-29 [CODE] User-reported OpsX drift is remediated: AGENTS/generation tests reject old OpenSpec paths, resume routes use `continue` + `nextArtifact`, task execution advances lifecycle, and `opsx-new` avoids placeholder planning artifacts.
+- 2026-04-29 [CODE] Verify acceptance now re-evaluates and records `implementation-consistency-checkpoint` for `IMPLEMENTED` changes; task-group execution also starts queued `GROUP_VERIFIED` groups before completing them.
 
 ## Done (recent)
 - 2026-04-28 [CODE] Executed all Phase 7 plans `07-01` through `07-08`.
@@ -72,6 +75,7 @@
 - 2026-04-28 [USER] D018 ACTIVE: Phase 7 should implement hard verify/archive gates, conservative sync conflict checks, archive-internal safe sync, per-change batch skip reporting, and library-first gate modules rather than prompt-only guidance.
 - 2026-04-28 [CODE] D019 ACTIVE: Phase 7 plans lock `picomatch@4.0.4` for Node-14-compatible `allowedPaths` / `forbiddenPaths` matching and preserve archived changes as full directories at `.opsx/archive/<change-name>/`.
 - 2026-04-28 [CODE] D020 ACTIVE: Phase 7 hard gates reject forged sync roots, validate canonical spec writes, treat per-change batch exceptions as blocked results, and require clean verify/sync/archive preconditions before archival.
+- 2026-04-29 [CODE] D021 ACTIVE: OpsX verify owns the implementation consistency gate; no new public command is introduced, and change-local specs are documented as full target specs rather than delta-only patches.
 
 ## Receipts
 - 2026-04-28 [TOOL] Phase 7 plans `07-01` through `07-08` executed and produced summaries.
@@ -97,6 +101,8 @@
 - 2026-04-29 [TOOL] Phase 8 security audit returned `SECURED`; `npm test` passed 126/126 and `08-SECURITY.md` records `threats_open: 0`.
 - 2026-04-29 [TOOL] Phase 8 review fix report records `findings_in_scope: 2`, `fixed: 2`, `skipped: 0`, `status: all_fixed`; fixer verification ran `npm test` with 128/128 passing.
 - 2026-04-29 [TOOL] Phase 8 post-fix review superseded the warning report; current `08-REVIEW.md` is `status: clean` with critical/warning/info/total all 0.
+- 2026-04-29 [TOOL] Drift-remediation verification: `npm test` passed 131/131 after AGENTS, lifecycle, scaffold, path-scope, drift-ledger, and implementation-consistency changes.
+- 2026-04-29 [TOOL] Review-fix verification: `node scripts/test-workflow-gates.js` passed 86/86 and `npm test` passed 133/133 after hardening verify acceptance and `GROUP_VERIFIED` task-group execution.
 - 2026-04-28 [TOOL] `gsd-sdk query verify.schema-drift 07` returned valid with 0 issues across 8 checked plans.
 - 2026-04-28 [TOOL] Phase 7 verification report committed as `f32d323` with `status: passed` and 4/4 must-haves verified.
 - 2026-04-28 [TOOL] `workflow.security_enforcement` is true; no `07-SECURITY.md` exists yet, so run `$gsd-secure-phase 7` before advancing if a dedicated security gate is required.

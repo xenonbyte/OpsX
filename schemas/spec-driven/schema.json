@@ -1,6 +1,6 @@
 {
   "id": "spec-driven",
-  "description": "Schema-driven OpenSpec workflow for proposal, specs, design, and tasks.",
+  "description": "Schema-driven OpsX workflow for proposal, specs, design, checkpoints, and tasks.",
   "checkpoints": [
     {
       "id": "spec-split-checkpoint",
@@ -39,6 +39,16 @@
       "insertion": {
         "within": ["apply"],
         "frequency": "per-top-level-task-group"
+      },
+      "states": ["PASS", "WARN", "BLOCK"]
+    },
+    {
+      "id": "implementation-consistency-checkpoint",
+      "phase": "verification",
+      "trigger": "after-implemented-before-verify",
+      "insertion": {
+        "after": ["apply"],
+        "before": ["verify"]
       },
       "states": ["PASS", "WARN", "BLOCK"]
     }

@@ -74,11 +74,15 @@ OpsX 的项目级工作流默认配置当前位于 `.opsx/config.yaml`。
 ## 工作流检查点
 
 - `security-review` 位于 `design` 与 `tasks` 之间
-- `spec checkpoint` 在 `tasks` 前
-- `task checkpoint` 在 `apply` 前
+- `spec-split-checkpoint` 在 `specs` 之后、`design` 之前
+- `spec checkpoint` 在 `design` 之后、`tasks` 之前
+- `task checkpoint` 在 `tasks` 之后、`apply` 之前
 - `execution checkpoint` 在 `apply` 中每个顶层任务组完成后执行
+- `implementation-consistency-checkpoint` 在实现完成后、verify acceptance 之前执行
 - Security-review 状态：`required`、`recommended`、`waived`、`completed`
 - Checkpoint 状态：`PASS`、`WARN`、`BLOCK`
+
+change-local specs 表示每个 capability 的完整目标 spec。`sync` 会把这些完整 spec 写入 `.opsx/specs/`，不要把它们当作 delta-only patch。
 
 ## 文档
 

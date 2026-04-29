@@ -77,11 +77,15 @@ Workspace tracking policy:
 ## Workflow Checkpoints
 
 - `security-review` sits after `design` and before `tasks`
-- `spec checkpoint` runs before `tasks`
-- `task checkpoint` runs before `apply`
+- `spec-split-checkpoint` runs after `specs` and before `design`
+- `spec checkpoint` runs after `design` and before `tasks`
+- `task checkpoint` runs after `tasks` and before `apply`
 - `execution checkpoint` runs after each top-level task group during `apply`
+- `implementation-consistency-checkpoint` runs after implementation and before verify acceptance
 - Security-review states: `required`, `recommended`, `waived`, `completed`
 - Checkpoint states: `PASS`, `WARN`, `BLOCK`
+
+Change-local specs are full target specs for each capability. `sync` writes them into `.opsx/specs/`; do not treat them as delta-only patches.
 
 ## Documentation
 

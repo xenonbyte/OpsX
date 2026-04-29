@@ -35,8 +35,10 @@ Codex explicit route examples:
 
 ## Workflow Checkpoints
 
+- `spec-split-checkpoint`: after `specs`, before `design`
 - `spec checkpoint`: after `design`, before `tasks`
 - `task checkpoint`: after `tasks`, before `apply`
+- `implementation-consistency-checkpoint`: after all active task groups are implemented, before verify acceptance
 - `execution checkpoint`: after each top-level task group during `apply`
 - Checkpoints update existing artifacts and do not create separate review files.
 
@@ -71,7 +73,10 @@ Compatibility aliases (secondary):
 Behavior notes:
 - `install` / `uninstall` require `--platform` and support comma-separated multi-platform values.
 - Installation always deploys the full command surface; there is no profile split.
-- `migrate` and `status` are included in the command surface; deeper migration/state workflows are delivered in later phases.
+- `migrate`, `status`, and state-aware resume/continue guidance are included in the command surface.
+
+Spec sync note:
+- OpsX change-local specs are expected to represent the full target spec for each capability, not only a delta patch. `sync` writes those full capability specs into `.opsx/specs/`.
 
 ## `opsx status --json` Contract
 

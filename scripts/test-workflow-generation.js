@@ -251,8 +251,10 @@ function registerTests(test, helpers) {
     });
 
     const agentsHandOff = fs.readFileSync(path.join(REPO_ROOT, 'AGENTS.md'), 'utf8');
-    assert(agentsHandOff.includes('- Read `openspec/config.yaml` for project context and workflow defaults.'));
-    assert(agentsHandOff.includes('- Keep change artifacts under `openspec/changes/`.'));
+    assert(agentsHandOff.includes('Read `.opsx/config.yaml`'));
+    assert(agentsHandOff.includes('under `.opsx/changes/`'));
+    assert(!agentsHandOff.includes('openspec/config.yaml'));
+    assert(!agentsHandOff.includes('openspec/changes/'));
     assert(agentsHandOff.includes('- For Codex, use explicit $opsx-* routes; for Claude/Gemini, use /opsx-* routes.'));
     [
       '$openspec',

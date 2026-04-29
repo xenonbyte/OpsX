@@ -21,7 +21,7 @@ Execution rules:
 - If required artifacts are missing, report that honestly and apply route-specific fallback guidance.
 - Route fallback guidance:
 - If `.opsx/config.yaml` is missing, stop and redirect to `$opsx-onboard`.
-- Create `change.yaml`, placeholder planning files (`proposal.md`, `design.md`, `tasks.md`, `specs/README.md`), plus `state.yaml`, `context.md`, and `drift.md`.
+- Create only the new-change scaffold: `change.yaml`, `specs/`, `state.yaml`, `context.md`, and `drift.md`; do not create placeholder planning artifacts.
 - Set `.opsx/active.yaml` to the new change and leave `stage: INIT` after scaffold creation.
 - Use request details already present in the conversation.
 - Do not assume text typed after a `$opsx-*` command is reliably available as an inline argument in Codex.

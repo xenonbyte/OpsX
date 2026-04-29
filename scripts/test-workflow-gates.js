@@ -192,26 +192,35 @@ function registerTests(test, helpers) {
     [
       'applyMutationEvent',
       'resolveContinueAction',
-      'buildLifecycleBlockResult'
+      'buildLifecycleBlockResult',
+      'resolveNextArtifact'
     ].forEach((symbol) => {
       assert.strictEqual(typeof changeState[symbol], 'function', `Expected ${symbol} export.`);
     });
   });
 
   test('change-state blocks invalid transitions and routes continue by persisted stage', () => {
-    const { applyMutationEvent, resolveContinueAction } = require('../lib/change-state');
+    const { applyMutationEvent, resolveContinueAction, resolveNextArtifact } = require('../lib/change-state');
     const blocked = applyMutationEvent({ stage: 'INIT' }, 'COMPLETE_TASK_GROUP');
     assert.strictEqual(blocked.status, 'BLOCK');
     assert.strictEqual(blocked.code, 'invalid-transition');
     assert(Array.isArray(blocked.patchTargets));
-    assert.strictEqual(resolveContinueAction({ stage: 'INIT' }), 'proposal');
-    assert.strictEqual(resolveContinueAction({ stage: 'PROPOSAL_READY' }), 'specs');
-    assert.strictEqual(resolveContinueAction({ stage: 'SPECS_READY' }), 'design');
-    assert.strictEqual(resolveContinueAction({ stage: 'SPEC_SPLIT_REVIEWED' }), 'design');
-    assert.strictEqual(resolveContinueAction({ stage: 'DESIGN_READY' }), 'tasks');
-    assert.strictEqual(resolveContinueAction({ stage: 'SECURITY_REVIEW_REQUIRED' }), 'security-review');
-    assert.strictEqual(resolveContinueAction({ stage: 'SECURITY_REVIEWED' }), 'tasks');
-    assert.strictEqual(resolveContinueAction({ stage: 'SPEC_REVIEWED' }), 'tasks');
+    assert.strictEqual(resolveContinueAction({ stage: 'INIT' }), 'continue');
+    assert.strictEqual(resolveNextArtifact({ stage: 'INIT' }), 'proposal');
+    assert.strictEqual(resolveContinueAction({ stage: 'PROPOSAL_READY' }), 'continue');
+    assert.strictEqual(resolveNextArtifact({ stage: 'PROPOSAL_READY' }), 'specs');
+    assert.strictEqual(resolveContinueAction({ stage: 'SPECS_READY' }), 'continue');
+    assert.strictEqual(resolveNextArtifact({ stage: 'SPECS_READY' }), 'spec-split-checkpoint');
+    assert.strictEqual(resolveContinueAction({ stage: 'SPEC_SPLIT_REVIEWED' }), 'continue');
+    assert.strictEqual(resolveNextArtifact({ stage: 'SPEC_SPLIT_REVIEWED' }), 'design');
+    assert.strictEqual(resolveContinueAction({ stage: 'DESIGN_READY' }), 'continue');
+    assert.strictEqual(resolveNextArtifact({ stage: 'DESIGN_READY' }), 'tasks');
+    assert.strictEqual(resolveContinueAction({ stage: 'SECURITY_REVIEW_REQUIRED' }), 'continue');
+    assert.strictEqual(resolveNextArtifact({ stage: 'SECURITY_REVIEW_REQUIRED' }), 'security-review');
+    assert.strictEqual(resolveContinueAction({ stage: 'SECURITY_REVIEWED' }), 'continue');
+    assert.strictEqual(resolveNextArtifact({ stage: 'SECURITY_REVIEWED' }), 'tasks');
+    assert.strictEqual(resolveContinueAction({ stage: 'SPEC_REVIEWED' }), 'continue');
+    assert.strictEqual(resolveNextArtifact({ stage: 'SPEC_REVIEWED' }), 'tasks');
     assert.strictEqual(resolveContinueAction({ stage: 'TASKS_READY' }), 'apply');
     assert.strictEqual(resolveContinueAction({
       stage: 'APPLYING_GROUP',
@@ -221,7 +230,7 @@ function registerTests(test, helpers) {
       stage: 'GROUP_VERIFIED',
       active: { nextTaskGroup: '2. Follow-up' }
     }), 'apply');
-    assert.strictEqual(resolveContinueAction({ stage: 'GROUP_VERIFIED' }), 'verify');
+    assert.strictEqual(resolveContinueAction({ stage: 'GROUP_VERIFIED' }), 'apply');
     assert.strictEqual(resolveContinueAction({ stage: 'IMPLEMENTED' }), 'verify');
     assert.strictEqual(resolveContinueAction({ stage: 'VERIFIED' }), 'sync');
     assert.strictEqual(resolveContinueAction({ stage: 'SYNCED' }), 'archive');
@@ -299,6 +308,7 @@ function registerTests(test, helpers) {
       'design.md': '# Design\n',
       'tasks.md': [
         '## 1. Behavior change verification',
+        '- Requirement Coverage: Verify gate warning visibility',
         '- [x] RED: add failing gate test',
         '- [x] GREEN: implement gate check',
         '- [x] VERIFY: run workflow runtime tests'
@@ -306,7 +316,11 @@ function registerTests(test, helpers) {
       'specs/runtime/spec.md': [
         '## ADDED Requirements',
         '### Requirement: Verify gate warning visibility',
-        'The system SHALL surface manual verification risk as warnings when rationale is missing.'
+        'The system SHALL surface manual verification risk as warnings when rationale is missing.',
+        '',
+        '#### Scenario: Manual verification warning',
+        '- **WHEN** verify sees manual evidence without rationale',
+        '- **THEN** it reports a warning'
       ].join('\n')
     });
     const now = new Date().toISOString();
@@ -315,6 +329,18 @@ function registerTests(test, helpers) {
       stage: 'IMPLEMENTED',
       hashes: hashTrackedArtifacts(changeDir),
       checkpoints: {
+        specSplit: {
+          status: 'PASS',
+          updatedAt: now
+        },
+        spec: {
+          status: 'PASS',
+          updatedAt: now
+        },
+        task: {
+          status: 'PASS',
+          updatedAt: now
+        },
         execution: {
           status: 'PASS',
           updatedAt: now
@@ -340,12 +366,15 @@ function registerTests(test, helpers) {
       '## New Assumptions',
       '',
       '## Scope Changes',
+      '- [resolved] 2026-04-29 Scope wording reconciled in proposal.',
       '',
       '## Out-of-Bound File Changes',
       '',
       '## Discovered Requirements',
+      '- [resolved] 2026-04-29 Requirement captured in specs/runtime/spec.md.',
       '',
       '## User Approval Needed',
+      '- [resolved] 2026-04-29 Reviewer approved manual verification note.',
       ''
     ].join('\n'));
 
@@ -372,6 +401,7 @@ function registerTests(test, helpers) {
       'design.md': '# Design\n',
       'tasks.md': [
         '## 1. Behavior change verification',
+        '- Requirement Coverage: Verify gate execution diff fallback',
         '- TDD Class: behavior-change',
         '- [x] RED: add failing gate test',
         '- [x] GREEN: implement gate check',
@@ -380,7 +410,11 @@ function registerTests(test, helpers) {
       'specs/runtime/spec.md': [
         '## ADDED Requirements',
         '### Requirement: Verify gate execution diff fallback',
-        'The system SHALL check recorded execution changed files when direct diff input is absent.'
+        'The system SHALL check recorded execution changed files when direct diff input is absent.',
+        '',
+        '#### Scenario: Execution log fallback',
+        '- **WHEN** caller diff input is absent',
+        '- **THEN** verify checks recorded execution changed files'
       ].join('\n')
     });
     const now = new Date().toISOString();
@@ -389,6 +423,18 @@ function registerTests(test, helpers) {
       stage: 'IMPLEMENTED',
       hashes: hashTrackedArtifacts(changeDir),
       checkpoints: {
+        specSplit: {
+          status: 'PASS',
+          updatedAt: now
+        },
+        spec: {
+          status: 'PASS',
+          updatedAt: now
+        },
+        task: {
+          status: 'PASS',
+          updatedAt: now
+        },
         execution: {
           status: 'PASS',
           updatedAt: now
@@ -427,6 +473,97 @@ function registerTests(test, helpers) {
     assert.strictEqual(gate.status, 'BLOCK');
     assert(gate.findings.some((finding) => finding.code === 'forbidden-path-change'));
     assert.deepStrictEqual(gate.pathScope.forbiddenMatches, ['secrets/private.pem']);
+  });
+
+  test('implementation consistency checkpoint passes complete implemented changes', () => {
+    const {
+      evaluateImplementationConsistency,
+      acceptImplementationConsistency
+    } = require('../lib/implementation-consistency');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const { writeChangeState, loadChangeState } = require('../lib/change-store');
+    const changeName = 'implementation-consistency-pass';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': [
+        '## Why',
+        'Need theme preference persistence.',
+        '## What Changes',
+        '- Persist theme preference across sessions.'
+      ].join('\n'),
+      'design.md': [
+        '## Context',
+        'Theme preference persistence.',
+        '## Approach',
+        '- Store preference through the theme provider.'
+      ].join('\n'),
+      'tasks.md': [
+        '## 1. Theme persistence',
+        '- Requirement Coverage: Theme preference persistence',
+        '- [x] RED: add failing theme persistence test',
+        '- [x] GREEN: implement theme provider persistence',
+        '- [x] VERIFY: run theme provider test'
+      ].join('\n'),
+      'specs/theme/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Theme preference persistence',
+        'The system SHALL persist theme preference across sessions.',
+        '',
+        '#### Scenario: Saved theme restored',
+        '- **WHEN** the user returns',
+        '- **THEN** the saved theme preference is restored'
+      ].join('\n')
+    });
+    const now = new Date().toISOString();
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'IMPLEMENTED',
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        specSplit: { status: 'PASS', updatedAt: now },
+        spec: { status: 'PASS', updatedAt: now },
+        task: { status: 'PASS', updatedAt: now },
+        execution: { status: 'PASS', updatedAt: now }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Theme persistence',
+        verificationCommand: 'npm test -- theme',
+        verificationResult: 'PASS',
+        changedFiles: ['src/theme/provider.ts', 'tests/theme/provider.test.ts'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Implemented Theme preference persistence.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['src/theme/**', 'tests/theme/**'],
+      forbiddenPaths: ['*.pem']
+    });
+
+    const result = evaluateImplementationConsistency({
+      changeDir,
+      changedFiles: ['src/theme/provider.ts', 'tests/theme/provider.test.ts']
+    });
+    assert.strictEqual(result.checkpoint, 'implementation-consistency-checkpoint');
+    assert.strictEqual(result.status, 'PASS');
+    assert.strictEqual(result.result.requirementCoverage.covered, 1);
+
+    acceptImplementationConsistency(changeDir, result);
+    const persisted = loadChangeState(changeDir);
+    assert.strictEqual(persisted.checkpoints.implementationConsistency.status, 'PASS');
   });
 
   test('verify gate deep merges global project and change gate policy', () => {
@@ -471,13 +608,18 @@ function registerTests(test, helpers) {
       'design.md': '# Design\n',
       'tasks.md': [
         '## 1. Policy merge',
+        '- Requirement Coverage: Verify policy merge',
         '- TDD Class: migration-only',
         '- [x] GREEN: implement policy merge behavior'
       ].join('\n'),
       'specs/runtime/spec.md': [
         '## ADDED Requirements',
         '### Requirement: Verify policy merge',
-        'The system SHALL preserve global and project gate policy when change config is partial.'
+        'The system SHALL preserve global and project gate policy when change config is partial.',
+        '',
+        '#### Scenario: Partial change policy',
+        '- **WHEN** verify loads partial change policy',
+        '- **THEN** global and project policy remain active'
       ].join('\n')
     });
     const now = new Date().toISOString();
@@ -486,6 +628,18 @@ function registerTests(test, helpers) {
       stage: 'IMPLEMENTED',
       hashes: hashTrackedArtifacts(changeDir),
       checkpoints: {
+        specSplit: {
+          status: 'PASS',
+          updatedAt: now
+        },
+        spec: {
+          status: 'PASS',
+          updatedAt: now
+        },
+        task: {
+          status: 'PASS',
+          updatedAt: now
+        },
         execution: {
           status: 'PASS',
           updatedAt: now
@@ -517,16 +671,27 @@ function registerTests(test, helpers) {
     assert(codes.has('strict-tdd-record-missing'), 'Expected project rules.tdd.requireFor to block verify.');
   });
 
-  test('acceptVerifyGate advances implemented changes to VERIFIED with refreshed hashes', () => {
+  test('acceptVerifyGate evaluates consistency checkpoint before advancing implemented changes', () => {
     const { acceptVerifyGate } = require('../lib/verify');
     const { hashTrackedArtifacts } = require('../lib/change-artifacts');
-    const { writeChangeState } = require('../lib/change-store');
+    const { writeChangeState, loadChangeState } = require('../lib/change-store');
     const changeName = 'accept-verify-gate-transition';
     const changeDir = createChange(fixtureRoot, changeName, {
-      'proposal.md': '# Proposal\n',
-      'design.md': '# Design\n',
+      'proposal.md': [
+        '## Why',
+        'Verify acceptance must enforce implementation consistency.',
+        '## What Changes',
+        '- Transition accepted implemented changes to verified.'
+      ].join('\n'),
+      'design.md': [
+        '## Context',
+        'Verify acceptance transition.',
+        '## Approach',
+        '- Re-run implementation consistency during acceptance.'
+      ].join('\n'),
       'tasks.md': [
         '## 1. Behavior change verification',
+        '- Requirement Coverage: Verify acceptance transition',
         '- [x] RED: add failing gate test',
         '- [x] GREEN: implement gate check',
         '- [x] VERIFY: run workflow runtime tests'
@@ -534,15 +699,51 @@ function registerTests(test, helpers) {
       'specs/runtime/spec.md': [
         '## ADDED Requirements',
         '### Requirement: Verify acceptance transition',
-        'The system SHALL transition IMPLEMENTED changes to VERIFIED when gate acceptance succeeds.'
+        'The system SHALL transition IMPLEMENTED changes to VERIFIED when gate acceptance succeeds.',
+        '',
+        '#### Scenario: Gate acceptance succeeds',
+        '- **WHEN** verify gate acceptance is recorded',
+        '- **THEN** the change is marked verified'
       ].join('\n')
     });
+    const now = new Date().toISOString();
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
     writeChangeState(changeDir, {
       change: changeName,
       stage: 'IMPLEMENTED',
-      hashes: {
-        'proposal.md': 'stale-hash'
-      }
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        specSplit: { status: 'PASS', updatedAt: now },
+        spec: { status: 'PASS', updatedAt: now },
+        task: { status: 'PASS', updatedAt: now },
+        execution: { status: 'PASS', updatedAt: now }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Behavior change verification',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        changedFiles: ['lib/verify.js'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Implemented Verify acceptance transition.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['lib/**'],
+      forbiddenPaths: ['*.pem']
     });
 
     const accepted = acceptVerifyGate(changeDir, {
@@ -552,6 +753,64 @@ function registerTests(test, helpers) {
     assert.strictEqual(accepted.stage, 'VERIFIED');
     assert.strictEqual(accepted.nextAction, 'sync');
     assert.deepStrictEqual(accepted.hashes, hashTrackedArtifacts(changeDir));
+    assert.strictEqual(loadChangeState(changeDir).checkpoints.implementationConsistency.status, 'PASS');
+  });
+
+  test('acceptVerifyGate rejects stale pass results when consistency checkpoint blocks', () => {
+    const { acceptVerifyGate } = require('../lib/verify');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const { writeChangeState, loadChangeState } = require('../lib/change-store');
+    const changeName = 'accept-verify-gate-rejects-stale-pass';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Behavior change verification',
+        '- Requirement Coverage: Verify acceptance consistency',
+        '- [x] RED: add failing gate test',
+        '- [x] GREEN: implement gate check',
+        '- [x] VERIFY: run workflow runtime tests'
+      ].join('\n'),
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Verify acceptance consistency',
+        'The system SHALL reject verify acceptance when implementation consistency is blocked.',
+        '',
+        '#### Scenario: Consistency blocked',
+        '- **WHEN** verify gate acceptance is recorded with stale caller input',
+        '- **THEN** the change remains implemented'
+      ].join('\n')
+    });
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'IMPLEMENTED',
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        specSplit: { status: 'PENDING', updatedAt: null },
+        spec: { status: 'PASS', updatedAt: new Date().toISOString() },
+        task: { status: 'PASS', updatedAt: new Date().toISOString() },
+        execution: { status: 'PASS', updatedAt: new Date().toISOString() }
+      },
+      verificationLog: [{
+        taskGroup: '1. Behavior change verification',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        changedFiles: ['lib/verify.js'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Implemented Verify acceptance consistency.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['lib/**']
+    });
+
+    assert.throws(
+      () => acceptVerifyGate(changeDir, { status: 'PASS' }),
+      /implementation consistency checkpoint/
+    );
+    const persisted = loadChangeState(changeDir);
+    assert.strictEqual(persisted.stage, 'IMPLEMENTED');
+    assert.strictEqual(persisted.checkpoints.implementationConsistency.status, 'PENDING');
   });
 
   test('sync plan blocks duplicate requirement ids and writes nothing', () => {
@@ -1322,7 +1581,7 @@ function registerTests(test, helpers) {
     });
 
     assert.strictEqual(normalized.stage, 'TASKS_READY');
-    assert.strictEqual(normalized.nextAction, 'Create proposal.md for this change.');
+    assert.strictEqual(normalized.nextAction, 'continue');
     ['spec', 'task', 'execution'].forEach((checkpointId) => {
       assert(Object.prototype.hasOwnProperty.call(normalized.checkpoints, checkpointId));
     });
@@ -1342,7 +1601,7 @@ function registerTests(test, helpers) {
     assert.strictEqual(fs.readFileSync(atomicPath, 'utf8'), 'phase4-atomic-write\n');
   });
 
-  test('createChangeSkeleton writes full new-change artifacts and keeps INIT lifecycle state', () => {
+  test('createChangeSkeleton writes scaffold only and keeps INIT lifecycle state', () => {
     const { createChangeSkeleton } = require('../lib/workspace');
     const { loadActiveChangePointer, loadChangeState } = require('../lib/change-store');
     const changeName = 'skeleton-init-state';
@@ -1350,10 +1609,7 @@ function registerTests(test, helpers) {
     const changeDir = path.join(fixtureRoot, '.opsx', 'changes', changeName);
     const filesToAssert = [
       'change.yaml',
-      'proposal.md',
-      'design.md',
-      'tasks.md',
-      'specs/README.md',
+      'specs',
       'state.yaml',
       'context.md',
       'drift.md'
@@ -1382,22 +1638,17 @@ function registerTests(test, helpers) {
       }
     });
 
-    const tasksText = fs.readFileSync(path.join(changeDir, 'tasks.md'), 'utf8');
-    assert(tasksText.includes('- [ ] 1.1 Replace placeholders with real task groups after planning checkpoints.'));
-
     const activePointer = loadActiveChangePointer(fixtureRoot);
     assert.strictEqual(activePointer.activeChange, changeName);
 
     const state = loadChangeState(changeDir);
     assert.strictEqual(state.stage, 'INIT');
-    assert.strictEqual(state.nextAction, 'Create proposal.md for this change.');
-    assert(Object.prototype.hasOwnProperty.call(state.hashes, 'proposal.md'));
-    assert(Object.prototype.hasOwnProperty.call(state.hashes, 'design.md'));
-    assert(Object.prototype.hasOwnProperty.call(state.hashes, 'tasks.md'));
+    assert.strictEqual(state.nextAction, 'continue');
+    assert.deepStrictEqual(state.hashes, {});
     assert.deepStrictEqual(buildStatus({ repoRoot: fixtureRoot, changeName }).hashDriftWarnings, []);
   });
 
-  test('opsx-new skeleton creates placeholder files, active pointer, and INIT stage', () => {
+  test('opsx-new skeleton creates no placeholder artifacts, active pointer, and INIT stage', () => {
     const { createChangeSkeleton } = require('../lib/workspace');
     const { loadActiveChangePointer, loadChangeState } = require('../lib/change-store');
     const changeName = 'opsx-new-skeleton';
@@ -1412,10 +1663,7 @@ function registerTests(test, helpers) {
 
     [
       'change.yaml',
-      'proposal.md',
-      'design.md',
-      'tasks.md',
-      'specs/README.md',
+      'specs',
       'state.yaml',
       'context.md',
       'drift.md'
@@ -1424,6 +1672,10 @@ function registerTests(test, helpers) {
     });
 
     assert(fs.statSync(path.join(changeDir, 'specs')).isDirectory());
+    assert(!fs.existsSync(path.join(changeDir, 'proposal.md')));
+    assert(!fs.existsSync(path.join(changeDir, 'design.md')));
+    assert(!fs.existsSync(path.join(changeDir, 'tasks.md')));
+    assert(!fs.existsSync(path.join(changeDir, 'specs', 'README.md')));
     assert(!fs.existsSync(path.join(changeDir, 'specs', 'spec.md')));
 
     const state = loadChangeState(changeDir);
@@ -1431,16 +1683,8 @@ function registerTests(test, helpers) {
 
     assert.strictEqual(activePointer.activeChange, changeName);
     assert.strictEqual(state.stage, 'INIT');
-    assert.strictEqual(state.nextAction, 'Create proposal.md for this change.');
-    assert(Object.prototype.hasOwnProperty.call(state.hashes, 'proposal.md'));
-    assert(Object.prototype.hasOwnProperty.call(state.hashes, 'design.md'));
-    assert(Object.prototype.hasOwnProperty.call(state.hashes, 'tasks.md'));
-
-    const designText = fs.readFileSync(path.join(changeDir, 'design.md'), 'utf8');
-    const tasksText = fs.readFileSync(path.join(changeDir, 'tasks.md'), 'utf8');
-
-    assert(designText.includes('## Context'));
-    assert(tasksText.includes('- [ ] 1.1 Replace placeholders with real task groups after planning checkpoints.'));
+    assert.strictEqual(state.nextAction, 'continue');
+    assert.deepStrictEqual(state.hashes, {});
     assert.strictEqual(state.checkpoints.task.status, 'PENDING');
     assert.strictEqual(state.checkpoints.execution.status, 'PENDING');
     assert.strictEqual(state.stage, 'INIT');
@@ -1837,6 +2081,37 @@ function registerTests(test, helpers) {
     assert.deepStrictEqual(scopeFinding.patchTargets, ['proposal', 'specs/billing/spec.md']);
   });
 
+  test('spec validator reads Chinese proposal scope headings', () => {
+    const { collectSpecSplitEvidence, reviewSpecSplitEvidence } = require('../lib/spec-validator');
+    const evidence = collectSpecSplitEvidence({
+      proposalText: [
+        '## 变更内容',
+        '- 主题偏好持久化',
+        '## 能力范围',
+        '### 新增能力',
+        '- 主题偏好'
+      ].join('\n'),
+      specFiles: [
+        {
+          path: 'specs/theme/spec.md',
+          text: [
+            '## ADDED Requirements',
+            '### Requirement: 主题偏好持久化',
+            'The system SHALL persist 主题偏好 across sessions.',
+            '',
+            '#### Scenario: 主题偏好恢复',
+            '- **WHEN** the user returns',
+            '- **THEN** the saved 主题偏好 is restored'
+          ].join('\n')
+        }
+      ]
+    });
+
+    const findings = reviewSpecSplitEvidence(evidence);
+    assert.strictEqual(evidence.proposal.scopeLines.length, 2);
+    assert(!findings.some((finding) => finding.code === 'proposal-coverage-gap'));
+  });
+
   test('runSpecSplitCheckpoint passes clean inline single-spec reviews with canonical fields', () => {
     const result = runSpecSplitCheckpoint({
       sources: {
@@ -2129,7 +2404,10 @@ function registerTests(test, helpers) {
       driftStatus: 'clean'
     });
 
-    assert.strictEqual(persisted.active.taskGroup, '2. Runtime integration');
+    assert.strictEqual(persisted.stage, 'GROUP_VERIFIED');
+    assert.strictEqual(persisted.nextAction, 'apply');
+    assert.strictEqual(persisted.active.taskGroup, null);
+    assert.strictEqual(persisted.active.nextTaskGroup, '2. Runtime integration');
     assert(Array.isArray(persisted.verificationLog));
     assert.strictEqual(persisted.verificationLog.length, 1);
     assert.deepStrictEqual(Object.keys(persisted.verificationLog[0]), [
@@ -2147,10 +2425,56 @@ function registerTests(test, helpers) {
     const contextText = fs.readFileSync(path.join(changeDir, 'context.md'), 'utf8');
     assert(contextText.includes('# Context Capsule'));
     assert(contextText.includes('## Stage'));
-    assert(contextText.includes('APPLYING_GROUP'));
+    assert(contextText.includes('GROUP_VERIFIED'));
     assert(contextText.includes('## Last Verification'));
     assert(contextText.includes('npm run test:workflow-runtime'));
     assert(contextText.includes('1. Runtime setup'));
+  });
+
+  test('recordTaskGroupExecution starts queued group before completing from GROUP_VERIFIED', () => {
+    const { recordTaskGroupExecution, writeChangeState } = require('../lib/change-store');
+    const changeName = 'group-verified-starts-next-group';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Runtime setup',
+        '- [x] 1.1 Setup workspace',
+        '',
+        '## 2. Runtime integration',
+        '- [x] 2.1 Build integration'
+      ].join('\n'),
+      'specs/runtime/spec.md': '## ADDED Requirements\n### Requirement: Runtime\n'
+    });
+
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'GROUP_VERIFIED',
+      active: {
+        taskGroup: null,
+        nextTaskGroup: '2. Runtime integration'
+      },
+      blockers: []
+    });
+
+    const persisted = recordTaskGroupExecution(changeDir, {
+      taskGroup: '2. Runtime integration',
+      nextTaskGroup: null,
+      verificationCommand: 'npm run test:workflow-runtime',
+      verificationResult: 'PASS',
+      changedFiles: ['lib/change-store.js'],
+      checkpointStatus: 'PASS',
+      completedSteps: ['RED', 'GREEN', 'VERIFY'],
+      diffSummary: 'Completed the queued task group lifecycle.',
+      driftStatus: 'clean'
+    });
+
+    assert.strictEqual(persisted.stage, 'IMPLEMENTED');
+    assert.strictEqual(persisted.nextAction, 'verify');
+    assert.strictEqual(persisted.active.taskGroup, null);
+    assert.strictEqual(persisted.active.nextTaskGroup, null);
+    assert(!persisted.blockers.some((blocker) => blocker.includes('Invalid transition')));
+    assert.strictEqual(persisted.verificationLog[0].taskGroup, '2. Runtime integration');
   });
 
   test('recordTaskGroupExecution persists extended verification evidence', () => {
@@ -2185,6 +2509,8 @@ function registerTests(test, helpers) {
     });
 
     assert.strictEqual(persisted.verificationLog.length, 1);
+    assert.strictEqual(persisted.stage, 'IMPLEMENTED');
+    assert.strictEqual(persisted.nextAction, 'verify');
     assert.deepStrictEqual(persisted.verificationLog[0].completedSteps, ['RED', 'GREEN', 'VERIFY']);
     assert.strictEqual(
       persisted.verificationLog[0].diffSummary,
