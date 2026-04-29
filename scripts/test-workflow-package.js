@@ -14,8 +14,7 @@ const REQUIRED_TARBALL_PREFIXES = Object.freeze([
   'skills/',
   'schemas/',
   'templates/',
-  'config/',
-  'docs/'
+  'config/'
 ]);
 const REQUIRED_TARBALL_FILES = Object.freeze([
   'README.md'

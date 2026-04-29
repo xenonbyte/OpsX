@@ -19,7 +19,5 @@ Next steps:
 
 Documentation:
 - README.md
-- docs/commands.md
-- docs/codex.md
 - docs/customization.md
 `);

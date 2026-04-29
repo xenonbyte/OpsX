@@ -7,17 +7,6 @@ const { install } = require('../lib/install');
 const { buildPlatformBundle } = require('../lib/generator');
 const { runRegisteredTopicTests } = require('./test-workflow-shared');
 
-const RELEASE_GATE_POST_CHECKS = Object.freeze([
-  'gsd-sdk query verify.schema-drift 08',
-  '$gsd-code-review 8',
-  '$gsd-verify-work 8'
-]);
-
-const RELEASE_GATE_WORKFLOW_STEPS = Object.freeze([
-  '$gsd-code-review 8',
-  '$gsd-verify-work 8'
-]);
-
 const PUBLIC_ROUTE_SCAN_TARGETS = Object.freeze([
   'README.md',
   'README-zh.md',
@@ -124,17 +113,6 @@ function formatBannedPublicRouteHits(hits) {
 function assertNoBannedPublicRouteForms(relativePath, content) {
   const hits = findBannedPublicRouteHits(relativePath, content);
   assert.strictEqual(hits.length, 0, formatBannedPublicRouteHits(hits));
-}
-
-function collectMarkdownCodeBlocks(content, language) {
-  const blocks = [];
-  const fencePattern = new RegExp(`\`\`\`${language}\\n([\\s\\S]*?)\\n\`\`\``, 'g');
-
-  Array.from(content.matchAll(fencePattern)).forEach((match) => {
-    blocks.push(match[1]);
-  });
-
-  return blocks;
 }
 
 function registerTests(test, helpers) {
@@ -668,37 +646,6 @@ function registerTests(test, helpers) {
     });
   });
 
-  test('release checklist keeps schema drift shell command separate from workflow-agent steps', () => {
-    const checklistPath = path.join(REPO_ROOT, 'docs', 'release-checklist.md');
-    assert(fs.existsSync(checklistPath), `Expected release checklist to exist: ${checklistPath}`);
-    const checklistContent = fs.readFileSync(checklistPath, 'utf8');
-    const bashBlocks = collectMarkdownCodeBlocks(checklistContent, 'bash');
-    const textBlocks = collectMarkdownCodeBlocks(checklistContent, 'text');
-
-    RELEASE_GATE_POST_CHECKS.forEach((command) => {
-      assert(
-        checklistContent.includes(command),
-        `Release checklist must preserve post-split verification step: ${command}`
-      );
-    });
-
-    assert(
-      bashBlocks.some((block) => block.includes('gsd-sdk query verify.schema-drift 08')),
-      'Release checklist must keep schema drift as an executable shell command'
-    );
-    RELEASE_GATE_WORKFLOW_STEPS.forEach((route) => {
-      assert(
-        textBlocks.some((block) => block.includes(route)),
-        `Release checklist must keep workflow step in a text block: ${route}`
-      );
-      bashBlocks.forEach((block) => {
-        assert(
-          !block.includes(route),
-          `Release checklist must not put workflow step in a bash block: ${route}`
-        );
-      });
-    });
-  });
 }
 
 if (require.main === module) {

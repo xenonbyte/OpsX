@@ -1,6 +1,0 @@
-name: upgrade-artifact-graph-runtime
-schema: spec-driven
-createdAt: 2026-04-05T23:32:00
-securityWaiver:
-  approved: true
-  reason: "Workflow runtime and test-coverage upgrade only; no auth/permission/token surface changes."

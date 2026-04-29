@@ -6,7 +6,11 @@ const path = require('path');
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SCRIPT_RELATIVE_PATH = 'scripts/check-phase1-legacy-allowlist.js';
 const LEGACY_TOKEN_PATTERN = /OpenSpec|openspec|\.openspec|\$openspec|\/openspec|\/prompts:openspec|@xenonbyte\/openspec|~\/\.openspec/g;
-const README_LINEAGE_SENTENCE = 'OpsX was originally adapted from Fission-AI/OpenSpec.';
+const README_LINEAGE_SENTENCES = new Set([
+  'OpsX was originally adapted from Fission-AI/OpenSpec.',
+  'OpsX is a downstream adaptation of [Fission-AI/OpenSpec](https://github.com/Fission-AI/OpenSpec).',
+  'OpsX 是 [Fission-AI/OpenSpec](https://github.com/Fission-AI/OpenSpec) 的下游改造版本。'
+]);
 
 const SCAN_TARGETS = [
   'README.md',
@@ -75,7 +79,7 @@ function resolveScanFiles() {
 function isLineageSentence(filePath, lineText) {
   return (
     (filePath === 'README.md' || filePath === 'README-zh.md') &&
-    lineText.trim() === README_LINEAGE_SENTENCE
+    README_LINEAGE_SENTENCES.has(lineText.trim())
   );
 }
 

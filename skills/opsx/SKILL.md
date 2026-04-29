@@ -145,5 +145,5 @@ If `language: en`:
 
 ## Resources
 
-- Docs: `docs/commands.md`, `docs/codex.md`, `docs/customization.md`
+- Docs: `README.md`, `docs/customization.md`
 - Schema: `schemas/spec-driven/schema.json`

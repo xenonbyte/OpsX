@@ -2,6 +2,10 @@
 
 OpsX is an AI-native operational spec execution workflow for Claude, Codex, and Gemini.
 
+OpsX is a downstream adaptation of [Fission-AI/OpenSpec](https://github.com/Fission-AI/OpenSpec).
+It keeps the lightweight spec-driven workflow idea and adds a stricter OpsX
+public surface, multi-agent install flow, and state-aware execution gates.
+
 ## Quick Start
 
 ```bash
@@ -9,8 +13,6 @@ npm install -g @xenonbyte/opsx
 opsx install --platform claude,codex,gemini
 opsx check
 ```
-
-Current release: `3.0.0`
 
 ## CLI Surface
 
@@ -32,19 +34,48 @@ Compatibility aliases (secondary):
 - `opsx --doc`
 - `opsx --language <en|zh>`
 
-## Codex Usage
+## Agent Commands
 
-Use explicit action routes:
-```text
-$opsx-onboard
-$opsx-propose
-$opsx-status
-$opsx-apply
-```
+Claude and Gemini use `/opsx-<action>`. Codex uses `$opsx-<action>`.
 
-Additional workflow routes follow the same explicit pattern (for example:
-`$opsx-explore`, `$opsx-continue`, `$opsx-verify`, `$opsx-archive`).
-Use only explicit action routes shown above; avoid dispatcher or wildcard route forms.
+| Action | Claude / Gemini | Codex |
+| --- | --- | --- |
+| onboard | `/opsx-onboard` | `$opsx-onboard` |
+| new | `/opsx-new` | `$opsx-new` |
+| propose | `/opsx-propose` | `$opsx-propose` |
+| explore | `/opsx-explore` | `$opsx-explore` |
+| continue | `/opsx-continue` | `$opsx-continue` |
+| ff | `/opsx-ff` | `$opsx-ff` |
+| status | `/opsx-status` | `$opsx-status` |
+| resume | `/opsx-resume` | `$opsx-resume` |
+| apply | `/opsx-apply` | `$opsx-apply` |
+| verify | `/opsx-verify` | `$opsx-verify` |
+| sync | `/opsx-sync` | `$opsx-sync` |
+| archive | `/opsx-archive` | `$opsx-archive` |
+| batch-apply | `/opsx-batch-apply` | `$opsx-batch-apply` |
+| bulk-archive | `/opsx-bulk-archive` | `$opsx-bulk-archive` |
+
+Use only explicit action routes from the table. Avoid dispatcher or wildcard
+route forms.
+
+## Capability Improvements
+
+- Unified install and uninstall across Claude, Codex, and Gemini:
+  `opsx install --platform claude,codex,gemini`.
+- Explicit generated agent commands for every workflow action, with Codex using
+  `$opsx-*` routes and Claude/Gemini using `/opsx-*` routes.
+- Canonical `.opsx/` workspace layout for project config, active change state,
+  change artifacts, synced specs, and archive output.
+- State-aware `status`, `resume`, `continue`, `apply`, `verify`, `sync`, and
+  `archive` flows backed by `state.yaml`, `context.md`, and `drift.md`.
+- Security-review and checkpoint gates:
+  `spec-split-checkpoint`, `spec checkpoint`, `task checkpoint`,
+  `execution checkpoint`, and `implementation-consistency-checkpoint`.
+- Stable `opsx status --json` envelope for automation and tooling.
+- Migration support for older workspace layouts through `opsx migrate` and
+  `opsx migrate --dry-run`.
+- Release hardening through split runtime tests, package-surface checks, and a
+  single `npm test` preflight entrypoint.
 
 ## Release Preflight
 
@@ -89,11 +120,7 @@ Change-local specs are full target specs for each capability. `sync` writes them
 
 ## Documentation
 
-- [Command reference](docs/commands.md)
-- [Codex usage guide](docs/codex.md)
 - [Customization guide](docs/customization.md)
-- [Runtime guidance kernel](docs/runtime-guidance.md)
-- [Supported tools](docs/supported-tools.md)
 
 ## Repository Shape
 
