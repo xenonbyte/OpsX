@@ -27,6 +27,6 @@
 - 安装始终下发完整命令面，不再区分 `--profile`。
 - `--check` 会同时展示已安装 manifest 与“最后一次选择的平台”配置字段。
 - `--doc` 优先读取包内 guide，再回退到已安装共享副本。
-- 命令包会在 `install` 时自动生成，不需要额外的构建/校验命令。
+- 命令/action-skill 包会在 `install` 时自动生成，不需要额外的构建/校验命令。
 - 在 Codex 中使用 `$opsx-*` routes。
 - 在 Claude/Gemini 中，使用 `/opsx-*` 作为主要命令入口。

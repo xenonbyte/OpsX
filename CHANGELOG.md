@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.0.1
+
+Release date: 2026-04-29
+
+Highlights:
+- Fix public agent command discovery so Claude Code and Gemini install flat `/opsx-<action>` commands instead of nested `/opsx:<action>` routes.
+- Fix Codex command discovery by installing one generated `$opsx-<action>` action skill per workflow action instead of a standalone `$opsx` runtime entry.
+- Expand README Agent Commands with per-command explanations and usage scenarios in English and Chinese.
+
 ## v3.0.0
 
 Release date: 2026-04-27

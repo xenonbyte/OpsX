@@ -1,6 +1,6 @@
 {
   "name": "@xenonbyte/opsx",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "AI-native operational spec execution workflow for Claude, Codex, and Gemini",
   "bin": {
     "opsx": "bin/opsx.js"

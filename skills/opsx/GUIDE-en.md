@@ -27,6 +27,6 @@ Use `.opsx/config.yaml` for `schema`, `language`, `context`, per-artifact `rules
 - Install always deploys the full command surface (no `--profile` split).
 - `--check` reports installed manifests and treats config `platform` as last selected platform.
 - `--doc` prefers package-local guide content over installed shared copies.
-- Command bundles are generated during `install`; no extra build/validation command is required.
+- Command/action-skill bundles are generated during `install`; no extra build/validation command is required.
 - Use `$opsx-*` routes in Codex.
 - In Claude/Gemini, use `/opsx-*` commands as the primary route surface.

@@ -349,9 +349,9 @@ function registerTests(test, helpers) {
     const installResults = install({ platform: 'claude,codex,gemini', homeDir: tempHome, language: 'en' });
     assert.strictEqual(installResults.length, 3);
     installResults.forEach((result) => {
-      assert(result.platformSkillDir.includes(path.join('skills', 'opsx')));
-      assert(!result.platformSkillDir.includes(path.join('skills', 'openspec')));
-      assert(fs.existsSync(result.platformSkillDir));
+      assert(result.platformSkillRootDir.includes('skills'));
+      assert(!result.legacyPlatformSkillDir.includes(path.join('skills', 'openspec')));
+      assert(!fs.existsSync(result.legacyPlatformSkillDir), `${result.platform} must not install a standalone opsx runtime skill`);
     });
 
     const sharedSkillDir = path.join(tempHome, '.opsx', 'skills', 'opsx');
@@ -363,6 +363,15 @@ function registerTests(test, helpers) {
     assert(fs.existsSync(sharedCommandPath));
     const sharedCommandContent = fs.readFileSync(sharedCommandPath, 'utf8');
     assert(sharedCommandContent.includes('OpsX'));
+    assert(fs.existsSync(path.join(tempHome, '.claude', 'commands', 'opsx-apply.md')));
+    assert(!fs.existsSync(path.join(tempHome, '.claude', 'commands', 'opsx', 'apply.md')));
+    assert(!fs.existsSync(path.join(tempHome, '.claude', 'commands', 'opsx.md')));
+    assert(fs.existsSync(path.join(tempHome, '.gemini', 'commands', 'opsx-apply.toml')));
+    assert(!fs.existsSync(path.join(tempHome, '.gemini', 'commands', 'opsx', 'apply.toml')));
+    assert(!fs.existsSync(path.join(tempHome, '.gemini', 'commands', 'opsx.toml')));
+    assert(fs.existsSync(path.join(tempHome, '.codex', 'skills', 'opsx-apply', 'SKILL.md')));
+    assert(!fs.existsSync(path.join(tempHome, '.codex', 'skills', 'opsx', 'SKILL.md')));
+    assert(!fs.existsSync(path.join(tempHome, '.codex', 'prompts', 'opsx-apply.md')));
 
     const generatedBundles = {
       claude: buildPlatformBundle('claude'),
@@ -387,22 +396,22 @@ function registerTests(test, helpers) {
       assert(BANNED_PUBLIC_ROUTE_STRINGS.includes(token));
     });
 
-    assert(generatedBundles.claude['opsx.md'].includes('OpsX'));
-    assert(generatedBundles.claude['opsx.md'].includes('Primary workflow entry: `/opsx-<action>`'));
-    assert(!generatedBundles.claude['opsx.md'].includes('Primary workflow entry: `$opsx <request>`'));
-    assert(generatedBundles.codex['prompts/opsx.md'].includes('OpsX'));
+    assert(generatedBundles.claude['opsx-apply.md'].includes('OpsX route: Apply'));
+    assert(generatedBundles.claude['opsx-apply.md'].includes('Primary workflow entry: `/opsx-<action>`'));
+    assert(!generatedBundles.claude['opsx-apply.md'].includes('Primary workflow entry: `$opsx <request>`'));
+    assert(generatedBundles.codex['skills/opsx-apply/SKILL.md'].includes('name: opsx-apply'));
+    assert(generatedBundles.codex['skills/opsx-apply/SKILL.md'].includes('Shared OpsX Workflow Contract'));
     expectedCodexRoutes.forEach((route) => {
+      const skillPath = `skills/${route.slice(1)}/SKILL.md`;
       assert(
-        generatedBundles.codex['prompts/opsx.md'].includes(`\`${route}\``),
-        `Codex route catalog must include ${route}`
+        generatedBundles.codex[skillPath] && generatedBundles.codex[skillPath].includes(`Explicit action route: \`${route}\``),
+        `Codex action skill must include ${route}`
       );
     });
-    assert(!generatedBundles.codex['prompts/opsx.md'].includes('Preferred:'), 'Codex route catalog must not advertise a preferred standalone entry.');
-    assert(!generatedBundles.codex['prompts/opsx.md'].includes('$opsx <request>'), 'Codex route catalog must not advertise `$opsx <request>`.');
-    assert(!generatedBundles.codex['prompts/opsx.md'].includes('Primary workflow entry:'), 'Codex route catalog must stay internal and avoid primary-entry wording.');
-    assert(generatedBundles.gemini['opsx.toml'].includes('OpsX Workflow'));
-    assert(generatedBundles.gemini['opsx.toml'].includes('Primary workflow entry: `/opsx-<action>`'));
-    assert(!generatedBundles.gemini['opsx.toml'].includes('Primary workflow entry: `$opsx <request>`'));
+    assert(!Object.prototype.hasOwnProperty.call(generatedBundles.codex, 'skills/opsx/SKILL.md'), 'Codex bundle must not expose a standalone opsx skill.');
+    assert(generatedBundles.gemini['opsx-apply.toml'].includes('OpsX route: Apply'));
+    assert(generatedBundles.gemini['opsx-apply.toml'].includes('Primary workflow entry: `/opsx-<action>`'));
+    assert(!generatedBundles.gemini['opsx-apply.toml'].includes('Primary workflow entry: `$opsx <request>`'));
     Object.entries(PHASE5_PLANNING_PROMPT_ASSERTION_TARGETS).forEach(([platform, promptPaths]) => {
       promptPaths.forEach((promptPath) => {
         const generatedPrompt = generatedBundles[platform][promptPath] || '';
@@ -410,10 +419,17 @@ function registerTests(test, helpers) {
           generatedPrompt.includes('`spec-split-checkpoint`'),
           `${platform}:${promptPath} source output must mention spec-split-checkpoint`
         );
-        assert(
-          !generatedPrompt.includes('spec-review.md'),
-          `${platform}:${promptPath} source output must not mention spec-review.md`
-        );
+        if (platform !== 'codex') {
+          assert(
+            !generatedPrompt.includes('spec-review.md'),
+            `${platform}:${promptPath} source output must not mention spec-review.md`
+          );
+        } else {
+          assert(
+            generatedPrompt.includes('must not create `spec-review.md`'),
+            `${platform}:${promptPath} embedded contract must only mention spec-review.md as a no-create guard`
+          );
+        }
       });
     });
     Object.entries(PHASE5_PLANNING_PROMPT_ASSERTION_TARGETS).forEach(([platform, promptPaths]) => {
@@ -426,10 +442,17 @@ function registerTests(test, helpers) {
           checkedInPrompt.includes('`spec-split-checkpoint`'),
           `${platform}:${promptPath} checked-in prompt must mention spec-split-checkpoint`
         );
-        assert(
-          !checkedInPrompt.includes('spec-review.md'),
-          `${platform}:${promptPath} checked-in prompt must not mention spec-review.md`
-        );
+        if (platform !== 'codex') {
+          assert(
+            !checkedInPrompt.includes('spec-review.md'),
+            `${platform}:${promptPath} checked-in prompt must not mention spec-review.md`
+          );
+        } else {
+          assert(
+            checkedInPrompt.includes('must not create `spec-review.md`'),
+            `${platform}:${promptPath} checked-in embedded contract must only mention spec-review.md as a no-create guard`
+          );
+        }
       });
     });
     assert.strictEqual(PHASE6_TDD_PROMPT_PATHS.length, 12, 'Phase 6 prompt assertions must stay scoped to exactly 12 checked-in files');
@@ -534,7 +557,7 @@ function registerTests(test, helpers) {
           `${platform}:${relativePath} checked-in prompt must mention no partial sync writes`
         );
       }
-      if (relativePath.includes('/archive.') || relativePath.includes('opsx-archive.')) {
+      if (relativePath.includes('opsx-archive')) {
         assert(
           generatedPrompt.includes('.opsx/archive/<change-name>'),
           `${platform}:${relativePath} source output must mention .opsx/archive/<change-name>`
@@ -647,6 +670,7 @@ function registerTests(test, helpers) {
     });
 
     Object.values(PLATFORM_BUNDLE_TARGETS).forEach((target) => {
+      if (!target.entryPath) return;
       const entryPath = path.join(target.checkedInRoot, target.entryPath);
       assert(fs.existsSync(entryPath), `Missing checked-in command entry: ${entryPath}`);
       const entryContent = fs.readFileSync(entryPath, 'utf8');
@@ -657,7 +681,13 @@ function registerTests(test, helpers) {
       path.join(REPO_ROOT, 'commands', 'openspec.md'),
       path.join(REPO_ROOT, 'commands', 'claude', 'openspec.md'),
       path.join(REPO_ROOT, 'commands', 'codex', 'prompts', 'openspec.md'),
-      path.join(REPO_ROOT, 'commands', 'gemini', 'openspec.toml')
+      path.join(REPO_ROOT, 'commands', 'gemini', 'openspec.toml'),
+      path.join(REPO_ROOT, 'commands', 'claude', 'opsx.md'),
+      path.join(REPO_ROOT, 'commands', 'claude', 'opsx', 'apply.md'),
+      path.join(REPO_ROOT, 'commands', 'codex', 'prompts', 'opsx.md'),
+      path.join(REPO_ROOT, 'commands', 'codex', 'prompts', 'opsx-apply.md'),
+      path.join(REPO_ROOT, 'commands', 'gemini', 'opsx.toml'),
+      path.join(REPO_ROOT, 'commands', 'gemini', 'opsx', 'apply.toml')
     ];
     removedLegacyEntries.forEach((legacyPath) => {
       assert(!fs.existsSync(legacyPath), `Legacy command entry should be removed: ${legacyPath}`);

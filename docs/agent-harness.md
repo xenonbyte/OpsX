@@ -17,13 +17,14 @@ Use this lookup order when adding or changing guidance:
 1. Root constraint files: platform route and source map only.
 2. `skills/opsx/SKILL.md`: shared workflow contract and reference loading.
 3. `skills/opsx/references/`: detailed artifact templates and action playbooks.
-4. `templates/`: generated command and hand-off surfaces.
+4. `templates/`: generated command, action-skill, and hand-off surfaces.
 5. `scripts/test-workflow-*.js`: executable invariants that should not rely on prose alone.
 
 ## Hard Invariants
 
 - Codex public routes stay explicit `$opsx-*`.
 - Claude Code and Gemini public routes stay `/opsx-*`.
+- Do not install or document a standalone runtime `opsx` action; each public action has its own `opsx-<action>` command or skill.
 - Public docs, prompts, and templates must not introduce dispatcher or wildcard route forms.
 - `.opsx/` is the canonical workspace layout.
 - Behavior-changing workflow edits should update runtime code, generated prompts, templates, docs, and tests together.

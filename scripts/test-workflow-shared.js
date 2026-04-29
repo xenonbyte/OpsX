@@ -65,73 +65,73 @@ const STRICT_PREFLIGHT_MATCHERS = Object.freeze([
 const PLATFORM_BUNDLE_TARGETS = Object.freeze({
   claude: Object.freeze({
     checkedInRoot: path.join(REPO_ROOT, 'commands', 'claude'),
-    entryPath: 'opsx.md',
-    actionPath: (actionId) => `opsx/${actionId}.md`,
-    isTrackedBundlePath: (relativePath) => relativePath === 'opsx.md' || relativePath.startsWith('opsx/')
+    entryPath: null,
+    actionPath: (actionId) => `opsx-${actionId}.md`,
+    isTrackedBundlePath: (relativePath) => /^opsx-[^/]+\.md$/.test(relativePath)
   }),
   codex: Object.freeze({
     checkedInRoot: path.join(REPO_ROOT, 'commands', 'codex'),
-    entryPath: 'prompts/opsx.md',
-    actionPath: (actionId) => `prompts/opsx-${actionId}.md`,
-    isTrackedBundlePath: (relativePath) => relativePath === 'prompts/opsx.md' || relativePath.startsWith('prompts/opsx-')
+    entryPath: null,
+    actionPath: (actionId) => `skills/opsx-${actionId}/SKILL.md`,
+    isTrackedBundlePath: (relativePath) => /^skills\/opsx-[^/]+\/SKILL\.md$/.test(relativePath)
   }),
   gemini: Object.freeze({
     checkedInRoot: path.join(REPO_ROOT, 'commands', 'gemini'),
-    entryPath: 'opsx.toml',
-    actionPath: (actionId) => `opsx/${actionId}.toml`,
-    isTrackedBundlePath: (relativePath) => relativePath === 'opsx.toml' || relativePath.startsWith('opsx/')
+    entryPath: null,
+    actionPath: (actionId) => `opsx-${actionId}.toml`,
+    isTrackedBundlePath: (relativePath) => /^opsx-[^/]+\.toml$/.test(relativePath)
   })
 });
 
 const PHASE5_PLANNING_PROMPT_ASSERTION_TARGETS = Object.freeze({
   claude: Object.freeze([
-    'opsx/continue.md',
-    'opsx/ff.md',
-    'opsx/propose.md'
+    'opsx-continue.md',
+    'opsx-ff.md',
+    'opsx-propose.md'
   ]),
   codex: Object.freeze([
-    'prompts/opsx-continue.md',
-    'prompts/opsx-ff.md',
-    'prompts/opsx-propose.md'
+    'skills/opsx-continue/SKILL.md',
+    'skills/opsx-ff/SKILL.md',
+    'skills/opsx-propose/SKILL.md'
   ]),
   gemini: Object.freeze([
-    'opsx/continue.toml',
-    'opsx/ff.toml',
-    'opsx/propose.toml'
+    'opsx-continue.toml',
+    'opsx-ff.toml',
+    'opsx-propose.toml'
   ])
 });
 
 const PHASE6_TDD_PROMPT_PATHS = Object.freeze([
-  'commands/claude/opsx/apply.md',
-  'commands/claude/opsx/propose.md',
-  'commands/claude/opsx/continue.md',
-  'commands/claude/opsx/ff.md',
-  'commands/codex/prompts/opsx-apply.md',
-  'commands/codex/prompts/opsx-propose.md',
-  'commands/codex/prompts/opsx-continue.md',
-  'commands/codex/prompts/opsx-ff.md',
-  'commands/gemini/opsx/apply.toml',
-  'commands/gemini/opsx/propose.toml',
-  'commands/gemini/opsx/continue.toml',
-  'commands/gemini/opsx/ff.toml'
+  'commands/claude/opsx-apply.md',
+  'commands/claude/opsx-propose.md',
+  'commands/claude/opsx-continue.md',
+  'commands/claude/opsx-ff.md',
+  'commands/codex/skills/opsx-apply/SKILL.md',
+  'commands/codex/skills/opsx-propose/SKILL.md',
+  'commands/codex/skills/opsx-continue/SKILL.md',
+  'commands/codex/skills/opsx-ff/SKILL.md',
+  'commands/gemini/opsx-apply.toml',
+  'commands/gemini/opsx-propose.toml',
+  'commands/gemini/opsx-continue.toml',
+  'commands/gemini/opsx-ff.toml'
 ]);
 
 const PHASE7_GATE_PROMPT_PATHS = Object.freeze([
-  'commands/claude/opsx/verify.md',
-  'commands/claude/opsx/sync.md',
-  'commands/claude/opsx/archive.md',
-  'commands/claude/opsx/batch-apply.md',
-  'commands/claude/opsx/bulk-archive.md',
-  'commands/codex/prompts/opsx-verify.md',
-  'commands/codex/prompts/opsx-sync.md',
-  'commands/codex/prompts/opsx-archive.md',
-  'commands/codex/prompts/opsx-batch-apply.md',
-  'commands/codex/prompts/opsx-bulk-archive.md',
-  'commands/gemini/opsx/verify.toml',
-  'commands/gemini/opsx/sync.toml',
-  'commands/gemini/opsx/archive.toml',
-  'commands/gemini/opsx/batch-apply.toml',
-  'commands/gemini/opsx/bulk-archive.toml'
+  'commands/claude/opsx-verify.md',
+  'commands/claude/opsx-sync.md',
+  'commands/claude/opsx-archive.md',
+  'commands/claude/opsx-batch-apply.md',
+  'commands/claude/opsx-bulk-archive.md',
+  'commands/codex/skills/opsx-verify/SKILL.md',
+  'commands/codex/skills/opsx-sync/SKILL.md',
+  'commands/codex/skills/opsx-archive/SKILL.md',
+  'commands/codex/skills/opsx-batch-apply/SKILL.md',
+  'commands/codex/skills/opsx-bulk-archive/SKILL.md',
+  'commands/gemini/opsx-verify.toml',
+  'commands/gemini/opsx-sync.toml',
+  'commands/gemini/opsx-archive.toml',
+  'commands/gemini/opsx-batch-apply.toml',
+  'commands/gemini/opsx-bulk-archive.toml'
 ]);
 
 const WRONG_PLATFORM_ROUTE_PATTERNS = Object.freeze({
