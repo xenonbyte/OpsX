@@ -47,7 +47,6 @@
   "bugs": {
     "url": "https://github.com/xenonbyte/opsx/issues"
   },
-  "homepage": "https://github.com/xenonbyte/opsx#readme",
   "engines": {
     "node": ">=14.14.0"
   },
