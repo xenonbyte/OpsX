@@ -18,6 +18,7 @@
 - 2026-04-29 [CODE] Phase 8 plan `08-03` completed: shared `lib/path-utils.js` + `lib/glob-utils.js` are live, read-only path surfaces are migrated, and path-topic tests now own scope/hash/literal-glob assertions.
 - 2026-04-29 [CODE] Phase 8 plan `08-05` completed: remaining gate-domain tests moved to `scripts/test-workflow-gates.js`, and `scripts/test-workflow-runtime.js` is now a pure aggregate runner.
 - 2026-04-29 [CODE] Phase 8 is complete and verified: 7/7 plans executed, `08-VERIFICATION.md` passed 6/6 requirements, `npm test` passed 126/126, and schema drift returned 0 issues.
+- 2026-04-29 [CODE] Phase 8 security gate is complete: `08-SECURITY.md` has `status: verified`, `threats_open: 0`, and 14/14 planned threats closed.
 
 ## Done (recent)
 - 2026-04-28 [CODE] Executed all Phase 7 plans `07-01` through `07-08`.
@@ -33,6 +34,7 @@
 - 2026-04-29 [CODE] Executed Phase 8 plan `08-05` with commits `43eac6b` and `10df15a`; runtime suite now passes 121/121 with gate-domain ownership moved to `scripts/test-workflow-gates.js`.
 - 2026-04-29 [CODE] Executed Phase 8 plan `08-06` with commits `a3843ce` and `05f2334`; runtime suite now passes 126/126 with release pack/legacy allowlist gates active in split topic scripts.
 - 2026-04-29 [CODE] Executed Phase 8 plan `08-07`, recorded `08-REVIEW.md` with 2 non-blocking warnings, and recorded `08-VERIFICATION.md` with `status: passed`.
+- 2026-04-29 [CODE] Ran `$gsd-secure-phase 8`; `08-SECURITY.md` was created with all planned threats closed and no accepted risks.
 
 ## Working set
 - /Users/xubo/x-skills/openspec/.planning/ROADMAP.md
@@ -48,6 +50,7 @@
 - /Users/xubo/x-skills/openspec/.planning/phases/08-stability-json-and-release-coverage/08-01-PLAN.md
 - /Users/xubo/x-skills/openspec/.planning/phases/08-stability-json-and-release-coverage/08-07-PLAN.md
 - /Users/xubo/x-skills/openspec/.planning/phases/08-stability-json-and-release-coverage/08-REVIEW.md
+- /Users/xubo/x-skills/openspec/.planning/phases/08-stability-json-and-release-coverage/08-SECURITY.md
 - /Users/xubo/x-skills/openspec/.planning/phases/08-stability-json-and-release-coverage/08-VERIFICATION.md
 
 ## Decisions
@@ -86,6 +89,7 @@
 - 2026-04-29 [TOOL] `gsd-code-review 8` and `gsd-verify-work 8` shell commands are unavailable in this executor environment (`command not found`); release post-check preservation is enforced in `scripts/test-workflow-generation.js`.
 - 2026-04-29 [TOOL] Phase 8 review report committed with `status: issues_found`, warning=2, critical=0; findings are README banned-route wording and release-checklist workflow steps inside a bash block.
 - 2026-04-29 [TOOL] Phase 8 final verifier passed 6/6 requirements; `npm test` passed 126/126 and `gsd-sdk query verify.schema-drift 08` returned valid with 0 issues.
+- 2026-04-29 [TOOL] Phase 8 security audit returned `SECURED`; `npm test` passed 126/126 and `08-SECURITY.md` records `threats_open: 0`.
 - 2026-04-28 [TOOL] `gsd-sdk query verify.schema-drift 07` returned valid with 0 issues across 8 checked plans.
 - 2026-04-28 [TOOL] Phase 7 verification report committed as `f32d323` with `status: passed` and 4/4 must-haves verified.
 - 2026-04-28 [TOOL] `workflow.security_enforcement` is true; no `07-SECURITY.md` exists yet, so run `$gsd-secure-phase 7` before advancing if a dedicated security gate is required.
