@@ -44,7 +44,7 @@ $opsx-apply
 
 Additional workflow routes follow the same explicit pattern (for example:
 `$opsx-explore`, `$opsx-continue`, `$opsx-verify`, `$opsx-archive`).
-Do not use standalone `$opsx` or `/opsx:*`; public routes stay explicit-only.
+Use only explicit action routes shown above; avoid dispatcher or wildcard route forms.
 
 ## Release Preflight
 

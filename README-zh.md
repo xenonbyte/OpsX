@@ -44,7 +44,7 @@ $opsx-apply
 
 其余工作流命令也遵循同一显式模式（例如：
 `$opsx-explore`、`$opsx-continue`、`$opsx-verify`、`$opsx-archive`）。
-不要使用 standalone `$opsx` 或 `/opsx:*`；公共入口保持 explicit-only。
+仅使用上方展示的显式 action 路由；避免 dispatcher 或 wildcard 路由形式。
 
 ## 发布前预检
 

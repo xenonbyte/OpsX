@@ -441,6 +441,7 @@ function runRegisteredTopicTests(registerTests) {
     PHASE7_GATE_PROMPT_PATHS,
     WRONG_PLATFORM_ROUTE_PATTERNS,
     toPosixPath,
+    listFilesRecursive,
     collectBundleParity,
     collectFallbackCopyCoverage,
     assertPlatformLabeledCodexRouteLines,

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const assert = require('assert');
 const { PACKAGE_VERSION, REPO_ROOT } = require('../lib/constants');
 const { getAllActions, getActionSyntax } = require('../lib/workflow');
 const { install } = require('../lib/install');
@@ -11,6 +12,114 @@ const RELEASE_GATE_POST_CHECKS = Object.freeze([
   '$gsd-code-review 8',
   '$gsd-verify-work 8'
 ]);
+
+const PUBLIC_ROUTE_SCAN_TARGETS = Object.freeze([
+  'README.md',
+  'README-zh.md',
+  'docs',
+  'templates',
+  'commands',
+  'skills',
+  'scripts/postinstall.js',
+  'lib/cli.js',
+  'AGENTS.md'
+]);
+
+const PUBLIC_ROUTE_SCAN_EXTENSIONS = Object.freeze([
+  '.js',
+  '.json',
+  '.md',
+  '.md.tmpl',
+  '.tmpl',
+  '.toml',
+  '.txt',
+  '.yaml',
+  '.yml'
+]);
+
+const BANNED_PUBLIC_ROUTE_PATTERNS = Object.freeze([
+  {
+    label: '$opsx <request> dispatcher request style',
+    pattern: /\$opsx\s+<request>/g
+  },
+  {
+    label: 'standalone dispatcher route ($opsx)',
+    pattern: /\$opsx(?![-\w]|\s+<request>)/g
+  },
+  {
+    label: '/opsx:* wildcard route',
+    pattern: /\/opsx:\*/g
+  },
+  {
+    label: '/prompts:opsx-* wildcard route',
+    pattern: /\/prompts:opsx-\*/g
+  }
+]);
+
+function hasPublicRouteScanExtension(relativePath) {
+  return PUBLIC_ROUTE_SCAN_EXTENSIONS.some((extension) => relativePath.endsWith(extension));
+}
+
+function collectPublicRouteScanFiles({ fs, path, listFilesRecursive, toPosixPath }) {
+  const files = new Set();
+
+  PUBLIC_ROUTE_SCAN_TARGETS.forEach((target) => {
+    const absoluteTarget = path.join(REPO_ROOT, target);
+    assert(fs.existsSync(absoluteTarget), `Missing public route scan target: ${target}`);
+    const stat = fs.statSync(absoluteTarget);
+
+    if (stat.isDirectory()) {
+      listFilesRecursive(absoluteTarget).forEach((absolutePath) => {
+        const relativePath = toPosixPath(path.relative(REPO_ROOT, absolutePath));
+        if (hasPublicRouteScanExtension(relativePath)) {
+          files.add(relativePath);
+        }
+      });
+      return;
+    }
+
+    const relativePath = toPosixPath(path.relative(REPO_ROOT, absoluteTarget));
+    assert(hasPublicRouteScanExtension(relativePath), `Unsupported public route scan file type: ${relativePath}`);
+    files.add(relativePath);
+  });
+
+  return Array.from(files).sort((left, right) => left.localeCompare(right));
+}
+
+function findBannedPublicRouteHits(relativePath, content) {
+  const hits = [];
+  const lines = content.split(/\r?\n/);
+
+  lines.forEach((lineText, index) => {
+    const normalizedLine = lineText.replace(/`+/g, '');
+
+    BANNED_PUBLIC_ROUTE_PATTERNS.forEach(({ label, pattern }) => {
+      pattern.lastIndex = 0;
+      Array.from(normalizedLine.matchAll(pattern)).forEach((match) => {
+        hits.push({
+          filePath: relativePath,
+          lineNumber: index + 1,
+          token: match[0],
+          label,
+          lineText
+        });
+      });
+    });
+  });
+
+  return hits;
+}
+
+function formatBannedPublicRouteHits(hits) {
+  return hits
+    .map((hit) => `${hit.filePath}:${hit.lineNumber} ${hit.label} token="${hit.token}"\n  ${hit.lineText}`)
+    .join('\n');
+}
+
+function assertNoBannedPublicRouteForms(relativePath, content) {
+  const hits = findBannedPublicRouteHits(relativePath, content);
+  assert.strictEqual(hits.length, 0, formatBannedPublicRouteHits(hits));
+}
 
 function registerTests(test, helpers) {
   const {
@@ -30,6 +139,7 @@ function registerTests(test, helpers) {
     PHASE7_GATE_PROMPT_PATHS,
     WRONG_PLATFORM_ROUTE_PATTERNS,
     toPosixPath,
+    listFilesRecursive,
     collectBundleParity,
     collectFallbackCopyCoverage,
     assertPlatformLabeledCodexRouteLines,
@@ -74,6 +184,27 @@ function registerTests(test, helpers) {
     assert(!helpOutput.stdout.includes('openspec'));
     assert(!helpOutput.stdout.includes('$openspec'));
     assert(!helpOutput.stdout.includes('/prompts:openspec'));
+    assertNoBannedPublicRouteForms('opsx --help output', helpOutput.stdout);
+  });
+
+  test('public route scan catches markdown-wrapped dispatcher and wildcard forms', () => {
+    const syntheticContent = [
+      'Avoid standalone `$opsx` route text.',
+      'Avoid `$opsx` `<request>` route text.',
+      'Avoid `/opsx:*` route text.',
+      'Avoid `/prompts:opsx-*` route text.'
+    ].join('\n');
+    const hits = findBannedPublicRouteHits('synthetic-public-surface.md', syntheticContent);
+    assert.strictEqual(hits.length, 4, formatBannedPublicRouteHits(hits));
+    assert.deepStrictEqual(
+      hits.map((hit) => hit.label),
+      [
+        'standalone dispatcher route ($opsx)',
+        '$opsx <request> dispatcher request style',
+        '/opsx:* wildcard route',
+        '/prompts:opsx-* wildcard route'
+      ]
+    );
   });
 
   test('postinstall/template/hand-off guidance stays on explicit route contract', () => {
@@ -95,6 +226,7 @@ function registerTests(test, helpers) {
     BANNED_PUBLIC_ROUTE_STRINGS.forEach((token) => {
       assert(!postinstallOutput.includes(token), `Postinstall output must not include banned token ${token}`);
     });
+    assertNoBannedPublicRouteForms('postinstall output', postinstallOutput);
 
     const handoffTemplate = fs.readFileSync(path.join(REPO_ROOT, 'templates', 'project', 'rule-file.md.tmpl'), 'utf8');
     assert(handoffTemplate.includes('For Codex, use explicit `$opsx-*` routes; for Claude/Gemini, use `/opsx-*` routes.'));
@@ -150,6 +282,41 @@ function registerTests(test, helpers) {
         assert(!content.includes(phrase), `${relativePath} must not include stale phrase: ${phrase}`);
       });
     });
+  });
+
+  test('public docs and shipped guidance reject dispatcher and wildcard route forms', () => {
+    const scanFiles = collectPublicRouteScanFiles({ fs, path, listFilesRecursive, toPosixPath });
+    [
+      'README.md',
+      'README-zh.md',
+      'scripts/postinstall.js',
+      'lib/cli.js',
+      'AGENTS.md'
+    ].forEach((expectedFile) => {
+      assert(scanFiles.includes(expectedFile), `Public route scan must include ${expectedFile}`);
+    });
+    ['docs/', 'templates/', 'commands/', 'skills/'].forEach((expectedPrefix) => {
+      assert(
+        scanFiles.some((relativePath) => relativePath.startsWith(expectedPrefix)),
+        `Public route scan must include ${expectedPrefix} files`
+      );
+    });
+
+    scanFiles.forEach((relativePath) => {
+      const content = fs.readFileSync(path.join(REPO_ROOT, relativePath), 'utf8');
+      assertNoBannedPublicRouteForms(relativePath, content);
+    });
+
+    const helpOutput = runOpsxCli(['--help']);
+    assert.strictEqual(helpOutput.status, 0, helpOutput.stderr);
+    assertNoBannedPublicRouteForms('opsx --help output', helpOutput.stdout);
+
+    const postinstallResult = spawnSync(process.execPath, [path.join(REPO_ROOT, 'scripts', 'postinstall.js')], {
+      cwd: REPO_ROOT,
+      encoding: 'utf8'
+    });
+    assert.strictEqual(postinstallResult.status, 0, postinstallResult.stderr);
+    assertNoBannedPublicRouteForms('postinstall output', postinstallResult.stdout);
   });
 
   test('release legacy allowlist gate keeps public surface free of stale openspec routes', () => {
