@@ -1,6 +1,6 @@
 # OpsX v3.0 Release Checklist
 
-Run all commands from repository root.
+Run executable shell commands from repository root. Invoke workflow-agent steps through the GSD/Codex workflow UI.
 
 ## 1. Full regression entrypoint
 
@@ -58,8 +58,15 @@ Fail: command reports banned legacy route/surface drift.
 
 ## 5. Planning and verification gates
 
+Run the executable schema drift shell command from repository root:
+
 ```bash
 gsd-sdk query verify.schema-drift 08
+```
+
+Invoke through the GSD/Codex workflow UI:
+
+```text
 $gsd-code-review 8
 $gsd-verify-work 8
 ```
