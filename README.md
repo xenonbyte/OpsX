@@ -123,6 +123,7 @@ Change-local specs are full target specs for each capability. `sync` writes them
 ## Documentation
 
 - [Customization guide](docs/customization.md)
+- [Agent harness map](docs/agent-harness.md)
 
 ## Repository Shape
 

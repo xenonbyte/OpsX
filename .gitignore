@@ -55,6 +55,10 @@ coverage/
 .planning/
 .planning/**
 
-# Local agent/session notes
-/AGENTS.md
+# Canonical agent constraint maps are tracked.
+!/AGENTS.md
+!/CLAUDE.md
+!/GEMINI.md
+
+# Local continuity ledger
 /CONTINUITY.md

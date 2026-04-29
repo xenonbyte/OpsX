@@ -1,7 +1,17 @@
 # OpsX project hand-off
 
-This repository uses OpsX as the workflow source of truth.
+This file is a compact map, not the full workflow manual. Keep durable details in `.opsx/`, docs, generated prompts, or executable checks.
+
+## Route Surface
+
+- For Codex, use explicit `$opsx-*` routes.
+- For Claude/Gemini, use `/opsx-*` routes.
+- Do not introduce dispatcher or wildcard route forms.
+
+## Workflow Anchors
+
 - Read `.opsx/config.yaml` for project context and workflow defaults.
 - Keep active changes under `.opsx/changes/`.
-- For Codex, use explicit `$opsx-*` routes; for Claude/Gemini, use `/opsx-*` routes.
 - Keep `proposal.md`, `specs/`, `design.md`, `tasks.md`, `state.yaml`, `context.md`, and `drift.md` aligned when work changes scope.
+- Keep `security-review.md` between `design.md` and `tasks.md` when required or recommended.
+- Run `spec-split-checkpoint` after `specs` before `design`, `spec checkpoint` before `tasks`, `task checkpoint` before `apply`, `execution checkpoint` after each top-level task group, and `implementation-consistency-checkpoint` before verify acceptance.

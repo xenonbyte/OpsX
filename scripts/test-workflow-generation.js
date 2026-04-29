@@ -16,7 +16,9 @@ const PUBLIC_ROUTE_SCAN_TARGETS = Object.freeze([
   'skills',
   'scripts/postinstall.js',
   'lib/cli.js',
-  'AGENTS.md'
+  'AGENTS.md',
+  'CLAUDE.md',
+  'GEMINI.md'
 ]);
 
 const PUBLIC_ROUTE_SCAN_EXTENSIONS = Object.freeze([
@@ -223,17 +225,28 @@ function registerTests(test, helpers) {
     assertNoBannedPublicRouteForms('postinstall output', postinstallOutput);
 
     const handoffTemplate = fs.readFileSync(path.join(REPO_ROOT, 'templates', 'project', 'rule-file.md.tmpl'), 'utf8');
-    assert(handoffTemplate.includes('For Codex, use explicit `$opsx-*` routes; for Claude/Gemini, use `/opsx-*` routes.'));
+    assert(handoffTemplate.includes('This file is a compact map, not the full workflow manual.'));
+    assert(handoffTemplate.includes('For Codex, use explicit `$opsx-*` routes.'));
+    assert(handoffTemplate.includes('For Claude/Gemini, use `/opsx-*` routes.'));
     BANNED_PUBLIC_ROUTE_STRINGS.forEach((token) => {
       assert(!handoffTemplate.includes(token), `Project hand-off template must not include banned token ${token}`);
     });
 
-    const agentsHandOff = fs.readFileSync(path.join(REPO_ROOT, 'AGENTS.md'), 'utf8');
-    assert(agentsHandOff.includes('Read `.opsx/config.yaml`'));
-    assert(agentsHandOff.includes('under `.opsx/changes/`'));
-    assert(!agentsHandOff.includes('openspec/config.yaml'));
-    assert(!agentsHandOff.includes('openspec/changes/'));
-    assert(agentsHandOff.includes('- For Codex, use explicit $opsx-* routes; for Claude/Gemini, use /opsx-* routes.'));
+    ['AGENTS.md', 'CLAUDE.md', 'GEMINI.md'].forEach((relativePath) => {
+      const handOff = fs.readFileSync(path.join(REPO_ROOT, relativePath), 'utf8');
+      assert(handOff.includes('This file is a compact map, not the full workflow manual.'));
+      assert(handOff.includes('Read `.opsx/config.yaml`'));
+      assert(handOff.includes('under `.opsx/changes/`'));
+      assert(handOff.includes('docs/agent-harness.md'));
+      assert(!handOff.includes('openspec/config.yaml'));
+      assert(!handOff.includes('openspec/changes/'));
+      assert(handOff.includes('Codex uses explicit `$opsx-*` routes.'));
+      assert(handOff.includes('/opsx-*'));
+    });
+
+    const harnessDoc = fs.readFileSync(path.join(REPO_ROOT, 'docs', 'agent-harness.md'), 'utf8');
+    assert(harnessDoc.includes('Root constraint files: platform route and source map only.'));
+    assert(harnessDoc.includes('Behavior-changing workflow edits should update runtime code, generated prompts, templates, docs, and tests together.'));
     [
       '$openspec',
       '/openspec',
@@ -242,7 +255,10 @@ function registerTests(test, helpers) {
       '/prompts:opsx-*',
       '$opsx <request>'
     ].forEach((token) => {
-      assert(!agentsHandOff.includes(token), `AGENTS hand-off must not include stale token ${token}`);
+      ['AGENTS.md', 'CLAUDE.md', 'GEMINI.md'].forEach((relativePath) => {
+        const handOff = fs.readFileSync(path.join(REPO_ROOT, relativePath), 'utf8');
+        assert(!handOff.includes(token), `${relativePath} hand-off must not include stale token ${token}`);
+      });
     });
 
     [
@@ -287,7 +303,9 @@ function registerTests(test, helpers) {
       'README-zh.md',
       'scripts/postinstall.js',
       'lib/cli.js',
-      'AGENTS.md'
+      'AGENTS.md',
+      'CLAUDE.md',
+      'GEMINI.md'
     ].forEach((expectedFile) => {
       assert(scanFiles.includes(expectedFile), `Public route scan must include ${expectedFile}`);
     });

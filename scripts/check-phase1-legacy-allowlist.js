@@ -21,7 +21,9 @@ const SCAN_TARGETS = [
   'commands',
   'scripts/postinstall.js',
   'lib/cli.js',
-  'AGENTS.md'
+  'AGENTS.md',
+  'CLAUDE.md',
+  'GEMINI.md'
 ];
 
 const AGENTS_AUTHORING_ALLOWLIST_LINES = new Set();
@@ -94,7 +96,7 @@ function isAllowedMatch(filePath, lineText) {
 
 function classifySurface(filePath) {
   if (filePath === 'README.md' || filePath === 'README-zh.md') return 'forbidden public docs surface';
-  if (filePath === 'AGENTS.md') return 'forbidden project hand-off route surface';
+  if (filePath === 'AGENTS.md' || filePath === 'CLAUDE.md' || filePath === 'GEMINI.md') return 'forbidden project hand-off route surface';
   if (filePath === 'scripts/postinstall.js' || filePath === 'lib/cli.js') return 'forbidden help surface';
   if (filePath.startsWith('commands/')) return 'forbidden generated command surface';
   if (filePath.startsWith('skills/opsx/')) return 'forbidden skill surface';
