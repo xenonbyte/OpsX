@@ -347,11 +347,53 @@ function registerTests(test, helpers) {
 
     const migratedState = loadChangeState(path.join(executeFixture, '.opsx', 'changes', changeName));
     assert.strictEqual(migratedState.stage, 'PROPOSAL_READY');
+    assert.strictEqual(migratedState.migration.migrated, true);
+    assert(migratedState.warnings.includes('migrated-change-needs-checkpoint-refresh'));
     assert(Object.prototype.hasOwnProperty.call(migratedState.hashes, 'proposal.md'));
     const migratedStatus = buildStatus({ repoRoot: executeFixture, changeName });
     assert.strictEqual(migratedStatus.nextAction, 'continue');
     assert.strictEqual(migratedStatus.nextArtifact, 'specs');
     assert.deepStrictEqual(migratedStatus.hashDriftWarnings, []);
+  });
+
+  test('opsx migrate rolls back completed moves and clears journal after mid-run failure', () => {
+    const changeName = 'demo';
+    const { fixtureRoot: rollbackFixture } = createLegacyMigrationRepoFixture({ changeName });
+    const rollbackHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-rollback-home-'));
+    cleanupTargets.push(rollbackFixture, rollbackHome);
+    const { runMigration } = require('../lib/migrate');
+
+    const legacyConfigPath = path.join(rollbackFixture, 'openspec', 'config.yaml');
+    const canonicalConfigPath = path.join(rollbackFixture, '.opsx', 'config.yaml');
+    const journalPath = path.join(rollbackFixture, '.opsx-migration-journal.json');
+    const legacyConfigBefore = fs.readFileSync(legacyConfigPath, 'utf8');
+    const originalRenameSync = fs.renameSync;
+
+    fs.renameSync = (from, to) => {
+      if (String(to).endsWith(path.join('.opsx', 'changes'))) {
+        throw new Error('simulated migration move failure');
+      }
+      return originalRenameSync.call(fs, from, to);
+    };
+
+    try {
+      assert.throws(
+        () => runMigration({ cwd: rollbackFixture, homeDir: rollbackHome }),
+        /simulated migration move failure/
+      );
+    } finally {
+      fs.renameSync = originalRenameSync;
+    }
+
+    assert(fs.existsSync(legacyConfigPath), 'Rollback should restore the moved legacy config.');
+    assert.strictEqual(fs.readFileSync(legacyConfigPath, 'utf8'), legacyConfigBefore);
+    assert.strictEqual(fs.existsSync(canonicalConfigPath), false);
+    assert.strictEqual(fs.existsSync(path.join(rollbackFixture, '.opsx')), false, 'Rollback should remove empty canonical parent directories.');
+    assert.strictEqual(fs.existsSync(journalPath), false, 'Successful rollback should remove migration journal.');
+
+    const retryOutput = runMigration({ cwd: rollbackFixture, homeDir: rollbackHome });
+    assert(retryOutput.includes('OpsX migration complete.'));
+    assert(fs.existsSync(canonicalConfigPath), 'Retry should succeed after rollback removes empty .opsx parent.');
   });
 
   test('opsx migrate aborts by default when canonical .opsx exists and keeps legacy tree untouched', () => {

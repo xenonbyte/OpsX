@@ -17,7 +17,7 @@
 11. 在 `design` 之后、`tasks` 之前运行 `spec checkpoint`。
 12. 在 `tasks` 之后、`apply` 之前运行 `task checkpoint`。
 13. 路由面保持不变：Codex 不得新增 `$opsx-spec-split-*`，Claude/Gemini 不得新增 `/opsx-spec-split-*`，继续使用现有 `propose` / `continue` / `ff` 路由。
-14. 编写 `tasks.md` 时必须包含 `## Test Plan`，且每个一级任务组都要声明 `TDD Class:` 或 `TDD Exemption:`，并包含显式 `VERIFY:`。`manual-only verification` 仅在 `Verification:` 行明确说明为何不适合自动化检查时允许。
+14. 编写 `tasks.md` 时必须包含 `## Test Plan`，且每个一级任务组都要声明 `TDD Class:` 或 `TDD Exemption:`、`Requirement Coverage:`、`Implementation Evidence:`，并包含显式 `Verification:` / `VERIFY:`。`manual-only verification` 仅在 `Verification:` 行明确说明为何不适合自动化检查时允许。
 15. verify/sync/archive/batch 路由遵循 Phase 7 硬门禁：verify 产出 `PASS`/`WARN`/`BLOCK`，sync 采用保守且不允许 partial write 的规划，archive 先做安全 sync 再移动，batch 输出每个 change 的 skipped/blocked 原因。
 
 ## onboard

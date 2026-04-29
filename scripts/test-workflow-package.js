@@ -173,6 +173,8 @@ function registerTests(test, helpers) {
     assert(envelope.migration, 'status --json payload must include migration diagnostics.');
     assert.strictEqual(typeof envelope.migration.pendingMoves, 'number');
     assert.strictEqual(typeof envelope.migration.pendingCreates, 'number');
+    assert.strictEqual(typeof envelope.migration.journalPath, 'string');
+    assert.strictEqual(envelope.migration.journalExists, false);
     assert(Array.isArray(envelope.migration.legacyCandidates), 'status --json payload must include legacyCandidates array.');
     assert(Array.isArray(envelope.warnings), 'status --json payload must include warnings array.');
     assert(envelope.warnings.includes('workspace-not-initialized'));
@@ -218,6 +220,21 @@ function registerTests(test, helpers) {
       /Refusing to remove path outside OpsX install roots/
     );
     assert(fs.existsSync(victimPath), 'Reinstall cleanup must not remove paths outside OpsX install roots.');
+  });
+
+  test('manifest cleanup allows install root directory entries', () => {
+    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-home-manifest-root-'));
+    cleanupTargets.push(tempHome);
+
+    install({ platform: 'claude', homeDir: tempHome, language: 'en' });
+
+    const manifestPath = path.join(tempHome, '.opsx', 'manifests', 'claude.manifest');
+    const commandsRoot = path.join(tempHome, '.claude', 'commands');
+    assert(fs.existsSync(commandsRoot), 'Expected install command root to exist before uninstall.');
+    writeText(manifestPath, commandsRoot);
+
+    assert.deepStrictEqual(uninstall({ platform: 'claude', homeDir: tempHome }), ['claude']);
+    assert.strictEqual(fs.existsSync(commandsRoot), false);
   });
 
   test('install and uninstall reject mixed invalid platform values', () => {
@@ -266,6 +283,25 @@ function registerTests(test, helpers) {
 
     const removed = uninstall({ platform: 'claude,codex,gemini', homeDir: tempHome });
     assert.deepStrictEqual(removed.sort(), ['claude', 'codex', 'gemini']);
+  });
+
+  test('message catalog and verbose logger provide localized structured diagnostics', () => {
+    const { formatMessage } = require('../lib/messages');
+    const { createLogger } = require('../lib/logger');
+    const lines = [];
+
+    assert.strictEqual(formatMessage('language.switched', 'zh'), '语言已切换为中文。');
+    assert(formatMessage('command.unknown', 'zh', { command: 'bogus', product: 'opsx' }).includes('未知命令'));
+
+    createLogger({ verbose: false, sink: (line) => lines.push(line) }).info('hidden');
+    assert.deepStrictEqual(lines, []);
+
+    createLogger({ verbose: true, sink: (line) => lines.push(line) }).info('visible', { count: 1 });
+    assert.strictEqual(lines.length, 1);
+    const payload = JSON.parse(lines[0]);
+    assert.strictEqual(payload.level, 'info');
+    assert.strictEqual(payload.event, 'visible');
+    assert.strictEqual(payload.count, 1);
   });
 
   test('check output remains accurate after partial uninstall across platforms', () => {

@@ -51,6 +51,6 @@ coverage/
 .opsx/logs/
 .opsx/logs/**
 
-# Keep GSD planning artifacts trackable even if globally ignored.
-!.planning/
-!.planning/**
+# Local planning artifacts
+.planning/
+.planning/**

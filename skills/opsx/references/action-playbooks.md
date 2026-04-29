@@ -17,7 +17,7 @@ Use these when the active workflow action is explicit.
 11. Run `spec checkpoint` after `design` and before `tasks`.
 12. Run `task checkpoint` after `tasks` and before `apply`.
 13. Keep route surface unchanged: Codex must not add `$opsx-spec-split-*`, Claude/Gemini must not add `/opsx-spec-split-*`; use existing `propose` / `continue` / `ff` routes.
-14. Authored tasks must include `## Test Plan`, and each top-level group must declare `TDD Class:` or `TDD Exemption:` with explicit `VERIFY:` coverage. `manual-only verification` is allowed only when the `Verification:` line explains why automated checks are not practical.
+14. Authored tasks must include `## Test Plan`, and each top-level group must declare `TDD Class:` or `TDD Exemption:`, `Requirement Coverage:`, `Implementation Evidence:`, and explicit `Verification:` / `VERIFY:` coverage. `manual-only verification` is allowed only when the `Verification:` line explains why automated checks are not practical.
 15. Verify/sync/archive/batch routes follow Phase 7 hard gates: verify emits `PASS`/`WARN`/`BLOCK`, sync uses conservative no-partial-write planning, archive enforces safe sync before move, and batch routes report per-change skipped/blocked reasons.
 
 ## onboard

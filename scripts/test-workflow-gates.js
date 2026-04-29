@@ -120,6 +120,51 @@ function registerTests(test, helpers) {
     const roundTrip = parseYaml(rendered);
     assert.deepStrictEqual(roundTrip.rules.tdd.requireFor, ['behavior-change', 'bugfix']);
     assert.deepStrictEqual(roundTrip.rules.tdd.exempt, ['docs-only']);
+
+    assert.strictEqual(parseYaml(stringifyYaml({ value: null })).value, null);
+    assert.deepStrictEqual(parseYaml(stringifyYaml(['alpha', null, 'omega'])), ['alpha', null, 'omega']);
+    assert.deepStrictEqual(parseYaml('anchor: &alias "shared"\nplain: *alias\n"quoted:key": "值"\n'), {
+      'quoted:key': '值',
+      plain: 'shared',
+      anchor: 'shared'
+    });
+    assert.throws(() => stringifyYaml({ value: undefined }), /Cannot stringify undefined/);
+  });
+
+  test('shared spec file discovery only includes canonical lowercase spec.md files', () => {
+    const { listSpecFiles } = require('../lib/spec-files');
+    const specsDir = path.join(fixtureRoot, 'spec-file-discovery');
+    writeText(path.join(specsDir, 'runtime', 'spec.md'), '# Runtime spec\n');
+    writeText(path.join(specsDir, 'runtime', 'SPEC.md'), '# Uppercase spec should be ignored\n');
+    writeText(path.join(specsDir, 'runtime', 'notes.md'), '# Notes\n');
+    writeText(path.join(specsDir, 'api', 'spec.md'), '# API spec\n');
+
+    const discovered = listSpecFiles(specsDir)
+      .map((filePath) => toPosixPath(path.relative(specsDir, filePath)));
+
+    assert.deepStrictEqual(discovered, ['api/spec.md', 'runtime/spec.md']);
+  });
+
+  test('repo root resolution uses standard layout symlink targets and ancestor config', () => {
+    const { resolveRepoRoot } = require('../lib/repo-root');
+    const standardChangeDir = createChange(fixtureRoot, 'repo-root-standard', {
+      'proposal.md': '# Standard\n'
+    });
+    assert.strictEqual(resolveRepoRoot(standardChangeDir), fixtureRoot);
+    const canonicalFixtureRoot = fs.realpathSync.native(fixtureRoot);
+
+    const symlinkPath = path.join(os.tmpdir(), `opsx-change-link-${process.pid}-${Date.now()}`);
+    fs.symlinkSync(standardChangeDir, symlinkPath, 'dir');
+    cleanupTargets.push(symlinkPath);
+    assert.strictEqual(fs.realpathSync.native(resolveRepoRoot(symlinkPath)), canonicalFixtureRoot);
+
+    const nestedNonstandardDir = path.join(fixtureRoot, 'worktrees', 'change-copy');
+    ensureDir(nestedNonstandardDir);
+    assert.strictEqual(resolveRepoRoot(nestedNonstandardDir), fixtureRoot);
+
+    const orphanChangeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-orphan-change-'));
+    cleanupTargets.push(orphanChangeDir);
+    assert.throws(() => resolveRepoRoot(orphanChangeDir), /Unable to resolve OpsX repo root/);
   });
 
   test('project config template seeds rules.tdd strict defaults', () => {
@@ -230,10 +275,16 @@ function registerTests(test, helpers) {
       stage: 'GROUP_VERIFIED',
       active: { nextTaskGroup: '2. Follow-up' }
     }), 'apply');
-    assert.strictEqual(resolveContinueAction({ stage: 'GROUP_VERIFIED' }), 'apply');
+    assert.strictEqual(resolveContinueAction({ stage: 'GROUP_VERIFIED' }), 'verify');
     assert.strictEqual(resolveContinueAction({ stage: 'IMPLEMENTED' }), 'verify');
     assert.strictEqual(resolveContinueAction({ stage: 'VERIFIED' }), 'sync');
     assert.strictEqual(resolveContinueAction({ stage: 'SYNCED' }), 'archive');
+
+    const missingQueuedGroup = applyMutationEvent({ stage: 'GROUP_VERIFIED' }, {
+      type: 'START_TASK_GROUP'
+    });
+    assert.strictEqual(missingQueuedGroup.status, 'BLOCK');
+    assert.strictEqual(missingQueuedGroup.code, 'missing-task-group');
   });
 
   test('verify gate blocks forbidden paths unresolved drift and incomplete task groups', () => {
@@ -298,6 +349,41 @@ function registerTests(test, helpers) {
     });
   });
 
+  test('verify gate preserves same-code findings with distinct messages', () => {
+    const { evaluateVerifyGate } = require('../lib/verify');
+    const { writeChangeState } = require('../lib/change-store');
+    const changeName = 'verify-distinct-finding-messages';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## 1. Runtime setup',
+        '- [x] 1.1 Setup workspace',
+        '',
+        '## 2. Runtime integration',
+        '- [x] 2.1 Build integration'
+      ].join('\n'),
+      'specs/runtime/spec.md': '## ADDED Requirements\n### Requirement: Runtime\nThe system SHALL support runtime work.\n'
+    });
+
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'TASKS_READY',
+      verificationLog: []
+    });
+
+    const gate = evaluateVerifyGate({
+      changeDir,
+      changedFiles: ['lib/verify.js']
+    });
+    const executionFindings = gate.findings.filter((finding) => finding.code === 'execution-checkpoint-missing');
+
+    assert.strictEqual(executionFindings.length, 3);
+    assert(executionFindings.some((finding) => finding.message.includes('Execution checkpoint must be accepted')));
+    assert(executionFindings.some((finding) => finding.message.includes('1. Runtime setup')));
+    assert(executionFindings.some((finding) => finding.message.includes('2. Runtime integration')));
+  });
+
   test('verify gate warns for manual verification rationale and docs-only extras', () => {
     const { evaluateVerifyGate } = require('../lib/verify');
     const { hashTrackedArtifacts } = require('../lib/change-artifacts');
@@ -309,6 +395,8 @@ function registerTests(test, helpers) {
       'tasks.md': [
         '## 1. Behavior change verification',
         '- Requirement Coverage: Verify gate warning visibility',
+        '- Implementation Evidence:',
+        '  - docs/verify-notes.md',
         '- [x] RED: add failing gate test',
         '- [x] GREEN: implement gate check',
         '- [x] VERIFY: run workflow runtime tests'
@@ -498,7 +586,12 @@ function registerTests(test, helpers) {
       ].join('\n'),
       'tasks.md': [
         '## 1. Theme persistence',
+        '- TDD Class: behavior-change',
         '- Requirement Coverage: Theme preference persistence',
+        '- Implementation Evidence:',
+        '  - src/theme/provider.ts',
+        '  - tests/theme/provider.test.ts',
+        '- Verification: npm test -- theme',
         '- [x] RED: add failing theme persistence test',
         '- [x] GREEN: implement theme provider persistence',
         '- [x] VERIFY: run theme provider test'
@@ -564,6 +657,673 @@ function registerTests(test, helpers) {
     acceptImplementationConsistency(changeDir, result);
     const persisted = loadChangeState(changeDir);
     assert.strictEqual(persisted.checkpoints.implementationConsistency.status, 'PASS');
+  });
+
+  test('implementation consistency requires explicit task group evidence fields', () => {
+    const { evaluateImplementationConsistency } = require('../lib/implementation-consistency');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const { writeChangeState } = require('../lib/change-store');
+    const changeName = 'implementation-consistency-explicit-task-evidence';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': [
+        '## Why',
+        'Need theme preference persistence.',
+        '## What Changes',
+        '- Persist theme preference across sessions.'
+      ].join('\n'),
+      'design.md': [
+        '## Context',
+        'Theme preference persistence.',
+        '## Approach',
+        '- Store preference through the theme provider.'
+      ].join('\n'),
+      'tasks.md': [
+        '## 1. Theme preference persistence',
+        '- TDD Class: behavior-change',
+        '- [x] RED: add failing Theme preference persistence test',
+        '- [x] GREEN: implement Theme preference persistence storage',
+        '- [x] VERIFY: run Theme preference persistence test'
+      ].join('\n'),
+      'specs/theme/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Theme preference persistence',
+        'The system SHALL persist theme preference across sessions.',
+        '',
+        '#### Scenario: Saved theme restored',
+        '- **WHEN** the user returns',
+        '- **THEN** the saved theme preference is restored'
+      ].join('\n')
+    });
+    const now = new Date().toISOString();
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'IMPLEMENTED',
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        specSplit: { status: 'PASS', updatedAt: now },
+        spec: { status: 'PASS', updatedAt: now },
+        task: { status: 'PASS', updatedAt: now },
+        execution: { status: 'PASS', updatedAt: now }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Theme storage implementation',
+        verificationCommand: 'npm test -- theme',
+        verificationResult: 'PASS',
+        changedFiles: ['src/theme/provider.ts'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Implemented provider storage.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['src/theme/**'],
+      forbiddenPaths: []
+    });
+
+    const result = evaluateImplementationConsistency({
+      changeDir,
+      changedFiles: ['src/theme/provider.ts']
+    });
+    const codes = new Set(result.findings.map((finding) => finding.code));
+    assert.strictEqual(result.status, 'BLOCK');
+    assert(codes.has('task-group-evidence-fields-missing'));
+    assert(codes.has('requirement-without-evidence'));
+    assert.strictEqual(result.result.requirementCoverage.covered, 0);
+    assert.strictEqual(result.result.taskGroupEvidence.missing, 1);
+  });
+
+  test('changed-file collection only silently skips explicit non-git workspaces', () => {
+    const { collectGitChangedFiles } = require('../lib/changed-files');
+    const nonGitRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'opsx-non-git-'));
+    cleanupTargets.push(nonGitRoot);
+
+    const nonGit = collectGitChangedFiles(nonGitRoot);
+    assert.strictEqual(nonGit.ok, false);
+    assert.strictEqual(nonGit.isGitRepo, false);
+    assert.deepStrictEqual(nonGit.warnings, []);
+
+    const originalPath = process.env.PATH;
+    process.env.PATH = path.join(nonGitRoot, 'missing-bin');
+    try {
+      const failedProbe = collectGitChangedFiles(nonGitRoot);
+      assert.strictEqual(failedProbe.ok, false);
+      assert.strictEqual(failedProbe.isGitRepo, true);
+      assert(failedProbe.warnings.some((warning) => warning.includes('Unable to collect git changed files')));
+      assert(failedProbe.warnings.some((warning) => warning.includes('Git executable was not found on PATH')));
+    } finally {
+      process.env.PATH = originalPath;
+    }
+  });
+
+  test('implementation consistency combines log and git diff and blocks unlogged deleted files', () => {
+    const { evaluateVerifyGate } = require('../lib/verify');
+    const { evaluateImplementationConsistency } = require('../lib/implementation-consistency');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const { writeChangeState } = require('../lib/change-store');
+    const repoRoot = createFixtureRepo();
+    cleanupTargets.push(repoRoot);
+    writeText(path.join(repoRoot, 'src', 'theme', 'provider.ts'), 'export const theme = "light";\n');
+    const changeName = 'implementation-consistency-git-delete';
+    const changeDir = createChange(repoRoot, changeName, {
+      'proposal.md': [
+        '## Why',
+        'Need theme preference persistence.',
+        '## What Changes',
+        '- Persist theme preference across sessions.'
+      ].join('\n'),
+      'design.md': [
+        '## Context',
+        'Theme preference persistence.',
+        '## Approach',
+        '- Store preference through the theme provider.'
+      ].join('\n'),
+      'tasks.md': [
+        '## Test Plan',
+        '- Verification: npm test -- theme',
+        '',
+        '## 1. Theme persistence',
+        '- TDD Class: behavior-change',
+        '- Requirement Coverage: Theme preference persistence',
+        '- Implementation Evidence:',
+        '  - src/theme/provider.ts',
+        '- Verification: npm test -- theme',
+        '- [x] RED: add failing theme persistence test',
+        '- [x] GREEN: implement theme provider persistence',
+        '- [x] VERIFY: run theme provider test'
+      ].join('\n'),
+      'specs/theme/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Theme preference persistence',
+        'The system SHALL persist theme preference across sessions.',
+        '',
+        '#### Scenario: Saved theme restored',
+        '- **WHEN** the user returns',
+        '- **THEN** the saved theme preference is restored'
+      ].join('\n')
+    });
+    const now = new Date().toISOString();
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'IMPLEMENTED',
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        specSplit: { status: 'PASS', updatedAt: now },
+        spec: { status: 'PASS', updatedAt: now },
+        task: { status: 'PASS', updatedAt: now },
+        execution: { status: 'PASS', updatedAt: now }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Theme persistence',
+        verificationCommand: 'npm test -- theme',
+        verificationResult: 'PASS',
+        changedFiles: ['docs/verify-notes.md'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Implemented Theme preference persistence.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['docs/**'],
+      forbiddenPaths: []
+    });
+
+    function git(args) {
+      const result = spawnSync('git', args, { cwd: repoRoot, encoding: 'utf8' });
+      assert.strictEqual(result.status, 0, result.stderr || result.stdout);
+    }
+
+    git(['init']);
+    git(['add', '.']);
+    git(['-c', 'user.name=OpsX Tests', '-c', 'user.email=opsx-tests@example.com', 'commit', '-m', 'baseline']);
+    fs.unlinkSync(path.join(repoRoot, 'src', 'theme', 'provider.ts'));
+
+    const consistency = evaluateImplementationConsistency({ changeDir, repoRoot });
+    const consistencyCodes = new Set(consistency.findings.map((finding) => finding.code));
+    assert.strictEqual(consistency.status, 'BLOCK');
+    assert(consistencyCodes.has('unlogged-git-changes'));
+    assert(consistencyCodes.has('out-of-scope-change'));
+    assert(consistency.patchTargets.includes('src/theme/provider.ts'));
+    assert(consistency.result.changedFilesSource.includes('git'));
+
+    const gate = evaluateVerifyGate({ changeDir, repoRoot });
+    const gateCodes = new Set(gate.findings.map((finding) => finding.code));
+    assert.strictEqual(gate.status, 'BLOCK');
+    assert(gateCodes.has('unlogged-git-changes'));
+    assert(gateCodes.has('out-of-scope-change'));
+    assert(gate.pathScope.outOfScopeMatches.includes('src/theme/provider.ts'));
+  });
+
+  test('changed-file evidence ignores unlogged workflow bookkeeping artifacts', () => {
+    const { evaluateVerifyGate } = require('../lib/verify');
+    const { evaluateImplementationConsistency } = require('../lib/implementation-consistency');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const { loadChangeState, writeChangeState } = require('../lib/change-store');
+    const repoRoot = createFixtureRepo();
+    cleanupTargets.push(repoRoot);
+    writeText(path.join(repoRoot, 'src', 'theme', 'provider.ts'), 'export const theme = "light";\n');
+    const changeName = 'implementation-consistency-workflow-bookkeeping';
+    const changeDir = createChange(repoRoot, changeName, {
+      'proposal.md': [
+        '## Why',
+        'Need theme preference persistence.',
+        '## What Changes',
+        '- Persist theme preference across sessions.'
+      ].join('\n'),
+      'design.md': [
+        '## Context',
+        'Theme preference persistence.',
+        '## Approach',
+        '- Store preference through the theme provider.'
+      ].join('\n'),
+      'tasks.md': [
+        '## Test Plan',
+        '- Verification: npm test -- theme',
+        '',
+        '## 1. Theme persistence',
+        '- TDD Class: behavior-change',
+        '- Requirement Coverage: Theme preference persistence',
+        '- Implementation Evidence:',
+        '  - src/theme/provider.ts',
+        '- Verification: npm test -- theme',
+        '- [x] RED: add failing theme persistence test',
+        '- [x] GREEN: implement theme provider persistence',
+        '- [x] VERIFY: run theme provider test'
+      ].join('\n'),
+      'specs/theme/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Theme preference persistence',
+        'The system SHALL persist theme preference across sessions.',
+        '',
+        '#### Scenario: Saved theme restored',
+        '- **WHEN** the user returns',
+        '- **THEN** the saved theme preference is restored'
+      ].join('\n')
+    });
+    const now = new Date().toISOString();
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'IMPLEMENTED',
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        specSplit: { status: 'PASS', updatedAt: now },
+        spec: { status: 'PASS', updatedAt: now },
+        task: { status: 'PASS', updatedAt: now },
+        execution: { status: 'PASS', updatedAt: now }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Theme persistence',
+        verificationCommand: 'npm test -- theme',
+        verificationResult: 'PASS',
+        changedFiles: ['src/theme/provider.ts'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Implemented Theme preference persistence.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['src/theme/**'],
+      forbiddenPaths: []
+    });
+
+    function git(args) {
+      const result = spawnSync('git', args, { cwd: repoRoot, encoding: 'utf8' });
+      assert.strictEqual(result.status, 0, result.stderr || result.stdout);
+    }
+
+    git(['init']);
+    git(['add', '.']);
+    git(['-c', 'user.name=OpsX Tests', '-c', 'user.email=opsx-tests@example.com', 'commit', '-m', 'baseline']);
+    writeText(path.join(repoRoot, 'src', 'theme', 'provider.ts'), 'export const theme = "dark";\n');
+    writeText(path.join(changeDir, 'context.md'), '# Context Capsule\n\nUpdated after execution.\n');
+    const stateAfterBaseline = loadChangeState(changeDir);
+    writeChangeState(changeDir, Object.assign({}, stateAfterBaseline, {
+      warnings: ['Bookkeeping warning after execution checkpoint']
+    }));
+
+    const consistency = evaluateImplementationConsistency({ changeDir, repoRoot });
+    const consistencyCodes = new Set(consistency.findings.map((finding) => finding.code));
+    assert(!consistencyCodes.has('unlogged-git-changes'));
+    assert.strictEqual(consistency.status, 'PASS');
+
+    const gate = evaluateVerifyGate({ changeDir, repoRoot });
+    const gateCodes = new Set(gate.findings.map((finding) => finding.code));
+    assert(!gateCodes.has('unlogged-git-changes'));
+    assert.strictEqual(gate.status, 'PASS');
+    assert(gate.pathScope.workflowArtifactMatches.includes(`.opsx/changes/${changeName}/state.yaml`));
+    assert(gate.pathScope.workflowArtifactMatches.includes(`.opsx/changes/${changeName}/context.md`));
+  });
+
+  test('changed-file evidence blocks git changes when verification logs omit changedFiles', () => {
+    const { evaluateImplementationConsistency } = require('../lib/implementation-consistency');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const { writeChangeState } = require('../lib/change-store');
+    const repoRoot = createFixtureRepo();
+    cleanupTargets.push(repoRoot);
+    writeText(path.join(repoRoot, 'src', 'theme', 'provider.ts'), 'export const theme = "light";\n');
+    const changeName = 'implementation-consistency-omitted-changed-files';
+    const changeDir = createChange(repoRoot, changeName, {
+      'proposal.md': [
+        '## Why',
+        'Need theme preference persistence.',
+        '## What Changes',
+        '- Persist theme preference across sessions.'
+      ].join('\n'),
+      'design.md': [
+        '## Context',
+        'Theme preference persistence.',
+        '## Approach',
+        '- Store preference through the theme provider.'
+      ].join('\n'),
+      'tasks.md': [
+        '## Test Plan',
+        '- Verification: npm test -- theme',
+        '',
+        '## 1. Theme persistence',
+        '- TDD Class: behavior-change',
+        '- Requirement Coverage: Theme preference persistence',
+        '- Implementation Evidence:',
+        '  - src/theme/provider.ts',
+        '- Verification: npm test -- theme',
+        '- [x] RED: add failing theme persistence test',
+        '- [x] GREEN: implement theme provider persistence',
+        '- [x] VERIFY: run theme provider test'
+      ].join('\n'),
+      'specs/theme/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Theme preference persistence',
+        'The system SHALL persist theme preference across sessions.',
+        '',
+        '#### Scenario: Saved theme restored',
+        '- **WHEN** the user returns',
+        '- **THEN** the saved theme preference is restored'
+      ].join('\n')
+    });
+    const now = new Date().toISOString();
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'IMPLEMENTED',
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        specSplit: { status: 'PASS', updatedAt: now },
+        spec: { status: 'PASS', updatedAt: now },
+        task: { status: 'PASS', updatedAt: now },
+        execution: { status: 'PASS', updatedAt: now }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Theme persistence',
+        verificationCommand: 'npm test -- theme',
+        verificationResult: 'PASS',
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Implemented Theme preference persistence.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['src/theme/**'],
+      forbiddenPaths: []
+    });
+
+    function git(args) {
+      const result = spawnSync('git', args, { cwd: repoRoot, encoding: 'utf8' });
+      assert.strictEqual(result.status, 0, result.stderr || result.stdout);
+    }
+
+    git(['init']);
+    git(['add', '.']);
+    git(['-c', 'user.name=OpsX Tests', '-c', 'user.email=opsx-tests@example.com', 'commit', '-m', 'baseline']);
+    writeText(path.join(repoRoot, 'src', 'theme', 'provider.ts'), 'export const theme = "dark";\n');
+
+    const consistency = evaluateImplementationConsistency({ changeDir, repoRoot });
+    const consistencyFinding = consistency.findings.find((finding) => finding.code === 'unlogged-git-changes');
+    assert(consistencyFinding, 'Expected omitted changedFiles to block unlogged git changes.');
+    assert.strictEqual(consistencyFinding.severity, 'BLOCK');
+    assert.deepStrictEqual(consistencyFinding.patchTargets, ['src/theme/provider.ts']);
+
+    const explicitEvidence = evaluateImplementationConsistency({
+      changeDir,
+      repoRoot,
+      changedFiles: ['./src/../src/theme/provider.ts']
+    });
+    assert(!explicitEvidence.findings.some((finding) => finding.code === 'unlogged-git-changes'));
+    assert.strictEqual(explicitEvidence.status, 'PASS');
+  });
+
+  test('changed-file evidence scopes git diff to nested OpsX workspace root', () => {
+    const { evaluateVerifyGate } = require('../lib/verify');
+    const { evaluateImplementationConsistency } = require('../lib/implementation-consistency');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const { writeChangeState } = require('../lib/change-store');
+    const outerRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'openspec-nested-git-'));
+    const repoRoot = path.join(outerRoot, 'packages', 'app');
+    cleanupTargets.push(outerRoot);
+
+    copyDir(path.join(REPO_ROOT, 'schemas'), path.join(repoRoot, 'schemas'));
+    copyDir(path.join(REPO_ROOT, 'skills'), path.join(repoRoot, 'skills'));
+    ensureDir(path.join(repoRoot, '.opsx', 'changes'));
+    writeText(path.join(repoRoot, '.opsx', 'config.yaml'), [
+      'schema: spec-driven',
+      'language: en',
+      'context: Nested runtime fixture project',
+      'securityReview:',
+      '  mode: heuristic',
+      '  required: false',
+      '  allowWaiver: true'
+    ].join('\n'));
+    writeText(path.join(repoRoot, 'src', 'theme', 'provider.ts'), 'export const theme = "light";\n');
+    writeText(path.join(outerRoot, 'packages', 'sibling', 'notes.txt'), 'baseline sibling note\n');
+
+    const changeName = 'implementation-consistency-nested-git';
+    const changeDir = createChange(repoRoot, changeName, {
+      'proposal.md': [
+        '## Why',
+        'Need nested git workspace path handling.',
+        '## What Changes',
+        '- Persist theme preference across sessions.'
+      ].join('\n'),
+      'design.md': [
+        '## Context',
+        'Nested git workspace path handling.',
+        '## Approach',
+        '- Scope git diff collection to the OpsX workspace root.'
+      ].join('\n'),
+      'tasks.md': [
+        '## Test Plan',
+        '- Verification: npm test -- theme',
+        '',
+        '## 1. Theme persistence',
+        '- TDD Class: behavior-change',
+        '- Requirement Coverage: Nested git workspace path handling',
+        '- Implementation Evidence:',
+        '  - src/theme/provider.ts',
+        '- Verification: npm test -- theme',
+        '- [x] RED: add nested git path regression',
+        '- [x] GREEN: scope changed file collection',
+        '- [x] VERIFY: run workflow gate tests'
+      ].join('\n'),
+      'specs/theme/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Nested git workspace path handling',
+        'The system SHALL compare changed files relative to the OpsX workspace root.',
+        '',
+        '#### Scenario: Workspace nested in a larger git repository',
+        '- **WHEN** sibling directories also have git changes',
+        '- **THEN** verify only evaluates files under the OpsX workspace root'
+      ].join('\n')
+    });
+    const now = new Date().toISOString();
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'IMPLEMENTED',
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        specSplit: { status: 'PASS', updatedAt: now },
+        spec: { status: 'PASS', updatedAt: now },
+        task: { status: 'PASS', updatedAt: now },
+        execution: { status: 'PASS', updatedAt: now }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Theme persistence',
+        verificationCommand: 'npm test -- theme',
+        verificationResult: 'PASS',
+        changedFiles: ['./src/../src/theme/provider.ts'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Implemented nested git workspace path handling.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['src/theme/**'],
+      forbiddenPaths: []
+    });
+
+    function git(args) {
+      const result = spawnSync('git', args, { cwd: outerRoot, encoding: 'utf8' });
+      assert.strictEqual(result.status, 0, result.stderr || result.stdout);
+    }
+
+    git(['init']);
+    git(['add', '.']);
+    git(['-c', 'user.name=OpsX Tests', '-c', 'user.email=opsx-tests@example.com', 'commit', '-m', 'baseline']);
+    writeText(path.join(repoRoot, 'src', 'theme', 'provider.ts'), 'export const theme = "dark";\n');
+    writeText(path.join(outerRoot, 'packages', 'sibling', 'notes.txt'), 'changed sibling note\n');
+
+    const consistency = evaluateImplementationConsistency({ changeDir, repoRoot });
+    const consistencyCodes = new Set(consistency.findings.map((finding) => finding.code));
+    assert.strictEqual(consistency.status, 'PASS');
+    assert(!consistencyCodes.has('unlogged-git-changes'));
+    assert(!consistencyCodes.has('out-of-scope-change'));
+    assert.strictEqual(consistency.result.changedFilesSource, 'verificationLog+git');
+
+    const gate = evaluateVerifyGate({ changeDir, repoRoot });
+    const gateCodes = new Set(gate.findings.map((finding) => finding.code));
+    assert.strictEqual(gate.status, 'PASS');
+    assert(!gateCodes.has('unlogged-git-changes'));
+    assert(!gateCodes.has('out-of-scope-change'));
+    assert(gate.pathScope.changedFiles.includes('src/theme/provider.ts'));
+    assert(!gate.pathScope.changedFiles.includes('packages/app/src/theme/provider.ts'));
+    assert(!gate.pathScope.changedFiles.includes('packages/sibling/notes.txt'));
+  });
+
+  test('migrated implemented changes warn on missing spec-split checkpoint history', () => {
+    const { evaluateImplementationConsistency } = require('../lib/implementation-consistency');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const { writeChangeState } = require('../lib/change-store');
+    const changeName = 'migrated-spec-split-refresh';
+    const changeDir = createChange(fixtureRoot, changeName, {
+      'proposal.md': [
+        '## Why',
+        'Need migrated checkpoint tolerance.',
+        '## What Changes',
+        '- Preserve migrated change verification without hiding refresh work.'
+      ].join('\n'),
+      'design.md': [
+        '## Context',
+        'Migrated checkpoint tolerance.',
+        '## Approach',
+        '- Treat missing spec split history as refresh warning.'
+      ].join('\n'),
+      'tasks.md': [
+        '## 1. Migrated checkpoint tolerance',
+        '- TDD Class: migration-only',
+        '- Requirement Coverage: Migrated checkpoint tolerance',
+        '- Implementation Evidence:',
+        '  - lib/implementation-consistency.js',
+        '- Verification: npm run test:workflow-runtime',
+        '- [x] GREEN: add migration tolerance behavior',
+        '- [x] VERIFY: run workflow runtime tests'
+      ].join('\n'),
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Migrated checkpoint tolerance',
+        'The system SHALL surface missing migrated spec-split history as refresh work.',
+        '',
+        '#### Scenario: Migrated spec split missing',
+        '- **WHEN** an implemented migrated change lacks spec-split checkpoint history',
+        '- **THEN** implementation consistency warns without hiding later blockers'
+      ].join('\n')
+    });
+    const now = new Date().toISOString();
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'IMPLEMENTED',
+      migration: {
+        migrated: true,
+        checkpointRefreshRequired: true,
+        source: 'openspec',
+        migratedAt: now
+      },
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        specSplit: { status: 'PENDING', updatedAt: null },
+        spec: { status: 'PASS', updatedAt: now },
+        task: { status: 'PASS', updatedAt: now },
+        execution: { status: 'PASS', updatedAt: now }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Migrated checkpoint tolerance',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        changedFiles: ['lib/implementation-consistency.js'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['GREEN', 'VERIFY'],
+        diffSummary: 'Implemented Migrated checkpoint tolerance.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['lib/**']
+    });
+
+    const result = evaluateImplementationConsistency({
+      changeDir,
+      changedFiles: ['lib/implementation-consistency.js']
+    });
+    assert.strictEqual(result.status, 'WARN');
+    assert(result.findings.some((finding) => finding.code === 'migrated-change-needs-checkpoint-refresh'));
+    assert(!result.findings.some((finding) => finding.code === 'checkpoint-not-accepted'));
   });
 
   test('verify gate deep merges global project and change gate policy', () => {
@@ -692,6 +1452,8 @@ function registerTests(test, helpers) {
       'tasks.md': [
         '## 1. Behavior change verification',
         '- Requirement Coverage: Verify acceptance transition',
+        '- Implementation Evidence:',
+        '  - lib/verify.js',
         '- [x] RED: add failing gate test',
         '- [x] GREEN: implement gate check',
         '- [x] VERIFY: run workflow runtime tests'
@@ -856,6 +1618,49 @@ function registerTests(test, helpers) {
     assert.strictEqual(fs.readFileSync(canonicalPath, 'utf8'), canonicalBefore);
   });
 
+  test('applySyncPlan restores completed writes when a later write fails', () => {
+    const { applySyncPlan } = require('../lib/sync');
+    const canonicalSpecsDir = path.join(fixtureRoot, '.opsx', 'specs');
+    const runtimeSpecPath = path.join(canonicalSpecsDir, 'runtime', 'spec.md');
+    const brokenTargetPath = path.join(canonicalSpecsDir, 'broken-target');
+    const canonicalBefore = [
+      '## ADDED Requirements',
+      '### Requirement: Runtime rollback',
+      'The system SHALL preserve existing specs when a later sync write fails.'
+    ].join('\n');
+    writeText(runtimeSpecPath, canonicalBefore);
+    ensureDir(brokenTargetPath);
+
+    assert.throws(() => applySyncPlan({
+      status: 'PASS',
+      repoRoot: fixtureRoot,
+      canonicalSpecsDir,
+      findings: [],
+      writes: [
+        {
+          relativePath: 'runtime/spec.md',
+          targetPath: runtimeSpecPath,
+          content: `${canonicalBefore}\nUpdated content that must roll back.\n`
+        },
+        {
+          relativePath: 'broken-target',
+          targetPath: brokenTargetPath,
+          content: 'This write fails because the target is a directory.\n'
+        }
+      ]
+    }));
+
+    assert.strictEqual(fs.readFileSync(runtimeSpecPath, 'utf8'), canonicalBefore);
+    assert.deepStrictEqual(
+      fs.readdirSync(path.dirname(runtimeSpecPath)).filter((entry) => entry.startsWith('.spec.md.')),
+      []
+    );
+    assert.deepStrictEqual(
+      fs.readdirSync(canonicalSpecsDir).filter((entry) => entry.startsWith('.broken-target.')),
+      []
+    );
+  });
+
   test('sync plan blocks omitted canonical requirements and conflicting normative language', () => {
     const { planSync } = require('../lib/sync');
     const changeName = 'sync-plan-omission-conflict';
@@ -949,8 +1754,115 @@ function registerTests(test, helpers) {
     const accepted = acceptSyncPlan(changeDir, applied);
     assert.strictEqual(accepted.stage, 'SYNCED');
     assert.strictEqual(accepted.nextAction, 'archive');
+    assert.deepStrictEqual(accepted.sync.canonicalOutputs, ['.opsx/specs/runtime/spec.md']);
     assert.deepStrictEqual(accepted.hashes, hashTrackedArtifacts(changeDir));
     assert.strictEqual(loadChangeState(changeDir).stage, 'SYNCED');
+  });
+
+  test('archive gate allows accepted canonical sync outputs left in git diff', () => {
+    const { evaluateArchiveGate, archiveChange } = require('../lib/archive');
+    const { planSync, applySyncPlan, acceptSyncPlan } = require('../lib/sync');
+    const { writeChangeState, writeActiveChangePointer, loadChangeState } = require('../lib/change-store');
+    const { hashTrackedArtifacts } = require('../lib/change-artifacts');
+    const repoRoot = createFixtureRepo();
+    cleanupTargets.push(repoRoot);
+    const changeName = 'archive-accepted-sync-output';
+    const now = new Date().toISOString();
+    const changeDir = createChange(repoRoot, changeName, {
+      'proposal.md': '# Proposal\n',
+      'design.md': '# Design\n',
+      'tasks.md': [
+        '## Test Plan',
+        '- Verification: npm run test:workflow-runtime',
+        '',
+        '## 1. Archive accepted sync output',
+        '- TDD Class: behavior-change',
+        '- [x] RED: add archive gate sync-output regression',
+        '- [x] GREEN: exempt accepted canonical sync output',
+        '- [x] VERIFY: run workflow gate tests'
+      ].join('\n'),
+      'specs/runtime/spec.md': [
+        '## ADDED Requirements',
+        '### Requirement: Accepted sync output archive',
+        'The system SHALL allow accepted sync output during archive.',
+        '',
+        '#### Scenario: Synced canonical output remains in git diff',
+        '- **WHEN** archive runs after sync acceptance',
+        '- **THEN** canonical spec output is not treated as unlogged implementation work'
+      ].join('\n')
+    });
+    writeText(path.join(repoRoot, '.opsx', 'specs', 'runtime', 'spec.md'), [
+      '## ADDED Requirements',
+      '### Requirement: Accepted sync output archive',
+      'The system SHALL keep baseline archive sync behavior.',
+      '',
+      '#### Scenario: Baseline sync behavior',
+      '- **WHEN** canonical specs are read',
+      '- **THEN** baseline behavior remains defined'
+    ].join('\n'));
+    writeText(path.join(changeDir, 'drift.md'), [
+      '# Drift Log',
+      '',
+      '## New Assumptions',
+      '',
+      '## Scope Changes',
+      '',
+      '## Out-of-Bound File Changes',
+      '',
+      '## Discovered Requirements',
+      '',
+      '## User Approval Needed',
+      ''
+    ].join('\n'));
+    writeChangeState(changeDir, {
+      change: changeName,
+      stage: 'VERIFIED',
+      hashes: hashTrackedArtifacts(changeDir),
+      checkpoints: {
+        execution: {
+          status: 'PASS',
+          updatedAt: now
+        }
+      },
+      verificationLog: [{
+        at: now,
+        taskGroup: '1. Archive accepted sync output',
+        verificationCommand: 'npm run test:workflow-runtime',
+        verificationResult: 'PASS',
+        changedFiles: ['specs/runtime/spec.md'],
+        checkpointStatus: 'PASS',
+        completedSteps: ['RED', 'GREEN', 'VERIFY'],
+        diffSummary: 'Archive accepted sync output regression proof.',
+        driftStatus: 'clean'
+      }],
+      allowedPaths: ['specs/**', '.opsx/specs/**'],
+      forbiddenPaths: ['*.pem']
+    });
+    writeActiveChangePointer(repoRoot, changeName);
+
+    function git(args) {
+      const result = spawnSync('git', args, { cwd: repoRoot, encoding: 'utf8' });
+      assert.strictEqual(result.status, 0, result.stderr || result.stdout);
+      return result.stdout || '';
+    }
+
+    git(['init']);
+    git(['add', '.']);
+    git(['-c', 'user.name=OpsX Tests', '-c', 'user.email=opsx-tests@example.com', 'commit', '-m', 'baseline']);
+
+    const applied = applySyncPlan(planSync({ changeDir, repoRoot }));
+    assert.strictEqual(applied.status, 'PASS');
+    const synced = acceptSyncPlan(changeDir, applied);
+    assert.deepStrictEqual(synced.sync.canonicalOutputs, ['.opsx/specs/runtime/spec.md']);
+    assert(git(['diff', '--name-only']).split(/\r?\n/).includes('.opsx/specs/runtime/spec.md'));
+
+    const gate = evaluateArchiveGate({ changeDir, repoRoot });
+    assert(!gate.findings.some((finding) => finding.code === 'unlogged-git-changes'));
+    assert.notStrictEqual(gate.status, 'BLOCK');
+
+    const archived = archiveChange({ changeDir, repoRoot });
+    assert.strictEqual(archived.status, 'PASS');
+    assert.strictEqual(loadChangeState(archived.archivedChangeDir).stage, 'ARCHIVED');
   });
 
   test('archive gate blocks unsafe verify and sync prerequisites', () => {
@@ -1595,10 +2507,19 @@ function registerTests(test, helpers) {
   });
 
   test('writeTextAtomic persists full file contents', () => {
-    const { writeTextAtomic } = require('../lib/fs-utils');
+    const { createTempSiblingPath, writeTextAtomic } = require('../lib/fs-utils');
     const atomicPath = path.join(fixtureRoot, '.opsx', 'changes', 'atomic-write.txt');
+    const firstTempPath = createTempSiblingPath(atomicPath, 'tmp');
+    const secondTempPath = createTempSiblingPath(atomicPath, 'tmp');
+    assert.notStrictEqual(firstTempPath, secondTempPath);
+    assert.strictEqual(path.dirname(firstTempPath), path.dirname(atomicPath));
+    assert(path.basename(firstTempPath).startsWith('.atomic-write.txt.'));
     writeTextAtomic(atomicPath, 'phase4-atomic-write\n');
     assert.strictEqual(fs.readFileSync(atomicPath, 'utf8'), 'phase4-atomic-write\n');
+    assert.strictEqual(
+      fs.readdirSync(path.dirname(atomicPath)).some((entry) => entry.startsWith('.atomic-write.txt.')),
+      false
+    );
   });
 
   test('createChangeSkeleton writes scaffold only and keeps INIT lifecycle state', () => {
@@ -1916,6 +2837,7 @@ function registerTests(test, helpers) {
     });
 
     const findings = reviewSpecSplitEvidence(evidence);
+    const strictFindings = reviewSpecSplitEvidence(evidence, { duplicateBehaviorThreshold: 1.01 });
     const duplicateIdFinding = findings.find((finding) => finding.code === 'duplicate-requirement-id');
     const duplicateBehaviorFinding = findings.find((finding) => finding.code === 'duplicate-behavior-likely');
 
@@ -1924,6 +2846,7 @@ function registerTests(test, helpers) {
 
     assert(duplicateBehaviorFinding, 'Expected likely duplicate behavior finding.');
     assert.deepStrictEqual(duplicateBehaviorFinding.patchTargets, ['specs/auth/spec.md', 'specs/billing/spec.md']);
+    assert(!strictFindings.some((finding) => finding.code === 'duplicate-behavior-likely'));
   });
 
   test('spec validator flags conflicting requirements', () => {
@@ -2317,6 +3240,31 @@ function registerTests(test, helpers) {
     ].forEach((heading) => {
       assert(capsule.includes(heading), `Expected context capsule heading ${heading}`);
     });
+    assert(capsule.includes('UNCONFIRMED'));
+
+    const boundedCapsule = renderContextCapsule({
+      stage: 'APPLYING_GROUP',
+      active: {
+        taskGroup: '1. Oversized context'
+      },
+      warnings: Array.from({ length: 160 }, (_, index) => `Warning ${index + 1}`),
+      verificationLog: [{
+        at: '2026-04-27T01:02:03.000Z',
+        taskGroup: '1. Oversized context',
+        verificationCommand: 'manual',
+        verificationResult: 'PASS',
+        changedFiles: Array.from({ length: 60 }, (_, index) => `src/file-${index + 1}.js`),
+        checkpointStatus: 'PASS',
+        diffSummary: Array.from({ length: 80 }, () => 'long summary').join(' ')
+      }],
+      hashes: Array.from({ length: 80 }, (_, index) => [`src/file-${index + 1}.js`, `hash-${index + 1}`])
+        .reduce((output, [key, value]) => {
+          output[key] = value;
+          return output;
+        }, {})
+    });
+    assert(boundedCapsule.split(/\r?\n/).length <= 121);
+    assert(boundedCapsule.includes('Content truncated to keep context capsule bounded.'));
 
     appendDriftLedger(driftPath, [
       { section: 'newAssumptions', text: 'Assumed runtime fixtures remain deterministic.' },

@@ -24,6 +24,12 @@
 - 2026-04-29 [CODE] Phase 8 post-fix code review is clean: `08-REVIEW.md` has 0 findings across 22 files, and `npm test` passed 128/128.
 - 2026-04-29 [CODE] User-reported OpsX drift is remediated: AGENTS/generation tests reject old OpenSpec paths, resume routes use `continue` + `nextArtifact`, task execution advances lifecycle, and `opsx-new` avoids placeholder planning artifacts.
 - 2026-04-29 [CODE] Verify acceptance now re-evaluates and records `implementation-consistency-checkpoint` for `IMPLEMENTED` changes; task-group execution also starts queued `GROUP_VERIFIED` groups before completing them.
+- 2026-04-29 [CODE] Review follow-up hardens implementation consistency: changed files are normalized explicit + verificationLog + workspace-scoped git diff, unlogged git changes block while ignoring workflow bookkeeping artifacts, non-repository Git probes alone are silent, real Git probe failures warn, `GROUP_VERIFIED` without `nextTaskGroup` routes to verify, migrated changes carry checkpoint refresh state, task evidence fields are explicit, and context capsules are bounded.
+- 2026-04-29 [CODE] Review-report remediation fixed finding dedupe granularity, repo-root discovery, YAML null/array serialization, duplicate drift aliases, shared STOPWORDS, task-group lifecycle guarding, and shared gate utilities.
+- 2026-04-29 [CODE] Second review pass removed local finding/spec/path utility drift, unified `lib/yaml.js` onto the `yaml` package, randomized atomic temp paths, improved Git-missing diagnostics, allowed manifest root entries, and added sync rollback/path symlink coverage.
+- 2026-04-29 [CODE] Non-split optimization pass added chunked artifact hashing, migration journal rollback, structured debug logging, localized CLI message catalog, and optional-read TOCTOU guards.
+- 2026-04-29 [CODE] Migration rollback now removes empty canonical parent directories created during failed moves, so a failed `opsx migrate` can be retried after journal cleanup.
+- 2026-04-29 [CODE] Accepted sync outputs are now recorded in state and exempted from unlogged git-change blocking, so normal `SYNCED` -> archive flow tolerates `.opsx/specs/**` git diffs produced by sync.
 
 ## Done (recent)
 - 2026-04-28 [CODE] Executed all Phase 7 plans `07-01` through `07-08`.
@@ -42,6 +48,10 @@
 - 2026-04-29 [CODE] Ran `$gsd-secure-phase 8`; `08-SECURITY.md` was created with all planned threats closed and no accepted risks.
 - 2026-04-29 [CODE] Ran `$gsd-code-review-fix 8`; commits `7e8d336` and `1a12a2f` fixed both Phase 8 review warnings and created `08-REVIEW-FIX.md`.
 - 2026-04-29 [CODE] Re-ran `$gsd-code-review 8`; the updated `08-REVIEW.md` reports `status: clean`.
+- 2026-04-29 [CODE] Implemented review follow-up fixes for changed-files union, unlogged git diff blocking, deleted-file coverage, migrated checkpoint refresh warnings, explicit implementation evidence, and bounded context capsules.
+- 2026-04-29 [CODE] Remediated user-supplied review report findings across verify/sync/archive/implementation consistency, YAML, lifecycle state, shared text/finding/spec/repo-root utilities, and regression tests.
+- 2026-04-29 [CODE] Remediated second user-supplied re-review with finding adder factory usage, shared path normalization, YAML package wrapper, randomized atomic/sync temp files, install-root manifest cleanup fix, Git ENOENT diagnostics, configurable duplicate-behavior threshold, and rollback/symlink regression tests.
+- 2026-04-29 [CODE] Completed remaining non-large-file optimizations: chunked SHA-256 hashing, migration journal rollback/recovery, verbose JSON-line diagnostics, CLI message catalog, and optional file-read hardening.
 
 ## Working set
 - /Users/xubo/x-skills/openspec/.planning/ROADMAP.md
@@ -103,6 +113,12 @@
 - 2026-04-29 [TOOL] Phase 8 post-fix review superseded the warning report; current `08-REVIEW.md` is `status: clean` with critical/warning/info/total all 0.
 - 2026-04-29 [TOOL] Drift-remediation verification: `npm test` passed 131/131 after AGENTS, lifecycle, scaffold, path-scope, drift-ledger, and implementation-consistency changes.
 - 2026-04-29 [TOOL] Review-fix verification: `node scripts/test-workflow-gates.js` passed 86/86 and `npm test` passed 133/133 after hardening verify acceptance and `GROUP_VERIFIED` task-group execution.
+- 2026-04-29 [TOOL] Review follow-up verification: `node scripts/test-workflow-gates.js` passed 92/92 and `npm test` passed 139/139 after fixing changed-file path normalization, workflow artifact filtering, omitted `changedFiles` blocking, nested Git workspace scoping, and Git probe failure warnings.
+- 2026-04-29 [TOOL] Review-report remediation verification: `node scripts/test-workflow-gates.js` passed 95/95 and `npm test` passed 142/142.
+- 2026-04-29 [TOOL] Second re-review remediation verification: `node scripts/test-workflow-paths.js` passed 18/18, `node scripts/test-workflow-package.js` passed 11/11, `node scripts/test-workflow-gates.js` passed 97/97, and `npm test` passed 146/146.
+- 2026-04-29 [TOOL] Non-split optimization verification: `node scripts/test-workflow-paths.js` passed 18/18, `node scripts/test-workflow-package.js` passed 12/12, `node scripts/test-workflow-state.js` passed 14/14, `node scripts/test-workflow-gates.js` passed 97/97, and `npm test` passed 148/148.
+- 2026-04-29 [TOOL] Migration rollback retry fix verification: `node scripts/test-workflow-state.js` passed 14/14 and `npm test` passed 148/148.
+- 2026-04-29 [TOOL] Sync-output archive fix verification: `node scripts/test-workflow-gates.js` passed 98/98 and `npm test` passed 149/149.
 - 2026-04-28 [TOOL] `gsd-sdk query verify.schema-drift 07` returned valid with 0 issues across 8 checked plans.
 - 2026-04-28 [TOOL] Phase 7 verification report committed as `f32d323` with `status: passed` and 4/4 must-haves verified.
 - 2026-04-28 [TOOL] `workflow.security_enforcement` is true; no `07-SECURITY.md` exists yet, so run `$gsd-secure-phase 7` before advancing if a dedicated security gate is required.

@@ -73,6 +73,11 @@ Rules:
 
 ## 1. Enforce task-checkpoint TDD markers
 - TDD Class: behavior-change
+- Requirement Coverage: TDD-02 behavior-change groups expose deterministic TDD markers.
+- Implementation Evidence:
+  - lib/workflow.js
+  - scripts/test-workflow-gates.js
+- Verification: Run `npm run test:workflow-runtime` and record PASS/WARN/BLOCK output.
 - [ ] RED: Add a failing runtime test for missing VERIFY evidence.
 - [ ] GREEN: Implement checkpoint updates so the RED test passes.
 - [ ] REFACTOR: Optional cleanup that preserves passing tests.
@@ -80,6 +85,11 @@ Rules:
 
 ## 2. Refresh docs-only wording
 - TDD Exemption: docs-only — wording-only updates with no behavior logic change.
+- Requirement Coverage: Guidance artifacts describe the shipped TDD-light contract.
+- Implementation Evidence:
+  - commands/
+  - skills/opsx/references/
+- Verification: Run `npm run test:workflow-runtime` to ensure no runtime regressions.
 - [ ] Update wording in guidance artifacts for the shipped TDD-light contract.
 - [ ] VERIFY: Run `npm run test:workflow-runtime` to ensure no runtime regressions.
 ```

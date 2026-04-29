@@ -10,6 +10,7 @@ function registerTests(test, helpers) {
     const expectedExports = [
       'toPosixPath',
       'normalizeRelativePath',
+      'normalizePathArray',
       'relativeToBase',
       'realpathIfExists',
       'ensureWithinRealBase',
@@ -25,6 +26,7 @@ function registerTests(test, helpers) {
     const {
       toPosixPath,
       normalizeRelativePath,
+      normalizePathArray,
       relativeToBase,
       realpathIfExists,
       ensureWithinRealBase,
@@ -38,6 +40,10 @@ function registerTests(test, helpers) {
 
     assert.strictEqual(toPosixPath('a\\b\\c.md'), 'a/b/c.md');
     assert.strictEqual(normalizeRelativePath('./specs//demo\\spec.md'), 'specs/demo/spec.md');
+    assert.deepStrictEqual(normalizePathArray(['./specs//demo\\spec.md', '', '/absolute.md']), [
+      'specs/demo/spec.md',
+      'absolute.md'
+    ]);
     assert.strictEqual(relativeToBase(repoRoot, nestedPath), 'specs/demo/spec.md');
     assert.strictEqual(realpathIfExists(nestedPath), path.resolve(nestedPath));
     assert.strictEqual(isWithinBase(repoRoot, nestedPath), true);
@@ -50,6 +56,21 @@ function registerTests(test, helpers) {
       () => ensureWithinBase(repoRoot, outsidePath, 'repo root'),
       /outside repo root/
     );
+  });
+
+  test('path-utils containment handles symlinks with missing descendants', () => {
+    const { isWithinBase } = require('../lib/path-utils');
+    const realRoot = path.join(fixtureRoot, 'path-real-root');
+    const symlinkRoot = path.join(fixtureRoot, 'path-symlink-root');
+    const outsideRoot = path.join(fixtureRoot, 'path-outside-root');
+    const symlinkOutside = path.join(realRoot, 'linked-outside');
+    fs.mkdirSync(realRoot, { recursive: true });
+    fs.mkdirSync(outsideRoot, { recursive: true });
+    fs.symlinkSync(realRoot, symlinkRoot, 'dir');
+    fs.symlinkSync(outsideRoot, symlinkOutside, 'dir');
+
+    assert.strictEqual(isWithinBase(realRoot, path.join(symlinkRoot, 'missing', 'file.txt')), true);
+    assert.strictEqual(isWithinBase(realRoot, path.join(symlinkOutside, 'missing', 'file.txt')), false);
   });
 
   test('glob-utils exports shared picomatch wrappers', () => {
@@ -194,7 +215,8 @@ function registerTests(test, helpers) {
   });
 
   test('change-artifacts hashes tracked Phase 4 artifacts deterministically', () => {
-    const { hashTrackedArtifacts, detectArtifactHashDrift } = require('../lib/change-artifacts');
+    const { createHash } = require('crypto');
+    const { hashFileSha256, hashTrackedArtifacts, detectArtifactHashDrift } = require('../lib/change-artifacts');
     const changeName = 'tracked-artifact-hash';
     const changeDir = createChange(fixtureRoot, changeName, {
       'proposal.md': '# Proposal\n',
@@ -208,7 +230,12 @@ function registerTests(test, helpers) {
 
     const first = hashTrackedArtifacts(changeDir);
     const second = hashTrackedArtifacts(changeDir);
+    const expectedProposalHash = createHash('sha256')
+      .update(fs.readFileSync(path.join(changeDir, 'proposal.md')))
+      .digest('hex');
     assert.deepStrictEqual(first, second);
+    assert.strictEqual(hashFileSha256(path.join(changeDir, 'proposal.md')), expectedProposalHash);
+    assert.strictEqual(first['proposal.md'], expectedProposalHash);
     assert.deepStrictEqual(Object.keys(first), [
       'design.md',
       'proposal.md',

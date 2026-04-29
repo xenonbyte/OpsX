@@ -73,6 +73,11 @@ The system SHALL ...
 
 ## 1. 强化 task-checkpoint 的 TDD 标记
 - TDD Class: behavior-change
+- Requirement Coverage: TDD-02 behavior-change 任务组必须暴露可机读的 TDD 标记。
+- Implementation Evidence:
+  - lib/workflow.js
+  - scripts/test-workflow-gates.js
+- Verification: 运行 `npm run test:workflow-runtime` 并记录 PASS/WARN/BLOCK 结果。
 - [ ] RED: 增加一个缺少 VERIFY 证据时应失败的 runtime 测试。
 - [ ] GREEN: 实现 checkpoint 逻辑更新，让 RED 测试通过。
 - [ ] REFACTOR: 可选清理，且必须保持测试通过。
@@ -80,6 +85,11 @@ The system SHALL ...
 
 ## 2. 更新 docs-only 文案
 - TDD Exemption: docs-only — 仅文案修改，不涉及行为逻辑变更。
+- Requirement Coverage: guidance 工件描述已落地的 TDD-light 规则。
+- Implementation Evidence:
+  - commands/
+  - skills/opsx/references/
+- Verification: 运行 `npm run test:workflow-runtime`，确认无 runtime 回归。
 - [ ] 更新 guidance 工件文案以匹配已落地的 TDD-light 规则。
 - [ ] VERIFY: 运行 `npm run test:workflow-runtime`，确认无 runtime 回归。
 ```
