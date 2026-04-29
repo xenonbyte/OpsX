@@ -54,3 +54,7 @@ coverage/
 # Local planning artifacts
 .planning/
 .planning/**
+
+# Local agent/session notes
+/AGENTS.md
+/CONTINUITY.md
